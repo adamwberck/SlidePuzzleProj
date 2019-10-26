@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="menutitle" type="id"/>
+    <item name="menuplay" type="id"/>
+    <item name="boardfield" type="id"/>
+</resources>

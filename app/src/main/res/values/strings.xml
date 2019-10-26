@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">SlidePuzzleProj</string>
+    <string name="menu_title">SLIDE PUZZLE</string>
+    <string name="menu_play">PLAY GAME</string>
+</resources>
