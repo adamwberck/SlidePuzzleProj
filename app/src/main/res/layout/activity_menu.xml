@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginLeft="10dp"
+    android:layout_marginRight="10dp">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/menu_title"
+        android:textAllCaps="true"
+        android:textSize="50sp"
+        android:textStyle="bold"
+        android:textColor="@color/menu1"
+        />
+
+    <LinearLayout
+        android:id="@+id/change_image"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/back_border"
+        android:clickable="true"
+        android:focusable="true"
+        >
+        <ImageView
+            android:id="@+id/puzzle_image"
+            android:src="@drawable/ilya"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:scaleType="centerCrop"
+            android:layout_marginTop="2dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            />
+        <TextView
+            android:paddingTop="-2dp"
+            android:layout_marginTop="-2dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginBottom="2dp"
+            android:textColor="@color/menu1"
+            android:textAllCaps="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/change_image"
+            android:textSize="35sp"
+            android:textAlignment="center"
+            />
+    </LinearLayout>
+    <Button
+        android:id="@+id/play_button"
+        android:layout_marginTop="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:layout_gravity="center"
+        android:background="@drawable/back_border"
+        android:text="@string/menu_play"
+        android:textSize="65sp"
+        />
+    <Button
+        android:id="@+id/dimension_button"
+        android:layout_marginTop="40dp"
+        android:padding="10dp"
+        android:background="@drawable/back_border"
+        android:textSize="50sp"
+        android:text="5 X 5"
+        android:textColor="@color/menu1"
+        android:layout_gravity="center"
+        android:textAlignment="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:ignore="HardcodedText" />
+</LinearLayout>
