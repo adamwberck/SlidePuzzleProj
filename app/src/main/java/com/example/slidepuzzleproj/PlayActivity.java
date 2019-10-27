@@ -36,7 +36,6 @@ public class PlayActivity extends Activity {
     private GridLayout playSpace;
     private PuzzleBoard currentBoard;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,7 +45,8 @@ public class PlayActivity extends Activity {
         menu = findViewById(R.id.menuButton);
         timer = findViewById(R.id.time);
         playSpace = findViewById(R.id.playSpace);
-        setupBoard(playSpace, 5, 6);
+        setupBoard(playSpace, getIntent().getIntExtra("WIDTH", 3),
+                            getIntent().getIntExtra("HEIGHT", 3));
     }
     protected void setupBoard(final GridLayout playSpace, int w, int h){
         try {
