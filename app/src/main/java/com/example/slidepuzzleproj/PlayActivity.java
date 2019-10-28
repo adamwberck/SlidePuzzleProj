@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -29,7 +30,11 @@ public class PlayActivity extends Activity {
     private Button tips;
     private Button menu;
     private GridLayout playSpace;
+    private CountDownTimer timerTick;
     private PuzzleBoard currentBoard;
+    private final long ONE_MINUTE = 60000;
+    private final long ONE_SECOND = 1000;
+    private final long PLAY_TIME = 6 * ONE_MINUTE;
     private ImageView[] pieces;
 
     private int width;
@@ -71,6 +76,8 @@ public class PlayActivity extends Activity {
         try {
             Log.i("[DEBUG BOARD]", playSpace.getWidth() + "," + playSpace.getHeight());
 
+            //////////////////////////
+            ////// setting up the bitmap dimension and puzzle board
             DisplayMetrics display = new DisplayMetrics();
             getWindowManager().getDefaultDisplay().getMetrics(display);
 
@@ -92,6 +99,19 @@ public class PlayActivity extends Activity {
             Log.i("[NEW DIMENSION]", newWid+ ", " + newHei);
             bm = Bitmap.createScaledBitmap(bm, newWid, newHei, true);
             currentBoard  = new PuzzleBoard(bm, w, h);
+          
+            ////// setting up ticking timer
+            this.timerTick = new CountDownTimer(PLAY_TIME, ONE_SECOND) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    timer.setText(millisUntilFinished/ONE_MINUTE + ":" + millisUntilFinished%ONE_MINUTE/ONE_SECOND);
+                }
+
+                @Override
+                public void onFinish() {
+
+                }
+            };
 
             //// test code below
             playSpace.setRowCount(h);
@@ -118,6 +138,8 @@ public class PlayActivity extends Activity {
                 }
             }
             ////// end test //////
+
+            this.timerTick.start();
         }
         catch(Exception e)
         {
