@@ -61,17 +61,18 @@
         android:text="@string/menu_play"
         android:textSize="65sp"
         />
+
     <Button
         android:id="@+id/dimension_button"
-        android:layout_marginTop="40dp"
-        android:padding="10dp"
-        android:background="@drawable/back_border"
-        android:textSize="50sp"
-        android:text="5 X 5"
-        android:textColor="@color/menu1"
-        android:layout_gravity="center"
-        android:textAlignment="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="40dp"
+        android:background="@drawable/back_border"
+        android:padding="10dp"
+        android:text="5x5"
+        android:textAlignment="center"
+        android:textColor="@color/menu1"
+        android:textSize="50sp"
         tools:ignore="HardcodedText" />
 </LinearLayout>
