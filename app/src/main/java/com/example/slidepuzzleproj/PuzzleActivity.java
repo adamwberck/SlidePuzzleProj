@@ -21,15 +21,22 @@ import android.widget.TextView;
 
 import java.util.logging.Logger;
 
-public class MainActivity extends Activity {
+public class PuzzleActivity extends Activity {
+
+    private int mDrawableImage = R.drawable.ilya;
+    private ViewGroup mPuzzleArea;
+    private PuzzleBoard mPuzzleBoard;
+
+    private ImageView[] mPieces;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //setupMenu();
+        setContentView(R.layout.activity_puzzle);
+        mPuzzleArea = findViewById(R.id.puzzle_area);
         setupBoard();   /// showing the puzzle board component
-        //setupMenuEvents();
+
+
     }
 
     private void setupMenu()
@@ -98,7 +105,7 @@ public class MainActivity extends Activity {
             getWindowManager().getDefaultDisplay().getMetrics(display);
 
             /// get the initial bitmap
-            Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.knacko);
+            Bitmap bm = BitmapFactory.decodeResource(getResources(), mDrawableImage);
             int newWid = bm.getWidth();
             int newHei = bm.getHeight();
 
@@ -111,7 +118,7 @@ public class MainActivity extends Activity {
 
             }
             else{
-                newHei = min(display.widthPixels, display.heightPixels);
+                newHei = min(display.widthPixels-100, display.heightPixels-100);
                 double ratio = (double)newHei/(double)bm.getHeight();
                 newWid = (int)(newWid * ratio);
             }
@@ -122,7 +129,7 @@ public class MainActivity extends Activity {
 
 
             int w = 7, h = 4;
-            PuzzleBoard puz = new PuzzleBoard(bm, w, h);
+            mPuzzleBoard = new PuzzleBoard(bm, w, h);
 
             //// test code below
             GridLayout boardLayout = new GridLayout(this);
@@ -132,7 +139,7 @@ public class MainActivity extends Activity {
             boardLayout.setBackgroundColor(Color.DKGRAY);
 
             int i = 0;
-            ImageView[] pieces = new ImageView[w*h];
+            mPieces = new ImageView[w*h];
             for(int y = 0; y < h; y++)
             {
                 for(int x = 0; x < w; x++)
@@ -142,23 +149,24 @@ public class MainActivity extends Activity {
                     GridLayout.LayoutParams boardRules = new GridLayout.LayoutParams(row, col);
                     boardRules.setMargins(2,2,2,2);
                     //boardRules.setGravity(Gravity.FILL);
-                    pieces[i] = new ImageView(this);
+                    mPieces[i] = new ImageView(this);
 
-                    if(i != puz.getBlankIndex())
-                        pieces[i].setImageBitmap(puz.getPiece(i).getBitmap());
-                    boardLayout.addView(pieces[i], boardRules);
+                    mPieces[i].setOnClickListener(new PieceListener(i));
+
+                    if(i != mPuzzleBoard.getBlankIndex())
+                        mPieces[i].setImageBitmap(mPuzzleBoard.getPiece(i).getBitmap());
+                    boardLayout.addView(mPieces[i], boardRules);
                     i++;
                 }
             }
 
+            mPuzzleArea.addView(boardLayout);
 
-
-            setContentView(boardLayout);
             ////// end test //////
         }
         catch(Exception e)
         {
-            Log.i("[ERROR]", "Failed to splice bitmap");
+            Log.e("Board", "Failed to splice bitmap");
         }
 
     }
@@ -187,4 +195,15 @@ public class MainActivity extends Activity {
     }
 
 
+    private class PieceListener implements View.OnClickListener {
+        private int mNumOfView;
+        private PieceListener(int i) {
+            mNumOfView = i;
+        }
+
+        @Override
+        public void onClick(View v) {
+            Log.i("puz","clicked "+mNumOfView);
+        }
+    }
 }
