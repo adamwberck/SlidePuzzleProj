@@ -1,36 +1,30 @@
 package com.example.slidepuzzleproj;
 
 import android.app.Activity;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Display;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.annotation.RequiresApi;
-
-import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 import static java.lang.Math.min;
 
 public class PlayActivity extends Activity {
     private TextView timer;
+    private TextView moveNum;
+
     private Button undo;
     private Button tips;
     private Button menu;
@@ -40,8 +34,12 @@ public class PlayActivity extends Activity {
     private final long ONE_MINUTE = 60000;
     private final long ONE_SECOND = 1000;
     private final long PLAY_TIME = 6 * ONE_MINUTE;
-
     private ImageView[] pieces;
+
+    private int width;
+    private int height;
+
+    private boolean scrambled = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,11 +49,28 @@ public class PlayActivity extends Activity {
         tips = findViewById(R.id.tipsButton);
         menu = findViewById(R.id.menuButton);
         timer = findViewById(R.id.time);
+        moveNum = findViewById(R.id.moveNumber);
         playSpace = findViewById(R.id.playSpace);
 
-        setupBoard(playSpace, getIntent().getIntExtra("WIDTH", 3),
-                            getIntent().getIntExtra("HEIGHT", 3));
+        width = getIntent().getIntExtra("WIDTH", 3);
+        height = getIntent().getIntExtra("HEIGHT", 3);
+        setupBoard(playSpace,width,height);
     }
+    protected void scrambleBoard(){
+        List<PuzzleBoard.Direction> results = new ArrayList<>(4);
+        results.add(PuzzleBoard.Direction.Up);
+        results.add(PuzzleBoard.Direction.Down);
+        results.add(PuzzleBoard.Direction.Left);
+        results.add(PuzzleBoard.Direction.Right);
+        for(int i=0;i<100;i++){
+            PuzzleBoard.Direction d = results.get(0);
+            currentBoard.slideBlank(d);
+        }
+        playSpace.invalidate();
+    }
+
+
+
     protected void setupBoard(final GridLayout playSpace, int w, int h){
         try {
             Log.i("[DEBUG BOARD]", playSpace.getWidth() + "," + playSpace.getHeight());
@@ -82,11 +97,8 @@ public class PlayActivity extends Activity {
             }
             Log.i("[NEW DIMENSION]", newWid+ ", " + newHei);
             bm = Bitmap.createScaledBitmap(bm, newWid, newHei, true);
-            PuzzleBoard puz = new PuzzleBoard(bm, w, h);
-            ///////////////////////////////////////////////////
-
-
-            ///////////////////////////////
+            currentBoard  = new PuzzleBoard(bm, w, h);
+          
             ////// setting up ticking timer
             this.timerTick = new CountDownTimer(PLAY_TIME, ONE_SECOND) {
                 @Override
@@ -99,7 +111,6 @@ public class PlayActivity extends Activity {
 
                 }
             };
-            /////////////////////////////
 
             //// test code below
             playSpace.setRowCount(h);
@@ -119,8 +130,8 @@ public class PlayActivity extends Activity {
                     //boardRules.setGravity(Gravity.FILL);
                     pieces[i] = new ImageView(this);
                     pieces[i].setOnClickListener(new PieceListener(i));
-                    if(i != puz.getBlankIndex())
-                        pieces[i].setImageBitmap(puz.getPiece(i).getBitmap());
+                    if(i != currentBoard.getBlankIndex())
+                        pieces[i].setImageBitmap(currentBoard.getPiece(i).getBitmap());
                     playSpace.addView(pieces[i], boardRules);
                     i++;
                 }
@@ -144,6 +155,25 @@ public class PlayActivity extends Activity {
         @Override
         public void onClick(View v) {
             Log.i("puz","clicked "+mNumOfView);
+            PuzzleBoard.Direction d = currentBoard.dirNextToBlank(mNumOfView);
+            /*
+            if(!scrambled){
+                scrambled = true;
+                scrambleBoard();
+                return;
+            }*/
+            if(d!=null){
+                currentBoard.slideBlank(d);
+                for(int i=0;i<width*height;i++) {
+                    if(i!=currentBoard.getBlankIndex()) {
+                        pieces[i].setImageBitmap(currentBoard.getPiece(i).getBitmap());
+                        pieces[i].setVisibility(View.VISIBLE);
+                    }else{
+                        pieces[i].setVisibility(View.INVISIBLE);
+                    }
+                }
+                playSpace.invalidate();
+            }
         }
     }
 }
