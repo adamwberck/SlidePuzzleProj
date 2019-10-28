@@ -25,12 +25,8 @@ public class MenuActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu); //attach the layout
         //currentBoard = PuzzleLab.get(this).getCurrentBoard();
-
         puzzleImageView = findViewById(R.id.puzzle_image);
-
-
         //puzzleImageView.setImageBitmap(currentBoard.getPuzzleImage());
-
 
 
         changeButton = (Button)findViewById(R.id.test);
@@ -41,7 +37,6 @@ public class MenuActivity extends Activity {
                 openGallery();
             }
         });
-
 
 
         dimenButton = findViewById(R.id.dimension_button);
@@ -66,6 +61,7 @@ public class MenuActivity extends Activity {
                 playIntent.putExtra("WIDTH", width);
                 playIntent.putExtra("HEIGHT", height);
                 startActivity(playIntent);
+                send(imageUri);
             }
         });
 
@@ -88,4 +84,11 @@ public class MenuActivity extends Activity {
         }
     }
 
+    public void send(Uri image)
+    {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setClass(MenuActivity.this, PlayActivity.class);
+        intent.putExtra("picture", image);
+        startActivity(intent);
+    }
 }

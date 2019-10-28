@@ -1,13 +1,16 @@
 package com.example.slidepuzzleproj;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
@@ -25,6 +28,7 @@ import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 
+import java.io.IOException;
 import java.util.logging.Logger;
 
 import static java.lang.Math.min;
@@ -40,8 +44,8 @@ public class PlayActivity extends Activity {
     private final long ONE_MINUTE = 60000;
     private final long ONE_SECOND = 1000;
     private final long PLAY_TIME = 6 * ONE_MINUTE;
-
     private ImageView[] pieces;
+    private Bitmap bitmap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,10 +57,20 @@ public class PlayActivity extends Activity {
         timer = findViewById(R.id.time);
         playSpace = findViewById(R.id.playSpace);
 
+        Intent intent = getIntent();
+        Uri imageUri = (Uri)intent.getParcelableExtra("picture");
+        try {
+            bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+        }catch(IOException e){
+            Log.i("[TEST]", "TEST");
+        }
+
         setupBoard(playSpace, getIntent().getIntExtra("WIDTH", 3),
-                            getIntent().getIntExtra("HEIGHT", 3));
+                getIntent().getIntExtra("HEIGHT", 3), bitmap);
+
     }
-    protected void setupBoard(final GridLayout playSpace, int w, int h){
+
+    protected void setupBoard(final GridLayout playSpace, int w, int h,Bitmap bm){
         try {
             Log.i("[DEBUG BOARD]", playSpace.getWidth() + "," + playSpace.getHeight());
 
@@ -65,7 +79,7 @@ public class PlayActivity extends Activity {
             DisplayMetrics display = new DisplayMetrics();
             getWindowManager().getDefaultDisplay().getMetrics(display);
 
-            Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.ilya);
+            //Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.ilya);
             int newWid = bm.getWidth();
             int newHei = bm.getHeight();
             Log.i("[ORIGINAL DIMENSION]", newWid+ ", " + newHei);
