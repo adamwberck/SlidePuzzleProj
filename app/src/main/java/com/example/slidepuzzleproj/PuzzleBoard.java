@@ -3,6 +3,10 @@ package com.example.slidepuzzleproj;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 //// fix bug where uneven sized board isnt processed properly
 
 
@@ -220,6 +224,41 @@ public class PuzzleBoard
             return false;
         return slideBlankParsed(Direction.values()[dir]);
     }
+
+    public Direction slideBlankRandom(){
+        List<Direction> dirs = slideBlankPossible();
+        Collections.shuffle(dirs);
+        return dirs.get(0);
+    }
+
+    private List<Direction> slideBlankPossible()
+    {
+        List<Direction> dirs = new ArrayList<>(4);
+        //up
+        if(this.blankIndex - this.width >= 0)  ///if not on top row
+        {
+            dirs.add(Direction.Up);
+        }
+        //down
+        if(this.blankIndex + this.width < this.length)
+        {
+            dirs.add(Direction.Down);
+        }
+        //left
+        if(this.blankIndex % this.width != 0)
+        {
+            dirs.add(Direction.Left);
+        }
+        //right
+        if(this.blankIndex % this.width != this.width - 1)
+        {
+            dirs.add(Direction.Right);
+        }
+        return dirs;
+    }
+
+
+
     ///////////////////////////////
     //// The parsed direction version of slide blank
     private boolean slideBlankParsed(Direction dir)

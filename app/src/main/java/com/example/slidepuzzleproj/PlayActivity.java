@@ -88,16 +88,9 @@ public class PlayActivity extends Activity {
         setupBoard(playSpace,width,height);
     }
     protected void scrambleBoard(){
-        List<PuzzleBoard.Direction> results = new ArrayList<>(4);
-        results.add(PuzzleBoard.Direction.Up);
-        results.add(PuzzleBoard.Direction.Down);
-        results.add(PuzzleBoard.Direction.Left);
-        results.add(PuzzleBoard.Direction.Right);
-        for(int i=0;i<100;i++){
-            PuzzleBoard.Direction d = results.get(0);
-            currentBoard.slideBlank(d);
+        for(int i=0;i<250;i++){
+            slideImages(currentBoard.slideBlankRandom());
         }
-        playSpace.invalidate();
     }
 
 
@@ -190,28 +183,31 @@ public class PlayActivity extends Activity {
         public void onClick(View v) {
             Log.i("puz","clicked "+mNumOfView);
             PuzzleBoard.Direction d = currentBoard.dirNextToBlank(mNumOfView);
-            /*
             if(!scrambled){
                 scrambled = true;
                 scrambleBoard();
                 return;
-            }*/
+            }
             if(d!=null){
-                currentBoard.slideBlank(d);
-                for(int i=0;i<width*height;i++) {
-                    if(i!=currentBoard.getBlankIndex()) {
-                        pieces[i].setImageBitmap(currentBoard.getPiece(i).getBitmap());
-                        pieces[i].setVisibility(View.VISIBLE);
-                    }else{
-                        pieces[i].setVisibility(View.INVISIBLE);
-                    }
-                }
-                playSpace.invalidate();
+                slideImages(d);
 
                 moveInt++;
                 moveNum.setText(moveInt+"");
                 moveNum.invalidate();
             }
         }
+    }
+
+    public void slideImages(PuzzleBoard.Direction d){
+        currentBoard.slideBlank(d);
+        for(int i=0;i<width*height;i++) {
+            if(i!=currentBoard.getBlankIndex()) {
+                pieces[i].setImageBitmap(currentBoard.getPiece(i).getBitmap());
+                pieces[i].setVisibility(View.VISIBLE);
+            }else{
+                pieces[i].setVisibility(View.INVISIBLE);
+            }
+        }
+        playSpace.invalidate();
     }
 }
