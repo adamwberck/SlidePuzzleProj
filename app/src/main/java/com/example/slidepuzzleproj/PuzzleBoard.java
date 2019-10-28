@@ -5,15 +5,18 @@ import android.util.Log;
 
 //// fix bug where uneven sized board isnt processed properly
 
-enum Direction{
-    Up,
-    Down,
-    Left,
-    Right
-};
 
 public class PuzzleBoard
 {
+    enum Direction{
+        Up,
+        Down,
+        Left,
+        Right
+    };
+
+
+
     private int width, height, length, blankIndex;
     private int bmwidth, bmheight, pixwidth, pixheight;
     private PuzzlePiece[] pieces;
@@ -150,6 +153,32 @@ public class PuzzleBoard
 
         return false;
     }
+
+    public Direction dirNextToBlank(int i)
+    {
+        return dirNextToBlank(i%this.width, i/this.height);
+    }
+
+    public Direction dirNextToBlank(int x, int y)
+    {
+        if(x == getBlankX() && y == getBlankY())
+            return null;
+
+        if( x-1 == getBlankX() && y == getBlankY()) {//blank goes left
+            return Direction.Right;
+        }
+        if(x+1 == getBlankX() && y == getBlankY()) {//blank goes right
+            return Direction.Left;
+        }
+        if(x == getBlankX() && y-1 == getBlankY()){//blank goes down
+            return Direction.Down;
+        }
+        if(x == getBlankX() && y+1 == getBlankY()){//blank goes up
+            return Direction.Up;
+        }
+        return null;
+    }
+
 
     ////// get the bitmap image of this puzzle
     public Bitmap getPuzzleImage(){
