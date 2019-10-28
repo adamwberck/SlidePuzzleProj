@@ -14,6 +14,7 @@ import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -104,7 +105,9 @@ public class PlayActivity extends Activity {
             this.timerTick = new CountDownTimer(PLAY_TIME, ONE_SECOND) {
                 @Override
                 public void onTick(long millisUntilFinished) {
-                    timer.setText(millisUntilFinished/ONE_MINUTE + ":" + millisUntilFinished%ONE_MINUTE/ONE_SECOND);
+                    DecimalFormat df = new DecimalFormat("00");
+                    timer.setText(millisUntilFinished/ONE_MINUTE + ":"
+                            + df.format(millisUntilFinished%ONE_MINUTE/ONE_SECOND));
                 }
 
                 @Override
