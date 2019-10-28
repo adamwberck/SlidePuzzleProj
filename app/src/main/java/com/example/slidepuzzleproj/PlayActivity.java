@@ -36,6 +36,8 @@ public class PlayActivity extends Activity {
     private GridLayout playSpace;
     private PuzzleBoard currentBoard;
 
+    private ImageView[] pieces;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +80,7 @@ public class PlayActivity extends Activity {
             playSpace.setBackgroundColor(Color.DKGRAY);
 
             int i = 0;
-            ImageView[] pieces = new ImageView[w*h];
+            pieces = new ImageView[w*h];
             for(int y = 0; y < h; y++)
             {
                 for(int x = 0; x < w; x++)
@@ -89,7 +91,7 @@ public class PlayActivity extends Activity {
                     boardRules.setMargins(2,2,2,2);
                     //boardRules.setGravity(Gravity.FILL);
                     pieces[i] = new ImageView(this);
-
+                    pieces[i].setOnClickListener(new PieceListener(i));
                     if(i != puz.getBlankIndex())
                         pieces[i].setImageBitmap(puz.getPiece(i).getBitmap());
                     playSpace.addView(pieces[i], boardRules);
@@ -101,6 +103,18 @@ public class PlayActivity extends Activity {
         catch(Exception e)
         {
             Log.i("[ERROR]", "Failed to splice bitmap");
+        }
+    }
+
+    private class PieceListener implements View.OnClickListener {
+        private int mNumOfView;
+        private PieceListener(int i) {
+            mNumOfView = i;
+        }
+
+        @Override
+        public void onClick(View v) {
+            Log.i("puz","clicked "+mNumOfView);
         }
     }
 }
