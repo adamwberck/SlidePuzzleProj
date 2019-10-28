@@ -55,7 +55,7 @@ public class PlayActivity extends Activity {
             DisplayMetrics display = new DisplayMetrics();
             getWindowManager().getDefaultDisplay().getMetrics(display);
 
-            Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.knacko);
+            Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.ilya);
             int newWid = bm.getWidth();
             int newHei = bm.getHeight();
             Log.i("[ORIGINAL DIMENSION]", newWid+ ", " + newHei);
