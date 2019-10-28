@@ -132,6 +132,24 @@ public class PuzzleBoard
         return this.pixheight;
     }
 
+    public boolean isNextToBlank(int i)
+    {
+        return isNextToBlank(i%this.width, i/this.height);
+    }
+
+    public boolean isNextToBlank(int x, int y)
+    {
+        if(x == getBlankX() && y == getBlankY())
+            return false;
+
+        if( x-1 == getBlankX() && y == getBlankY() ||
+            x+1 == getBlankX() && y == getBlankY() ||
+            x == getBlankX() && y-1 == getBlankY() ||
+            x == getBlankX() && y+1 == getBlankY())
+            return true;
+
+        return false;
+    }
 
     ////// get the bitmap image of this puzzle
     public Bitmap getPuzzleImage(){
