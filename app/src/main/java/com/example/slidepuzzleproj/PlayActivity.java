@@ -45,11 +45,14 @@ public class PlayActivity extends Activity {
         menu = findViewById(R.id.menuButton);
         timer = findViewById(R.id.time);
         playSpace = findViewById(R.id.playSpace);
+
         setupBoard(playSpace, getIntent().getIntExtra("WIDTH", 3),
                             getIntent().getIntExtra("HEIGHT", 3));
     }
     protected void setupBoard(final GridLayout playSpace, int w, int h){
         try {
+            Log.i("[DEBUG BOARD]", playSpace.getWidth() + "," + playSpace.getHeight());
+
             DisplayMetrics display = new DisplayMetrics();
             getWindowManager().getDefaultDisplay().getMetrics(display);
 
@@ -59,12 +62,12 @@ public class PlayActivity extends Activity {
             Log.i("[ORIGINAL DIMENSION]", newWid+ ", " + newHei);
             if(bm.getWidth() > bm.getHeight())
             {
-                newWid = min(display.widthPixels, display.heightPixels*8/10);
+                newWid = min(display.widthPixels, display.heightPixels);
                 double ratio = (double)newWid/(double)bm.getWidth();
                 newHei = (int)(newHei * ratio);
             }
             else{
-                newHei = min(display.widthPixels, display.heightPixels*8/10);
+                newHei = min(display.widthPixels, display.heightPixels);
                 double ratio = (double)newHei/(double)bm.getHeight();
                 newWid = (int)(newWid * ratio);
             }
