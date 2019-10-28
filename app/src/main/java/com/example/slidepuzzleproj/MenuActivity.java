@@ -13,7 +13,7 @@ import android.widget.ImageView;
 public class MenuActivity extends Activity {
     private View changeImageButton;
     private ImageView puzzleImageView;
-    private Button playButton, dimenButton, changeButton;
+    private Button playButton, dimenButton;
     private int width, height;
     private static final int PICK_IMAGE = 100;
     Uri imageUri;
@@ -29,8 +29,8 @@ public class MenuActivity extends Activity {
         //puzzleImageView.setImageBitmap(currentBoard.getPuzzleImage());
 
 
-        changeButton = (Button)findViewById(R.id.test);
-        changeButton.setOnClickListener(new View.OnClickListener() {
+        changeImageButton = findViewById(R.id.change_image);
+        changeImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v)
             {
@@ -60,8 +60,8 @@ public class MenuActivity extends Activity {
                 Intent playIntent = new Intent(MenuActivity.this, PlayActivity.class);
                 playIntent.putExtra("WIDTH", width);
                 playIntent.putExtra("HEIGHT", height);
+                playIntent.putExtra("picture",imageUri);
                 startActivity(playIntent);
-                send(imageUri);
             }
         });
 
@@ -84,11 +84,4 @@ public class MenuActivity extends Activity {
         }
     }
 
-    public void send(Uri image)
-    {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setClass(MenuActivity.this, PlayActivity.class);
-        intent.putExtra("picture", image);
-        startActivity(intent);
-    }
 }

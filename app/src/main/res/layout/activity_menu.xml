@@ -27,6 +27,7 @@
         >
         <ImageView
             android:id="@+id/puzzle_image"
+            android:src="@drawable/ilya"
             android:layout_width="match_parent"
             android:layout_height="300dp"
             android:scaleType="centerCrop"
@@ -34,7 +35,7 @@
             android:layout_marginLeft="2dp"
             android:layout_marginRight="2dp"
             />
-        <Button
+        <TextView
             android:paddingTop="-2dp"
             android:layout_marginTop="-2dp"
             android:layout_marginLeft="2dp"

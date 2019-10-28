@@ -68,11 +68,13 @@ public class PlayActivity extends Activity {
         playSpace = findViewById(R.id.playSpace);
 
         Intent intent = getIntent();
-        Uri imageUri = (Uri)intent.getParcelableExtra("picture");
+        Uri imageUri = intent.getParcelableExtra("picture");
         try {
             bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
         }catch(IOException e){
             Log.i("[TEST]", "TEST");
+        }catch (NullPointerException npe){
+            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ilya);
         }
 
         setupBoard(playSpace, getIntent().getIntExtra("WIDTH", 3),
@@ -109,24 +111,25 @@ public class PlayActivity extends Activity {
             DisplayMetrics display = new DisplayMetrics();
             getWindowManager().getDefaultDisplay().getMetrics(display);
 
-            //Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.ilya);
-            int newWid = bm.getWidth();
-            int newHei = bm.getHeight();
+            //bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ilya);
+            
+            int newWid = bitmap.getWidth();
+            int newHei = bitmap.getHeight();
             Log.i("[ORIGINAL DIMENSION]", newWid+ ", " + newHei);
-            if(bm.getWidth() > bm.getHeight())
+            if(bitmap.getWidth() > bitmap.getHeight())
             {
                 newWid = min(display.widthPixels, display.heightPixels);
-                double ratio = (double)newWid/(double)bm.getWidth();
+                double ratio = (double)newWid/(double)bitmap.getWidth();
                 newHei = (int)(newHei * ratio);
             }
             else{
                 newHei = min(display.widthPixels, display.heightPixels);
-                double ratio = (double)newHei/(double)bm.getHeight();
+                double ratio = (double)newHei/(double)bitmap.getHeight();
                 newWid = (int)(newWid * ratio);
             }
             Log.i("[NEW DIMENSION]", newWid+ ", " + newHei);
-            bm = Bitmap.createScaledBitmap(bm, newWid, newHei, true);
-            currentBoard  = new PuzzleBoard(bm, w, h);
+            bitmap = Bitmap.createScaledBitmap(bitmap, newWid, newHei, true);
+            currentBoard  = new PuzzleBoard(bitmap, w, h);
           
             ////// setting up ticking timer
             this.timerTick = new CountDownTimer(PLAY_TIME, ONE_SECOND) {
