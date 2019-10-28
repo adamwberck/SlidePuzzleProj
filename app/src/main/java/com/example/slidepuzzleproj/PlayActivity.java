@@ -23,6 +23,7 @@ import static java.lang.Math.min;
 public class PlayActivity extends Activity {
     private TextView timer;
     private TextView moveNum;
+    private int moveInt;
 
     private Button undo;
     private Button tips;
@@ -151,6 +152,10 @@ public class PlayActivity extends Activity {
                     }
                 }
                 playSpace.invalidate();
+
+                moveInt++;
+                moveNum.setText(moveInt+"");
+                moveNum.invalidate();
             }
         }
     }
