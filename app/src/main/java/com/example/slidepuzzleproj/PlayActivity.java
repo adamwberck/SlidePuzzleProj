@@ -128,9 +128,11 @@ public class PlayActivity extends Activity {
             this.timerTick = new CountDownTimer(PLAY_TIME, ONE_SECOND) {
                 @Override
                 public void onTick(long millisUntilFinished) {
-                    DecimalFormat df = new DecimalFormat("00");
-                    timer.setText(millisUntilFinished/ONE_MINUTE + ":"
-                            + df.format(millisUntilFinished%ONE_MINUTE/ONE_SECOND));
+                    //DecimalFormat df = new DecimalFormat("00");
+                    String text = getString(R.string.time_string,
+                            millisUntilFinished/ONE_MINUTE,
+                            millisUntilFinished%ONE_MINUTE/ONE_SECOND);
+                    timer.setText(text);
                 }
 
                 @Override
