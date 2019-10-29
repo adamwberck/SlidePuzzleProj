@@ -71,7 +71,7 @@
         android:layout_marginTop="40dp"
         android:background="@drawable/back_border"
         android:padding="10dp"
-        android:text="5x5"
+        android:text="3x3"
         android:textAlignment="center"
         android:textColor="@color/menu1"
         android:textSize="50sp"
