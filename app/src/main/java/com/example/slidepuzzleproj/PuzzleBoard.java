@@ -3,17 +3,24 @@ package com.example.slidepuzzleproj;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 //// fix bug where uneven sized board isnt processed properly
 
-enum Direction{
-    Up,
-    Down,
-    Left,
-    Right
-};
 
 public class PuzzleBoard
 {
+    enum Direction{
+        Up,
+        Down,
+        Left,
+        Right
+    };
+
+
+
     private int width, height, length, blankIndex;
     private int bmwidth, bmheight, pixwidth, pixheight;
     private PuzzlePiece[] pieces;
@@ -132,6 +139,50 @@ public class PuzzleBoard
         return this.pixheight;
     }
 
+    public boolean isNextToBlank(int i)
+    {
+        return isNextToBlank(i%this.width, i/this.height);
+    }
+
+    public boolean isNextToBlank(int x, int y)
+    {
+        if(x == getBlankX() && y == getBlankY())
+            return false;
+
+        if( x-1 == getBlankX() && y == getBlankY() ||
+            x+1 == getBlankX() && y == getBlankY() ||
+            x == getBlankX() && y-1 == getBlankY() ||
+            x == getBlankX() && y+1 == getBlankY())
+            return true;
+
+        return false;
+    }
+
+    public Direction dirNextToBlank(int i)
+    {
+        return dirNextToBlank(i%this.width, i/this.height);
+    }
+
+    public Direction dirNextToBlank(int x, int y)
+    {
+        if(x == getBlankX() && y == getBlankY())
+            return null;
+
+        if( x-1 == getBlankX() && y == getBlankY()) {//blank goes left
+            return Direction.Right;
+        }
+        if(x+1 == getBlankX() && y == getBlankY()) {//blank goes right
+            return Direction.Left;
+        }
+        if(x == getBlankX() && y-1 == getBlankY()){//blank goes down
+            return Direction.Down;
+        }
+        if(x == getBlankX() && y+1 == getBlankY()){//blank goes up
+            return Direction.Up;
+        }
+        return null;
+    }
+
 
     ////// get the bitmap image of this puzzle
     public Bitmap getPuzzleImage(){
@@ -173,6 +224,41 @@ public class PuzzleBoard
             return false;
         return slideBlankParsed(Direction.values()[dir]);
     }
+
+    public Direction slideBlankRandom(){
+        List<Direction> dirs = slideBlankPossible();
+        Collections.shuffle(dirs);
+        return dirs.get(0);
+    }
+
+    private List<Direction> slideBlankPossible()
+    {
+        List<Direction> dirs = new ArrayList<>(4);
+        //up
+        if(this.blankIndex - this.width >= 0)  ///if not on top row
+        {
+            dirs.add(Direction.Up);
+        }
+        //down
+        if(this.blankIndex + this.width < this.length)
+        {
+            dirs.add(Direction.Down);
+        }
+        //left
+        if(this.blankIndex % this.width != 0)
+        {
+            dirs.add(Direction.Left);
+        }
+        //right
+        if(this.blankIndex % this.width != this.width - 1)
+        {
+            dirs.add(Direction.Right);
+        }
+        return dirs;
+    }
+
+
+
     ///////////////////////////////
     //// The parsed direction version of slide blank
     private boolean slideBlankParsed(Direction dir)
