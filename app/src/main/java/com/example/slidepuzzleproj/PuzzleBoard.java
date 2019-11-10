@@ -12,6 +12,33 @@ import java.util.List;
 
 public class PuzzleBoard
 {
+    public static Direction getOpposite(Direction d) {
+        if(d==Direction.Up)
+            return Direction.Down;
+        if(d==Direction.Down)
+            return Direction.Up;
+        if(d==Direction.Right)
+            return Direction.Left;
+        if(d==Direction.Left)
+            return Direction.Right;
+        return null;
+    }
+
+    public void restart() {
+        PuzzlePiece[] tempPieces = new PuzzlePiece[pieces.length];
+        for(PuzzlePiece p : pieces){
+            p.currentPos = p.correctPos;
+
+            p.width = p.correctPos%width;
+            p.height = p.correctPos/width;
+
+            p.isBlank = p.currentPos == pieces.length-1;//if its blank
+            tempPieces[p.currentPos]=p;
+        }
+        blankIndex = pieces.length-1;
+        pieces = tempPieces;
+    }
+
     enum Direction{
         Up,
         Down,
@@ -336,8 +363,8 @@ public class PuzzleBoard
             this.pieces[i] = this.pieces[j];
             this.pieces[j] = temp;
 
-            this.pieces[i].currentPos = j;
-            this.pieces[j].currentPos = i;
+            this.pieces[i].currentPos = i;
+            this.pieces[j].currentPos = j;
         }
     }
 

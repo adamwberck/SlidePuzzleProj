@@ -21,7 +21,7 @@ import androidx.annotation.Dimension;
 public class MenuActivity extends Activity {
     private View changeImageButton;
     private ImageView puzzleImageView;
-    private Button playButton, dimenButton;
+    private Button playButton;
     private int width = 3 , height=3;
     private static final int PICK_IMAGE = 100;
     private static final int DIMENSION = 200;

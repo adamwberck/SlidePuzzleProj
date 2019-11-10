@@ -19,16 +19,18 @@
             android:text="Time:"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textSize="36sp"
+            android:textColor="@color/menu1"
             android:textStyle="bold" />
         <TextView
             android:id="@+id/time"
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="match_parent"
             android:layout_weight="0.25"
             android:gravity="center"
-            android:text="0:00"
+            android:textColor="@color/menu1"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textSize="36sp"
+            android:text="60:00"
             android:textStyle="bold" />
         <TextView
             android:id="@+id/moveText"
@@ -36,30 +38,51 @@
             android:layout_height="match_parent"
             android:layout_weight="0.25"
             android:gravity="center"
-            android:text="Moves:"
+            android:textColor="@color/menu1"
+            android:text="@string/moves"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textSize="36sp"
             android:textStyle="bold" />
         <TextView
             android:id="@+id/moveNumber"
-            android:layout_width="wrap_content"
+            android:layout_width="75dp"
             android:layout_height="match_parent"
             android:layout_weight="0.25"
+            android:textColor="@color/menu1"
             android:gravity="center"
-            android:text="0"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textSize="36sp"
+            android:text="000"
             android:textStyle="bold" />
     </LinearLayout>
-
-    <android.widget.GridLayout
-        android:id="@+id/playSpace"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0.9">
+        <android.widget.GridLayout
 
-    </android.widget.GridLayout>
-
+            android:id="@+id/playSpace"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+        </android.widget.GridLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="175dp">
+            <TextView
+                android:id="@+id/restartText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/restart"
+                android:textSize="50sp"
+                android:textColor="@color/menu1"
+                android:background="@color/white"
+                android:layout_gravity="center"
+                />
+        </LinearLayout>
+    </RelativeLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
