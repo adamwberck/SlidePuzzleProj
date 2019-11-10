@@ -5,4 +5,7 @@
     <color name="colorAccent">#D81B60</color>
     <color name="menu1">#000000</color>
     <color name="changeImage">#8A8A8A</color>
+    <color name="failColor">#CC0000</color>
+    <color name="white">#ffffff</color>
+    <color name="winColor">#00EE00</color>
 </resources>

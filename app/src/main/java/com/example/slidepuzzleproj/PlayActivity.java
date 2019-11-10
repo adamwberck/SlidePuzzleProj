@@ -1,16 +1,12 @@
 package com.example.slidepuzzleproj;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.Build;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.provider.MediaStore;
@@ -22,22 +18,15 @@ import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.RequiresApi;
-
 import java.io.IOException;
-import java.util.logging.Logger;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.Stack;
 
 import static java.lang.Math.min;
 
 public class PlayActivity extends Activity {
     private TextView timer;
     private TextView moveNum;
-    private int moveInt;
+    private int moveInt=0;
 
     private Button undo;
     private Button tips;
@@ -45,16 +34,26 @@ public class PlayActivity extends Activity {
     private GridLayout playSpace;
     private CountDownTimer timerTick;
     private PuzzleBoard currentBoard;
+    private TextView restartText;
+
+
     private final long ONE_MINUTE = 60000;
     private final long ONE_SECOND = 1000;
-    private final long PLAY_TIME = 6 * ONE_MINUTE;
+    private final long PLAY_TIME = (6 * ONE_MINUTE);
     private ImageView[] pieces;
     private Bitmap bitmap;
+
+
+    private boolean isWin;
+    private boolean isLose;
 
     private int width;
     private int height;
 
-    private boolean scrambled = false;
+    private boolean isScrambled = false;
+
+    private Stack<PuzzleBoard.Direction> undoStack = new Stack<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +64,44 @@ public class PlayActivity extends Activity {
         menu = findViewById(R.id.menuButton);
         timer = findViewById(R.id.time);
         moveNum = findViewById(R.id.moveNumber);
+        moveNum.setText(String.format("%d", moveInt));
+
         playSpace = findViewById(R.id.playSpace);
+        restartText = findViewById(R.id.restartText);
+        restartText.setVisibility(View.INVISIBLE);
+        restartText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(isLose || isWin){
+                   restart();
+                }
+
+            }
+        });
+
+        undo.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("DefaultLocale")
+            @Override
+            public void onClick(View v) {
+                if(!isLose && !undoStack.isEmpty()) {
+                    PuzzleBoard.Direction d = undoStack.pop();
+                    d = PuzzleBoard.getOpposite(d);
+                    slideImages(d);
+                    moveInt--;
+                    moveNum.setText(String.format("%d", moveInt));
+                    moveNum.invalidate();
+                    //TODO fix the timer after winning
+                    //This works except the timer is broken
+                    if(isWin) {
+                        restartText.setVisibility(View.INVISIBLE);
+                        playSpace.setBackgroundColor(Color.DKGRAY);
+                        isWin = false;
+                    }
+
+                }
+            }
+        });
+
 
         Intent intent = getIntent();
         Uri imageUri = intent.getParcelableExtra("picture");
@@ -82,13 +118,41 @@ public class PlayActivity extends Activity {
 
     }
 
+    private void restart() {
+        isScrambled = false;
+        currentBoard.restart();
+        undoStack.clear();
+
+        for(int i=0;i<width*height;i++) {
+            if (i != currentBoard.getBlankIndex()) {
+                pieces[i].setImageBitmap(currentBoard.getPiece(i).getBitmap());
+                pieces[i].setVisibility(View.VISIBLE);
+            } else {
+                pieces[i].setVisibility(View.INVISIBLE);
+            }
+        }
+
+        restartText.setVisibility(View.INVISIBLE);
+        playSpace.setBackgroundColor(Color.DKGRAY);
+
+        restartText.invalidate();
+        playSpace.invalidate();
+        isLose = false;
+        isWin = false;
+
+        String text = getString(R.string.time_string,
+                PLAY_TIME/ONE_MINUTE,
+                PLAY_TIME%ONE_MINUTE/ONE_SECOND);
+        timer.setText(text);
+    }
+
     protected void setupBoard(final GridLayout playSpace, int w, int h,Bitmap bm){
         width = getIntent().getIntExtra("WIDTH", 3);
         height = getIntent().getIntExtra("HEIGHT", 3);
         setupBoard(playSpace,width,height);
     }
     protected void scrambleBoard(){
-        for(int i=0;i<250;i++){
+        for(int i=0;i<1000;i++){
             slideImages(currentBoard.slideBlankRandom());
         }
     }
@@ -123,8 +187,14 @@ public class PlayActivity extends Activity {
             Log.i("[NEW DIMENSION]", newWid+ ", " + newHei);
             bitmap = Bitmap.createScaledBitmap(bitmap, newWid, newHei, true);
             currentBoard  = new PuzzleBoard(bitmap, w, h);
-          
-            ////// setting up ticking timer
+
+            //init the timer text
+            String text = getString(R.string.time_string,
+                    PLAY_TIME/ONE_MINUTE,
+                    PLAY_TIME%ONE_MINUTE/ONE_SECOND);
+
+            timer.setText(text);
+
             this.timerTick = new CountDownTimer(PLAY_TIME, ONE_SECOND) {
                 @Override
                 public void onTick(long millisUntilFinished) {
@@ -133,12 +203,17 @@ public class PlayActivity extends Activity {
                             millisUntilFinished/ONE_MINUTE,
                             millisUntilFinished%ONE_MINUTE/ONE_SECOND);
                     timer.setText(text);
+                    timer.invalidate();
                 }
 
                 @Override
                 public void onFinish() {
-
-                }
+                    isLose = true;
+                    playSpace.setBackgroundColor(getResources().getColor(R.color.failColor));
+                    playSpace.invalidate();
+                    restartText.setVisibility(View.VISIBLE);
+                    restartText.invalidate();
+            }
             };
 
             //// test code below
@@ -167,7 +242,7 @@ public class PlayActivity extends Activity {
             }
             ////// end test //////
 
-            this.timerTick.start();
+
         }
         catch(Exception e)
         {
@@ -175,28 +250,45 @@ public class PlayActivity extends Activity {
         }
     }
 
+
     private class PieceListener implements View.OnClickListener {
         private int mNumOfView;
         private PieceListener(int i) {
             mNumOfView = i;
         }
 
+        @SuppressLint("DefaultLocale")
         @Override
         public void onClick(View v) {
             Log.i("puz","clicked "+mNumOfView);
             PuzzleBoard.Direction d = currentBoard.dirNextToBlank(mNumOfView);
-            if(!scrambled){
-                scrambled = true;
+            if(!isScrambled){
+                isScrambled = true;
+                timerTick.start();
                 scrambleBoard();
                 return;
             }
-            if(d!=null){
+
+            if(isLose || isWin){
+                restart();
+            }
+            else if(d!=null){
                 slideImages(d);
 
+                //add to undo
+                undoStack.push(d);
+
                 //increment number
-                moveInt++;
-                moveNum.setText(moveInt+"");
+                moveNum.setText(String.format("%d", ++moveInt));
                 moveNum.invalidate();
+            }
+
+            if(isScrambled && !isLose && currentBoard.checkWin()){
+                isWin = true;
+                restartText.setText(R.string.win);
+                restartText.setVisibility(View.VISIBLE);
+                playSpace.setBackgroundColor(getResources().getColor(R.color.winColor));
+                timerTick.cancel();
             }
         }
     }
