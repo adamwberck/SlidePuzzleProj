@@ -193,6 +193,7 @@ public class PlayActivity extends Activity {
             if(d!=null){
                 slideImages(d);
 
+                //increment number
                 moveInt++;
                 moveNum.setText(moveInt+"");
                 moveNum.invalidate();

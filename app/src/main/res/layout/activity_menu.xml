@@ -62,18 +62,37 @@
         android:text="@string/menu_play"
         android:textSize="65sp"
         />
-
-    <Button
-        android:id="@+id/dimension_button"
+    <LinearLayout
+        android:layout_marginTop="40dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="40dp"
+        android:orientation="horizontal"
         android:background="@drawable/back_border"
-        android:padding="10dp"
-        android:text="3x3"
-        android:textAlignment="center"
-        android:textColor="@color/menu1"
-        android:textSize="50sp"
-        tools:ignore="HardcodedText" />
+        android:layout_gravity="center">
+        <Spinner
+            android:id="@+id/height"
+            android:padding="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="50sp"
+            android:textColor="@color/menu1"
+            />
+        <TextView
+            android:padding="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="50sp"
+            android:textColor="@color/menu1"
+            android:text="x"
+            />
+        <Spinner
+            android:id="@+id/width"
+            android:padding="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="50sp"
+            android:textColor="@color/menu1"
+            android:text="5"
+            />
+    </LinearLayout>
 </LinearLayout>
