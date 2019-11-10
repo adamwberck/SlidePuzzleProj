@@ -208,12 +208,8 @@ public class PlayActivity extends Activity {
 
                 @Override
                 public void onFinish() {
-                    isLose = true;
-                    playSpace.setBackgroundColor(getResources().getColor(R.color.failColor));
-                    playSpace.invalidate();
-                    restartText.setVisibility(View.VISIBLE);
-                    restartText.invalidate();
-            }
+                    lose(playSpace);
+                }
             };
 
             //// test code below
@@ -250,6 +246,14 @@ public class PlayActivity extends Activity {
         }
     }
 
+    private void lose(GridLayout playSpace) {
+        isLose = true;
+        playSpace.setBackgroundColor(getResources().getColor(R.color.failColor));
+        playSpace.invalidate();
+        restartText.setVisibility(View.VISIBLE);
+        restartText.invalidate();
+    }
+
 
     private class PieceListener implements View.OnClickListener {
         private int mNumOfView;
@@ -284,13 +288,17 @@ public class PlayActivity extends Activity {
             }
 
             if(isScrambled && !isLose && currentBoard.checkWin()){
-                isWin = true;
-                restartText.setText(R.string.win);
-                restartText.setVisibility(View.VISIBLE);
-                playSpace.setBackgroundColor(getResources().getColor(R.color.winColor));
-                timerTick.cancel();
+                win();
             }
         }
+    }
+
+    private void win() {
+        isWin = true;
+        restartText.setText(R.string.win);
+        restartText.setVisibility(View.VISIBLE);
+        playSpace.setBackgroundColor(getResources().getColor(R.color.winColor));
+        timerTick.cancel();
     }
 
     public void slideImages(PuzzleBoard.Direction d){
