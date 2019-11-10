@@ -7,22 +7,29 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Spinner;
+import android.widget.TextView;
+
+import androidx.annotation.Dimension;
 
 public class MenuActivity extends Activity {
     private View changeImageButton;
     private ImageView puzzleImageView;
     private Button playButton, dimenButton;
-    private int width, height;
+    private int width = 3 , height=3;
     private static final int PICK_IMAGE = 100;
+    private static final int DIMENSION = 200;
     Uri imageUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
-
-
         super.onCreate(savedInstanceState);
+
+
         setContentView(R.layout.activity_menu); //attach the layout
         //currentBoard = PuzzleLab.get(this).getCurrentBoard();
         puzzleImageView = findViewById(R.id.puzzle_image);
@@ -38,34 +45,56 @@ public class MenuActivity extends Activity {
             }
         });
 
-
-        dimenButton = findViewById(R.id.dimension_button);
-        String[] dimen = dimenButton.getText().toString().split("x");
-        this.width = Integer.parseInt(dimen[0]);
-        this.height = Integer.parseInt(dimen[1]);
-
-        dimenButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                //TODO change dimension of board
-
-            }
-        });
-
         playButton = findViewById(R.id.play_button);
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO goto puzzle activity
                 Intent playIntent = new Intent(MenuActivity.this, PlayActivity.class);
                 playIntent.putExtra("WIDTH", width);
                 playIntent.putExtra("HEIGHT", height);
                 playIntent.putExtra("picture",imageUri);
-                startActivity(playIntent);
+                startActivityForResult(playIntent, DIMENSION);
             }
         });
+        ArrayAdapter<CharSequence> adapter
+                = ArrayAdapter.createFromResource(
+                this,R.array.numbers,R.layout.beter_spinner);
+        adapter.setDropDownViewResource(R.layout.beter_spinner_item);
+
+        Spinner spinnerW = findViewById(R.id.width);
+        spinnerW.setAdapter(adapter);
+
+        Spinner spinnerH = findViewById(R.id.height);
+        spinnerH.setAdapter(adapter);
+
+        spinnerH.setOnItemSelectedListener(new DimenListener(0));
+        spinnerW.setOnItemSelectedListener(new DimenListener(1));
 
     }
+
+    private class DimenListener implements AdapterView.OnItemSelectedListener {
+        private int heightOrWidth;
+
+        private DimenListener(int heightOrWidth){
+            this.heightOrWidth = heightOrWidth;
+        }
+
+        @Override
+        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+            if(heightOrWidth==0){
+                height = position+3;
+            }
+            else{
+                width = position+3;
+            }
+        }
+
+        @Override
+        public void onNothingSelected(AdapterView<?> parent) {
+
+        }
+    }
+
 
     private void openGallery()
     {

@@ -160,7 +160,7 @@ public class PuzzleBoard
 
     public Direction dirNextToBlank(int i)
     {
-        return dirNextToBlank(i%this.width, i/this.height);
+        return dirNextToBlank(i%this.width, i/this.width);
     }
 
     public Direction dirNextToBlank(int x, int y)
@@ -168,10 +168,10 @@ public class PuzzleBoard
         if(x == getBlankX() && y == getBlankY())
             return null;
 
-        if( x-1 == getBlankX() && y == getBlankY()) {//blank goes left
+        if( x-1 == getBlankX() && y == getBlankY()) {//blank goes right
             return Direction.Right;
         }
-        if(x+1 == getBlankX() && y == getBlankY()) {//blank goes right
+        if(x+1 == getBlankX() && y == getBlankY()) {//blank goes left
             return Direction.Left;
         }
         if(x == getBlankX() && y-1 == getBlankY()){//blank goes down
