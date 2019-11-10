@@ -5,6 +5,7 @@
     <string name="change_image">Change Image</string>
     <string name="restart">Restart?</string>
     <string name="time_string">%d:%02d</string>
+    <string name="time_gameover">GAME OVER</string>
     <string name="win">Win</string>
     <string name="moves">Moves:</string>
 

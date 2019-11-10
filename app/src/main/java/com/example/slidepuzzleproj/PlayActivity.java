@@ -26,7 +26,11 @@ import static java.lang.Math.min;
 public class PlayActivity extends Activity {
     private TextView timer;
     private TextView moveNum;
-    private int moveInt=0;
+
+    private PlayerStats stats;
+    private int moveInt = 0;
+    private long timeElapsed; //the current ellapsed time
+    private long timeRemain; // the millisecond time remaining for the puzzle
 
     private Button undo;
     private Button tips;
@@ -39,7 +43,7 @@ public class PlayActivity extends Activity {
 
     private final long ONE_MINUTE = 60000;
     private final long ONE_SECOND = 1000;
-    private final long PLAY_TIME = (6 * ONE_MINUTE);
+    private final long PLAY_TIME = 3 * ONE_MINUTE;
     private ImageView[] pieces;
     private Bitmap bitmap;
 
@@ -203,11 +207,16 @@ public class PlayActivity extends Activity {
                             millisUntilFinished/ONE_MINUTE,
                             millisUntilFinished%ONE_MINUTE/ONE_SECOND);
                     timer.setText(text);
+                    timeElapsed = PLAY_TIME - millisUntilFinished;
+                    timeRemain = millisUntilFinished;
                     timer.invalidate();
                 }
 
                 @Override
                 public void onFinish() {
+                    timer.setText(getString(R.string.time_gameover));
+                    timeElapsed = PLAY_TIME;
+                    timeRemain = 0;
                     lose(playSpace);
                 }
             };
@@ -238,7 +247,7 @@ public class PlayActivity extends Activity {
             }
             ////// end test //////
 
-
+            //this.timerTick.start();
         }
         catch(Exception e)
         {
@@ -270,6 +279,7 @@ public class PlayActivity extends Activity {
                 isScrambled = true;
                 timerTick.start();
                 scrambleBoard();
+                timerTick.start();
                 return;
             }
 
