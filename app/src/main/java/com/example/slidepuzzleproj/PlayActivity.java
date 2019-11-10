@@ -148,6 +148,13 @@ public class PlayActivity extends Activity {
                 PLAY_TIME/ONE_MINUTE,
                 PLAY_TIME%ONE_MINUTE/ONE_SECOND);
         timer.setText(text);
+
+        moveInt = 0;
+        moveNum.setText(String.format("%d", moveInt));
+        moveNum.invalidate();
+
+        timeElapsed = 0;
+        timeRemain = PLAY_TIME;
     }
 
     protected void setupBoard(final GridLayout playSpace, int w, int h,Bitmap bm){
