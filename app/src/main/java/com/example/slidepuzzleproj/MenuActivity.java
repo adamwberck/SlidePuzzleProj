@@ -2,6 +2,8 @@ package com.example.slidepuzzleproj;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -63,9 +65,11 @@ public class MenuActivity extends Activity {
 
         Spinner spinnerW = findViewById(R.id.width);
         spinnerW.setAdapter(adapter);
+        //spinnerW.getBackground().setColorFilter(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
 
         Spinner spinnerH = findViewById(R.id.height);
         spinnerH.setAdapter(adapter);
+        //spinnerH.getBackground().setColorFilter(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
 
         spinnerH.setOnItemSelectedListener(new DimenListener(0));
         spinnerW.setOnItemSelectedListener(new DimenListener(1));

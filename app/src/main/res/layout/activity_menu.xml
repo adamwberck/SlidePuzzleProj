@@ -76,6 +76,7 @@
             android:layout_height="wrap_content"
             android:textSize="50sp"
             android:textColor="@color/menu1"
+            android:background="@null"
             />
         <TextView
             android:padding="10dp"
@@ -93,6 +94,7 @@
             android:textSize="50sp"
             android:textColor="@color/menu1"
             android:text="5"
+            android:background="@null"
             />
     </LinearLayout>
 </LinearLayout>
