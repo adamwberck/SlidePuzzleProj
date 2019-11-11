@@ -17,6 +17,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageView;
@@ -236,12 +237,19 @@ public class PlayActivity extends Activity {
         }catch(IOException e){
             Log.i("[TEST]", "TEST");
         }catch (NullPointerException npe){
-            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ilya);
+            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.wooloo2);
             //imageUri
         }
 
-        setupBoard(playSpace, getIntent().getIntExtra("WIDTH", 3),
-                getIntent().getIntExtra("HEIGHT", 3), bitmap);
+        ViewTreeObserver tree = playSpace.getViewTreeObserver();
+        tree.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                setupBoard(playSpace, getIntent().getIntExtra("WIDTH", 3),
+                        getIntent().getIntExtra("HEIGHT", 3), bitmap);
+                playSpace.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+            }
+        });
 
 
         //// image preview

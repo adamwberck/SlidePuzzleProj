@@ -3,6 +3,7 @@ package com.example.slidepuzzleproj;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.media.AudioManager;
@@ -39,7 +40,8 @@ public class MenuActivity extends Activity {
         //currentBoard = PuzzleLab.get(this).getCurrentBoard();
         puzzleImageView = findViewById(R.id.puzzle_image);
         //puzzleImageView.setImageBitmap(currentBoard.getPuzzleImage());
-
+        /// set default image
+        puzzleImageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.wooloo2));
 
         changeImageButton = findViewById(R.id.change_image);
         changeImageButton.setOnClickListener(new View.OnClickListener() {
@@ -60,7 +62,7 @@ public class MenuActivity extends Activity {
 
                 if(imageUri == null)
                 {
-                    imageUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.ilya);
+                    imageUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.wooloo2);
                 }
                 playIntent.putExtra("picture",imageUri);
                 startActivityForResult(playIntent, DIMENSION);
