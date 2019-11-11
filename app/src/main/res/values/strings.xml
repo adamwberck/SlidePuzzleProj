@@ -3,8 +3,12 @@
     <string name="menu_title">Slide Puzzle</string>
     <string name="menu_play">Play</string>
     <string name="change_image">Change Image</string>
+    <string name="restart">Restart?</string>
     <string name="time_string">%d:%02d</string>
     <string name="api_key">e0ac8379fcf11a7cc79a0f854269349a</string>
+    <string name="time_gameover">GAME OVER</string>
+    <string name="win">Win</string>
+    <string name="moves">Moves:</string>
 
     <string-array name="numbers">
         <item>3</item>
@@ -16,6 +20,9 @@
         <item>9</item>
         <item>10</item>
     </string-array>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>

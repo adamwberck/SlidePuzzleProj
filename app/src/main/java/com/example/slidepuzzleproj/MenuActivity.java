@@ -3,10 +3,17 @@ package com.example.slidepuzzleproj;
 import android.graphics.Bitmap;
 import android.os.Environment;
 import android.app.Activity;
+
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -31,7 +38,7 @@ import java.util.Date;
 public class MenuActivity extends Activity {
     private View changeImageButton;
     private ImageView puzzleImageView;
-    private Button playButton, dimenButton;
+    private Button playButton;
     private int width = 3 , height=3;
     private static final int PICK_IMAGE = 100;
     private static final int DIMENSION = 200;
@@ -64,7 +71,11 @@ public class MenuActivity extends Activity {
                 Intent playIntent = new Intent(MenuActivity.this, PlayActivity.class);
                 playIntent.putExtra("WIDTH", width);
                 playIntent.putExtra("HEIGHT", height);
-                playIntent.putExtra("picture", imageUri);
+                if(imageUri == null)
+                {
+                    imageUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.ilya);
+                }
+                playIntent.putExtra("picture",imageUri);
                 startActivityForResult(playIntent, DIMENSION);
             }
         });
@@ -75,9 +86,11 @@ public class MenuActivity extends Activity {
 
         Spinner spinnerW = findViewById(R.id.width);
         spinnerW.setAdapter(adapter);
+        //spinnerW.getBackground().setColorFilter(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
 
         Spinner spinnerH = findViewById(R.id.height);
         spinnerH.setAdapter(adapter);
+        //spinnerH.getBackground().setColorFilter(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
 
         spinnerH.setOnItemSelectedListener(new DimenListener(0));
         spinnerW.setOnItemSelectedListener(new DimenListener(1));

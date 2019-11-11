@@ -23,6 +23,7 @@
                 android:resource="@xml/file_paths">
             </meta-data>
         </provider>
+        <activity android:name=".PreviewActivity"></activity>
         <activity android:name=".MenuActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
