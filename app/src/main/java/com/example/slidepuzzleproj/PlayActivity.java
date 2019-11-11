@@ -139,8 +139,15 @@ public class PlayActivity extends Activity {
                 });
                 popupMenu.show();
             }
-
         });
+
+        tips.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
 
 
         Intent intent = getIntent();
