@@ -121,7 +121,8 @@ public class PlayActivity extends Activity {
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.main_menu:
-                                Toast.makeText(PlayActivity.this, "Main Menu Clicked", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(PlayActivity.this, MenuActivity.class);
+                                startActivity(intent);
                                 return true;
                             case R.id.load_menu:
                                 Toast.makeText(PlayActivity.this, "Load Menu Clicked", Toast.LENGTH_SHORT).show();
