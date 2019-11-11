@@ -17,6 +17,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageView;
@@ -200,16 +201,46 @@ public class PlayActivity extends Activity {
         tips.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Toast.makeText(PlayActivity.this, playSpace.getWidth() + "," + playSpace.getHeight(), Toast.LENGTH_SHORT).show();
 
             }
         });
 
+        //init the timer text
+        String text = getString(R.string.time_string,
+                PLAY_TIME/ONE_MINUTE,
+                PLAY_TIME%ONE_MINUTE/ONE_SECOND);
+
+        timer.setText(text);
+
+        this.timerTick = new CountDownTimer(PLAY_TIME, ONE_SECOND) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                //DecimalFormat df = new DecimalFormat("00");
+                String text = getString(R.string.time_string,
+                        millisUntilFinished/ONE_MINUTE,
+                        millisUntilFinished%ONE_MINUTE/ONE_SECOND);
+                timer.setText(text);
+                timeElapsed = PLAY_TIME - millisUntilFinished;
+                timeRemain = millisUntilFinished;
+                timer.invalidate();
+            }
+
+            @Override
+            public void onFinish() {
+                timer.setText(getString(R.string.time_gameover));
+                timeElapsed = PLAY_TIME;
+                timeRemain = 0;
+                lose(playSpace);
+            }
+        };
 
 
         Intent intent = getIntent();
         imageUri = intent.getParcelableExtra("picture");
         try {
             bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+
             if (bitmap==null){
                 File f= new File(imageUri.toString());
                 BitmapFactory.Options options = new BitmapFactory.Options();
@@ -233,8 +264,18 @@ public class PlayActivity extends Activity {
         if(bitmap == null) {
             Log.i("[TEST]", "BITMAP IS NULL");
         }
-        setupBoard(playSpace, getIntent().getIntExtra("WIDTH", 3),
-                getIntent().getIntExtra("HEIGHT", 3), bitmap);
+
+
+
+        ViewTreeObserver tree = playSpace.getViewTreeObserver();
+        tree.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {@Override
+        public void onGlobalLayout() {
+            setupBoard(playSpace, getIntent().getIntExtra("WIDTH", 3),
+                    getIntent().getIntExtra("HEIGHT", 3), bitmap);
+            playSpace.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+        }
+        });
+
 
 
         //// image preview
@@ -317,6 +358,8 @@ public class PlayActivity extends Activity {
             int newWid = bitmap.getWidth();
             int newHei = bitmap.getHeight();
             Log.i("[ORIGINAL DIMENSION]", newWid+ ", " + newHei);
+            Toast.makeText(PlayActivity.this, playSpace.getWidth() + "," + playSpace.getHeight(), Toast.LENGTH_SHORT).show();
+
             if(bitmap.getWidth() > bitmap.getHeight())
             {
                 newWid = min(display.widthPixels, display.heightPixels);
@@ -332,34 +375,7 @@ public class PlayActivity extends Activity {
             bitmap = Bitmap.createScaledBitmap(bitmap, newWid, newHei, true);
             currentBoard  = new PuzzleBoard(bitmap, w, h);
 
-            //init the timer text
-            String text = getString(R.string.time_string,
-                    PLAY_TIME/ONE_MINUTE,
-                    PLAY_TIME%ONE_MINUTE/ONE_SECOND);
 
-            timer.setText(text);
-
-            this.timerTick = new CountDownTimer(PLAY_TIME, ONE_SECOND) {
-                @Override
-                public void onTick(long millisUntilFinished) {
-                    //DecimalFormat df = new DecimalFormat("00");
-                    String text = getString(R.string.time_string,
-                            millisUntilFinished/ONE_MINUTE,
-                            millisUntilFinished%ONE_MINUTE/ONE_SECOND);
-                    timer.setText(text);
-                    timeElapsed = PLAY_TIME - millisUntilFinished;
-                    timeRemain = millisUntilFinished;
-                    timer.invalidate();
-                }
-
-                @Override
-                public void onFinish() {
-                    timer.setText(getString(R.string.time_gameover));
-                    timeElapsed = PLAY_TIME;
-                    timeRemain = 0;
-                    lose(playSpace);
-                }
-            };
 
             //// test code below
             playSpace.setRowCount(h);
