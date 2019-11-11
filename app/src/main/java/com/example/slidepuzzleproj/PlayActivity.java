@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -95,6 +96,10 @@ public class PlayActivity extends Activity {
 
         moveNum = findViewById(R.id.moveNumber);
         moveNum.setText(String.format("%d", moveInt));
+
+        MediaPlayer menuBGM;
+        menuBGM = MediaPlayer.create(this, R.raw.wotw);
+        menuBGM.start();
 
         playSpace = findViewById(R.id.playSpace);
         restartText = findViewById(R.id.restartText);
