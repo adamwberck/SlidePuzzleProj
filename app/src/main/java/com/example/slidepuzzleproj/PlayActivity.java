@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -77,6 +78,16 @@ public class PlayActivity extends Activity {
 
     private Stack<PuzzleBoard.Direction> undoStack = new Stack<>();
 
+    private MediaPlayer menuBGM;
+    private boolean play;
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        menuBGM.release();
+    }
+
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -95,6 +106,10 @@ public class PlayActivity extends Activity {
 
         moveNum = findViewById(R.id.moveNumber);
         moveNum.setText(String.format("%d", moveInt));
+
+        menuBGM = MediaPlayer.create(this, R.raw.wotw);
+        menuBGM.start();
+        play = true;
 
         playSpace = findViewById(R.id.playSpace);
         restartText = findViewById(R.id.restartText);
@@ -156,6 +171,17 @@ public class PlayActivity extends Activity {
                                 return true;
                             case R.id.statistics_menu:
                                 Toast.makeText(PlayActivity.this, "Statistics Clicked", Toast.LENGTH_SHORT).show();
+                                return true;
+                            case R.id.mute_menu:
+                                if (play == true) {
+                                    menuBGM.pause();
+                                    play = false;
+                                }
+                                else if (play == false)
+                                {
+                                    menuBGM.start();
+                                    play = true;
+                                }
                                 return true;
                         }
                         return true;
