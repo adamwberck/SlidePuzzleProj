@@ -21,6 +21,12 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
 import java.io.IOException;
 import java.util.Stack;
 
@@ -38,6 +44,7 @@ public class PlayActivity extends Activity {
     private Button undo;
     private Button tips;
     private Button menu;
+    private Button prev;
     private GridLayout playSpace;
     private CountDownTimer timerTick;
     private PuzzleBoard currentBoard;
@@ -59,17 +66,23 @@ public class PlayActivity extends Activity {
 
     private boolean isScrambled = false;
 
+    private FragmentManager fmnger;
+
     private Stack<PuzzleBoard.Direction> undoStack = new Stack<>();
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
         undo = findViewById(R.id.undoButton);
         tips = findViewById(R.id.tipsButton);
         menu = findViewById(R.id.menuButton);
+        prev = findViewById(R.id.previewButton);
         timer = findViewById(R.id.time);
+
+
+
         moveNum = findViewById(R.id.moveNumber);
         moveNum.setText(String.format("%d", moveInt));
 
@@ -148,7 +161,12 @@ public class PlayActivity extends Activity {
             }
         });
 
-
+        prev.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                
+            }
+        });
 
         Intent intent = getIntent();
         Uri imageUri = intent.getParcelableExtra("picture");
