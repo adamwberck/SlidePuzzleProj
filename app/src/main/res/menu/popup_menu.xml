@@ -13,6 +13,9 @@
     <item
         android:id="@+id/statistics_menu"
         android:title="Statistics"/>
+    <item
+        android:id="@+id/mute_menu"
+        android:title="Mute"/>
 
 
 </menu>
