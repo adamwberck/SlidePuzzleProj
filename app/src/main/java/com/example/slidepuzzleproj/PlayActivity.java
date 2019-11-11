@@ -27,6 +27,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Stack;
 
@@ -161,12 +162,7 @@ public class PlayActivity extends Activity {
             }
         });
 
-        prev.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                
-            }
-        });
+
 
         Intent intent = getIntent();
         Uri imageUri = intent.getParcelableExtra("picture");
@@ -180,6 +176,22 @@ public class PlayActivity extends Activity {
 
         setupBoard(playSpace, getIntent().getIntExtra("WIDTH", 3),
                 getIntent().getIntExtra("HEIGHT", 3), bitmap);
+
+
+        //// image preview
+        prev.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                try {
+                    if(currentBoard != null) {
+                        Intent intPrev = new Intent(PlayActivity.this, PreviewActivity.class);
+
+                        startActivity(intPrev);
+                    }
+                }catch(Exception e){ Log.i("[ PREVIEW ]", e.getMessage());}
+
+            }
+        });
 
     }
 
