@@ -3,6 +3,7 @@ package com.example.slidepuzzleproj;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.List;
 //// fix bug where uneven sized board isnt processed properly
 
 
-public class PuzzleBoard
+public class PuzzleBoard implements Serializable
 {
     public static Direction getOpposite(Direction d) {
         if(d==Direction.Up)
@@ -378,7 +379,7 @@ public class PuzzleBoard
 
     ////////////////////////////////////////////
     ///// Class representing each puzzle piece
-    protected class PuzzlePiece
+    protected class PuzzlePiece implements Serializable
     {
         private int correctPos;
         private int currentPos;
