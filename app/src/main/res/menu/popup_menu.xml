@@ -10,6 +10,9 @@
     <item
         android:id="@+id/load_menu"
         android:title="Load"/>
+    <item
+        android:id="@+id/statistics_menu"
+        android:title="Statistics"/>
 
 
 </menu>

@@ -129,6 +129,9 @@ public class PlayActivity extends Activity {
                             case R.id.save_menu:
                                 Toast.makeText(PlayActivity.this, "Save Menu Clicked", Toast.LENGTH_SHORT).show();
                                 return true;
+                            case R.id.statistics_menu:
+                                Toast.makeText(PlayActivity.this, "Statistics Clicked", Toast.LENGTH_SHORT).show();
+                                return true;
                         }
                         return true;
                     }
