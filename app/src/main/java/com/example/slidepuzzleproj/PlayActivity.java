@@ -12,11 +12,14 @@ import android.os.CountDownTimer;
 import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.Stack;
@@ -104,6 +107,35 @@ public class PlayActivity extends Activity {
 
                 }
             }
+        });
+
+        menu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                PopupMenu popupMenu = new PopupMenu(PlayActivity.this, menu);
+                popupMenu.getMenuInflater().inflate(R.menu.popup_menu, popupMenu.getMenu());
+
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.main_menu:
+                                Toast.makeText(PlayActivity.this, "Main Menu Clicked", Toast.LENGTH_SHORT).show();
+                                return true;
+                            case R.id.load_menu:
+                                Toast.makeText(PlayActivity.this, "Load Menu Clicked", Toast.LENGTH_SHORT).show();
+                                return true;
+                            case R.id.save_menu:
+                                Toast.makeText(PlayActivity.this, "Save Menu Clicked", Toast.LENGTH_SHORT).show();
+                                return true;
+                        }
+                        return true;
+                    }
+                });
+                popupMenu.show();
+            }
+
         });
 
 
