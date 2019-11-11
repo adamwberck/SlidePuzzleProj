@@ -25,6 +25,10 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.squareup.picasso.Picasso;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -64,7 +68,9 @@ public class PlayActivity extends Activity {
     private final long ONE_SECOND = 1000;
     private final long PLAY_TIME = 3 * ONE_MINUTE;
     private ImageView[] pieces;
-    private Bitmap bitmap;
+  
+    private Bitmap bitmap = null;
+  
     private Uri imageUri;
 
     private boolean isWin;
@@ -234,22 +240,42 @@ public class PlayActivity extends Activity {
         imageUri = intent.getParcelableExtra("picture");
         try {
             bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
-        }catch(IOException e){
-            Log.i("[TEST]", "TEST");
-        }catch (NullPointerException npe){
-            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.wooloo2);
+
+            if (bitmap==null){
+                File f= new File(imageUri.toString());
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+                bitmap = BitmapFactory.decodeStream(new FileInputStream(f), null, options);
+            }
+        } catch (IOException e2) {
+            File f= new File(imageUri.toString());
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+            try {
+                bitmap = BitmapFactory.decodeStream(new FileInputStream(f), null, options);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        } catch (NullPointerException npe) {
+            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ilya);
             //imageUri
         }
 
+        if(bitmap == null) {
+            Log.i("[TEST]", "BITMAP IS NULL");
+        }
+
+
+
         ViewTreeObserver tree = playSpace.getViewTreeObserver();
-        tree.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                setupBoard(playSpace, getIntent().getIntExtra("WIDTH", 3),
-                        getIntent().getIntExtra("HEIGHT", 3), bitmap);
-                playSpace.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-            }
+        tree.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {@Override
+        public void onGlobalLayout() {
+            setupBoard(playSpace, getIntent().getIntExtra("WIDTH", 3),
+                    getIntent().getIntExtra("HEIGHT", 3), bitmap);
+            playSpace.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+        }
         });
+
 
 
         //// image preview
@@ -321,7 +347,6 @@ public class PlayActivity extends Activity {
 
     protected void setupBoard(final GridLayout playSpace, int w, int h){
         try {
-            Log.i("[DEBUG BOARD]", playSpace.getWidth() + "," + playSpace.getHeight());
 
             //////////////////////////
             ////// setting up the bitmap dimension and puzzle board
