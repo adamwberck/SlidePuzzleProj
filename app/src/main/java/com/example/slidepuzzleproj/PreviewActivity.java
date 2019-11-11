@@ -8,13 +8,17 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.media.Image;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+
+import java.io.File;
 
 public class PreviewActivity extends Activity {
 
@@ -38,9 +42,13 @@ public class PreviewActivity extends Activity {
         pbut.invalidate();
 
 
-        pimg = findViewById(R.id.prev_img);
-        pimg.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.ilya));
+        Uri uri = in.getParcelableExtra("img");
 
+        pimg = findViewById(R.id.prev_img);
+        try {
+            map = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
+            pimg.setImageBitmap(map);
+        }catch(Exception e){}
         pimg.invalidate();
     }
 }

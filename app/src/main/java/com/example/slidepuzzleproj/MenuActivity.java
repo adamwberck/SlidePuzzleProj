@@ -25,7 +25,7 @@ public class MenuActivity extends Activity {
     private int width = 3 , height=3;
     private static final int PICK_IMAGE = 100;
     private static final int DIMENSION = 200;
-    Uri imageUri;
+    Uri imageUri = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -54,6 +54,11 @@ public class MenuActivity extends Activity {
                 Intent playIntent = new Intent(MenuActivity.this, PlayActivity.class);
                 playIntent.putExtra("WIDTH", width);
                 playIntent.putExtra("HEIGHT", height);
+
+                if(imageUri == null)
+                {
+                    imageUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.ilya);
+                }
                 playIntent.putExtra("picture",imageUri);
                 startActivityForResult(playIntent, DIMENSION);
             }
