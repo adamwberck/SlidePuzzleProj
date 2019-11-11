@@ -96,7 +96,6 @@
         android:layout_height="wrap_content"
         android:layout_weight="0.02"
         android:text="Preview"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:background="@drawable/back_border"
         android:textSize="26sp"
         android:textStyle="bold" />
@@ -113,6 +112,8 @@
             android:layout_height="match_parent"
             android:layout_weight=".333"
             android:background="@drawable/back_border"
+            android:textSize="26sp"
+            android:textStyle="bold"
             android:text="Undo" />
 
         <Button
@@ -121,6 +122,8 @@
             android:layout_height="match_parent"
             android:layout_weight=".333"
             android:background="@drawable/back_border"
+            android:textSize="26sp"
+            android:textStyle="bold"
             android:text="Tips" />
 
         <Button
@@ -129,6 +132,8 @@
             android:layout_height="match_parent"
             android:layout_weight=".333"
             android:background="@drawable/back_border"
+            android:textSize="26sp"
+            android:textStyle="bold"
             android:text="Menu" />
     </LinearLayout>
 

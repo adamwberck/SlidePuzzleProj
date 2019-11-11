@@ -2,6 +2,8 @@ package com.example.slidepuzzleproj;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -28,12 +30,16 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Stack;
 
 import static java.lang.Math.min;
 
 public class PlayActivity extends Activity {
+    private ContextWrapper cw; //context / working directory of app
+
     private TextView timer;
     private TextView moveNum;
 
@@ -57,7 +63,7 @@ public class PlayActivity extends Activity {
     private final long PLAY_TIME = 3 * ONE_MINUTE;
     private ImageView[] pieces;
     private Bitmap bitmap;
-
+    private Uri imageUri;
 
     private boolean isWin;
     private boolean isLose;
@@ -76,6 +82,9 @@ public class PlayActivity extends Activity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
+
+        cw = new ContextWrapper(getApplicationContext());
+
         undo = findViewById(R.id.undoButton);
         tips = findViewById(R.id.tipsButton);
         menu = findViewById(R.id.menuButton);
@@ -135,8 +144,9 @@ public class PlayActivity extends Activity {
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.main_menu:
-                                Intent intent = new Intent(PlayActivity.this, MenuActivity.class);
-                                startActivity(intent);
+                                //Intent intent = new Intent(PlayActivity.this, MenuActivity.class);
+                                //startActivity(intent);
+                                finish();
                                 return true;
                             case R.id.load_menu:
                                 Toast.makeText(PlayActivity.this, "Load Menu Clicked", Toast.LENGTH_SHORT).show();
@@ -165,13 +175,14 @@ public class PlayActivity extends Activity {
 
 
         Intent intent = getIntent();
-        Uri imageUri = intent.getParcelableExtra("picture");
+        imageUri = intent.getParcelableExtra("picture");
         try {
             bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
         }catch(IOException e){
             Log.i("[TEST]", "TEST");
         }catch (NullPointerException npe){
             bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ilya);
+            //imageUri
         }
 
         setupBoard(playSpace, getIntent().getIntExtra("WIDTH", 3),
@@ -185,6 +196,8 @@ public class PlayActivity extends Activity {
                 try {
                     if(currentBoard != null) {
                         Intent intPrev = new Intent(PlayActivity.this, PreviewActivity.class);
+
+                        intPrev.putExtra("img", imageUri);
 
                         startActivity(intPrev);
                     }
