@@ -9,6 +9,7 @@
     <string name="time_gameover">GAME OVER</string>
     <string name="win">Win</string>
     <string name="moves">Moves:</string>
+    <string name="saveFile">stats.bin</string>
 
     <string-array name="numbers">
         <item>3</item>

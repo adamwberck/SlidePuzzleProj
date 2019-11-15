@@ -48,7 +48,6 @@ public class PuzzleBoard implements Serializable
     };
 
 
-
     private int width, height, length, blankIndex;
     private int bmwidth, bmheight, pixwidth, pixheight;
     private PuzzlePiece[] pieces;
@@ -103,7 +102,6 @@ public class PuzzleBoard implements Serializable
 
 
     }
-
 
     /////////////////////
     /// Accessor methods
@@ -377,6 +375,16 @@ public class PuzzleBoard implements Serializable
     }
 
 
+    public SerializablePuzzleBoard getSerializableData(){
+        SerializablePiece[] sp = new SerializablePiece[this.length];
+        for(int i = 0; i < this.length; i++)
+            sp[i] = new SerializablePiece(pieces[i].getCorrectPos(), pieces[i].getCurrentPos(), pieces[i].getIsBlank());
+        return new SerializablePuzzleBoard( width, height, length, blankIndex,
+                                            bmwidth, bmheight, pixwidth, pixheight,
+                                            sp, loaded);
+    }
+
+
     ////////////////////////////////////////////
     ///// Class representing each puzzle piece
     protected class PuzzlePiece implements Serializable
@@ -401,6 +409,16 @@ public class PuzzleBoard implements Serializable
         {
             if(this.image == null) return null;
             return this.image;
+        }
+
+        public int getCorrectPos() {
+            return this.correctPos;
+        }
+        public int getCurrentPos(){
+            return this.currentPos;
+        }
+        public boolean getIsBlank(){
+            return this.isBlank;
         }
     }
 
@@ -451,6 +469,7 @@ public class PuzzleBoard implements Serializable
             //}catch(Exception e){System.out.println("ERROR");}
             //return null;
         }
-
     }
+
+
 }

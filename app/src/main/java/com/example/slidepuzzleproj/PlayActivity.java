@@ -39,6 +39,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.Stack;
 
 import static java.lang.Math.min;
@@ -50,17 +52,13 @@ public class PlayActivity extends Activity {
     private TextView moveNum;
 
     private PlayerStats stats;
-    private int moveInt = 0;
-    private long timeElapsed; //the current ellapsed time
-    private long timeRemain; // the millisecond time remaining for the puzzle
+    private PuzzleLab lab;
 
     private Button undo;
     private Button tips;
     private Button menu;
     private Button prev;
     private GridLayout playSpace;
-    private CountDownTimer timerTick;
-    private PuzzleBoard currentBoard;
     private TextView restartText;
 
 
@@ -68,25 +66,23 @@ public class PlayActivity extends Activity {
     private final long ONE_SECOND = 1000;
     private final long PLAY_TIME = 3 * ONE_MINUTE;
     private ImageView[] pieces;
-  
-    private Bitmap bitmap = null;
-  
-    private Uri imageUri;
-
-    private boolean isWin;
-    private boolean isLose;
-
-    private int width;
-    private int height;
-
-    private boolean isScrambled = false;
-
-    private FragmentManager fmnger;
-
-    private Stack<PuzzleBoard.Direction> undoStack = new Stack<>();
-
     private MediaPlayer menuBGM;
-    private boolean play;
+
+    private int moveInt = 0;    // save
+    private long timeElapsed;   //save
+    private long timeRemain;    // save
+    private CountDownTimer timerTick;   // save
+    private PuzzleBoard currentBoard;   // save
+    private Bitmap bitmap = null;   //save
+    private Uri imageUri;   // save
+    private boolean isWin;  // save
+    private boolean isLose; // save
+    private int width;  // save
+    private int height; // save
+    private boolean isScrambled = false; // save
+    private Stack<PuzzleBoard.Direction> undoStack = new Stack<>(); //save
+    private boolean play; // save
+
 
     @Override
     protected void onPause()
@@ -102,6 +98,7 @@ public class PlayActivity extends Activity {
         setContentView(R.layout.activity_play);
 
         cw = new ContextWrapper(getApplicationContext());
+
 
         undo = findViewById(R.id.undoButton);
         tips = findViewById(R.id.tipsButton);
@@ -174,7 +171,25 @@ public class PlayActivity extends Activity {
                                 Toast.makeText(PlayActivity.this, "Load Menu Clicked", Toast.LENGTH_SHORT).show();
                                 return true;
                             case R.id.save_menu:
-                                Toast.makeText(PlayActivity.this, "Save Menu Clicked", Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(PlayActivity.this, "Save Menu Clicked", Toast.LENGTH_SHORT).show();
+
+                                try {
+                                    PlayerStats stats = new PlayerStats(moveInt, timeElapsed, timeRemain, timerTick, currentBoard.getSerializableData(), imageUri.toString(), isWin, isLose, width, height, isScrambled, undoStack, play);
+
+                                    FileOutputStream fos = PlayActivity.this.openFileOutput(getResources().getString(R.string.saveFile), Context.MODE_PRIVATE);
+
+                                    ObjectOutputStream os = new ObjectOutputStream(fos);
+
+                                    os.writeObject(stats);
+                                    Toast.makeText(PlayActivity.this, "Successfully saved stats", Toast.LENGTH_SHORT).show();
+                                    os.close();
+                                    fos.close();
+
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                //lab = PuzzleLab.get(PlayActivity.this);
+                                //PuzzleLab.saveLab(PlayActivity.this);
                                 return true;
                             case R.id.statistics_menu:
                                 Toast.makeText(PlayActivity.this, "Statistics Clicked", Toast.LENGTH_SHORT).show();
@@ -257,7 +272,7 @@ public class PlayActivity extends Activity {
                 e.printStackTrace();
             }
         } catch (NullPointerException npe) {
-            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ilya);
+            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.wooloo2);
             //imageUri
         }
 
