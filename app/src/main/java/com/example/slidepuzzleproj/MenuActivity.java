@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.media.AudioManager;
@@ -35,6 +36,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static androidx.core.content.FileProvider.getUriForFile;
+
 public class MenuActivity extends Activity {
     private View changeImageButton;
     private ImageView puzzleImageView;
@@ -53,7 +56,8 @@ public class MenuActivity extends Activity {
         //currentBoard = PuzzleLab.get(this).getCurrentBoard();
         puzzleImageView = findViewById(R.id.puzzle_image);
         //puzzleImageView.setImageBitmap(currentBoard.getPuzzleImage());
-
+        /// set default image
+        puzzleImageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.wooloo2));
 
         changeImageButton = findViewById(R.id.change_image);
         changeImageButton.setOnClickListener(new View.OnClickListener() {
@@ -73,7 +77,7 @@ public class MenuActivity extends Activity {
                 playIntent.putExtra("HEIGHT", height);
                 if(imageUri == null)
                 {
-                    imageUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.ilya);
+                    imageUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.wooloo2);
                 }
                 playIntent.putExtra("picture",imageUri);
                 startActivityForResult(playIntent, DIMENSION);
@@ -177,7 +181,7 @@ public class MenuActivity extends Activity {
             }
             Log.i("HERE", "HERE");
             if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(this, "com.example.slidepuzzleproj.FileProvider", photoFile);
+                Uri photoURI = getUriForFile(this, "com.example.slidepuzzleproj.provider", photoFile);
                 cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT,
                         photoURI);
                 Log.i("HERE", "HERE");

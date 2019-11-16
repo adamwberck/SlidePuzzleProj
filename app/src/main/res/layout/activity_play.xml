@@ -7,8 +7,8 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.05"
+        android:layout_height="60dp"
+        android:layout_weight="0.15"
         android:orientation="horizontal">
 
         <TextView
@@ -19,73 +19,74 @@
             android:gravity="center"
             android:text="Time:"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:textSize="26sp"
             android:textColor="@color/menu1"
+            android:textSize="26sp"
             android:textStyle="bold" />
+
         <TextView
             android:id="@+id/time"
             android:layout_width="100dp"
             android:layout_height="match_parent"
             android:layout_weight="0.25"
             android:gravity="center"
-            android:textColor="@color/menu1"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:textSize="26sp"
             android:text="60:00"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@color/menu1"
+            android:textSize="26sp"
             android:textStyle="bold" />
+
         <TextView
             android:id="@+id/moveText"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="0.25"
             android:gravity="center"
-            android:textColor="@color/menu1"
             android:text="@string/moves"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@color/menu1"
             android:textSize="26sp"
             android:textStyle="bold" />
+
         <TextView
             android:id="@+id/moveNumber"
             android:layout_width="75dp"
             android:layout_height="match_parent"
             android:layout_weight="0.25"
-            android:textColor="@color/menu1"
             android:gravity="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@color/menu1"
             android:textSize="26sp"
             android:textStyle="bold" />
     </LinearLayout>
 
 
-
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.9">
+        android:layout_height="603dp"
+        android:layout_weight="0.75">
+
         <android.widget.GridLayout
 
             android:id="@+id/playSpace"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/back_border"
-            >
-        </android.widget.GridLayout>
+            android:layout_height="match_parent"
+            android:background="@drawable/back_border"></android.widget.GridLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="175dp">
+            android:layout_marginTop="175dp"
+            android:orientation="vertical">
+
             <TextView
                 android:id="@+id/restartText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/restart"
-                android:textSize="50sp"
-                android:textColor="@color/menu1"
-                android:background="@color/white"
                 android:layout_gravity="center"
-                />
+                android:background="@color/white"
+                android:text="@string/restart"
+                android:textColor="@color/menu1"
+                android:textSize="50sp" />
         </LinearLayout>
 
     </RelativeLayout>
@@ -94,9 +95,9 @@
         android:id="@+id/previewButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0.02"
-        android:text="Preview"
+        android:layout_weight="0.05"
         android:background="@drawable/back_border"
+        android:text="Preview"
         android:textSize="26sp"
         android:textStyle="bold" />
 
@@ -112,9 +113,9 @@
             android:layout_height="match_parent"
             android:layout_weight=".333"
             android:background="@drawable/back_border"
+            android:text="Undo"
             android:textSize="26sp"
-            android:textStyle="bold"
-            android:text="Undo" />
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/tipsButton"
@@ -122,9 +123,9 @@
             android:layout_height="match_parent"
             android:layout_weight=".333"
             android:background="@drawable/back_border"
+            android:text="Tips"
             android:textSize="26sp"
-            android:textStyle="bold"
-            android:text="Tips" />
+            android:textStyle="bold" />
 
         <Button
             android:id="@+id/menuButton"
@@ -132,9 +133,9 @@
             android:layout_height="match_parent"
             android:layout_weight=".333"
             android:background="@drawable/back_border"
+            android:text="Menu"
             android:textSize="26sp"
-            android:textStyle="bold"
-            android:text="Menu" />
+            android:textStyle="bold" />
     </LinearLayout>
 
 </LinearLayout>

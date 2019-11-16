@@ -19,6 +19,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 public class PreviewActivity extends Activity {
 
@@ -47,8 +49,23 @@ public class PreviewActivity extends Activity {
         pimg = findViewById(R.id.prev_img);
         try {
             map = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
-            pimg.setImageBitmap(map);
-        }catch(Exception e){}
+            if (map==null) {
+                File f = new File(uri.toString());
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+                map = BitmapFactory.decodeStream(new FileInputStream(f), null, options);
+            }
+        }catch(Exception e){
+            File f= new File(uri.toString());
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+            try {
+                map = BitmapFactory.decodeStream(new FileInputStream(f), null, options);
+            } catch (FileNotFoundException ex) {
+                ex.printStackTrace();
+            }
+        }
+        pimg.setImageBitmap(map);
         pimg.invalidate();
     }
 }
