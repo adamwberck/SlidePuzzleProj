@@ -35,6 +35,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import org.w3c.dom.Text;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -92,9 +94,16 @@ public class PlayActivity extends Activity {
     protected void onPause()
     {
         super.onPause();
-        menuBGM.release();
+        menuBGM.pause();
+        play = false;
     }
 
+    @Override
+    protected void onResume(){
+        super.onResume();
+        menuBGM.start();
+        play = true;
+    }
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -360,17 +369,13 @@ public class PlayActivity extends Activity {
             Log.i("[ORIGINAL DIMENSION]", newWid+ ", " + newHei);
             Toast.makeText(PlayActivity.this, playSpace.getWidth() + "," + playSpace.getHeight(), Toast.LENGTH_SHORT).show();
 
-            if(bitmap.getWidth() > bitmap.getHeight())
-            {
-                newWid = min(display.widthPixels, display.heightPixels);
-                double ratio = (double)newWid/(double)bitmap.getWidth();
-                newHei = (int)(newHei * ratio);
+            newWid = playSpace.getWidth();
+            double ratio = (double)newWid/(double)bitmap.getWidth();
+            newHei = (int)(newHei * ratio);
+            if(newHei>playSpace.getHeight()){
+                newHei = playSpace.getHeight();
             }
-            else{
-                newHei = min(display.widthPixels, display.heightPixels);
-                double ratio = (double)newHei/(double)bitmap.getHeight();
-                newWid = (int)(newWid * ratio);
-            }
+
             Log.i("[NEW DIMENSION]", newWid+ ", " + newHei);
             bitmap = Bitmap.createScaledBitmap(bitmap, newWid, newHei, true);
             currentBoard  = new PuzzleBoard(bitmap, w, h);

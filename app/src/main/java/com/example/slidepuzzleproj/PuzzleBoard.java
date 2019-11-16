@@ -68,7 +68,7 @@ public class PuzzleBoard implements Serializable
         this.length = w*h;
         this.blankIndex = this.length-1;
         this.loaded = false;
-
+        Log.i("[PUZZLE BOARD]", ""+this.bmwidth + "," + this.bmheight);
         Log.i("[PUZZLE BOARD]", ""+this.pixwidth + "," + this.pixheight);
         sliceImageThreaded();
     }

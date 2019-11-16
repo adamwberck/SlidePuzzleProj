@@ -36,6 +36,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import static androidx.core.content.FileProvider.getUriForFile;
+
 public class MenuActivity extends Activity {
     private View changeImageButton;
     private ImageView puzzleImageView;
@@ -179,7 +181,7 @@ public class MenuActivity extends Activity {
             }
             Log.i("HERE", "HERE");
             if (photoFile != null) {
-                Uri photoURI = FileProvider.getUriForFile(this, "com.example.slidepuzzleproj.FileProvider", photoFile);
+                Uri photoURI = getUriForFile(this, "com.example.slidepuzzleproj.provider", photoFile);
                 cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT,
                         photoURI);
                 Log.i("HERE", "HERE");
