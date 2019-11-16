@@ -6,11 +6,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -19,6 +22,7 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ScrollView;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.content.FileProvider;
@@ -49,6 +53,11 @@ public class FlickrActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
+        if(!isOnline()){
+            Toast toast = Toast.makeText(this, "Cannot connect: network is unavailable", Toast.LENGTH_SHORT);
+            toast.show();
+            finish();
+        }
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_flickr); //attach the layout
@@ -61,6 +70,12 @@ public class FlickrActivity extends Activity {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onClick(View v) {
+                if(!isOnline()){
+                    Toast toast = Toast.makeText(FlickrActivity.this, "Cannot connect: network is unavailable", Toast.LENGTH_SHORT);
+                    toast.show();
+                    finish();
+                }
+                resultList = new ArrayList<>();
                 apiTask task = new apiTask();
                 task.execute(resultList);
             }
@@ -96,7 +111,7 @@ public class FlickrActivity extends Activity {
         OkHttpClient client = new OkHttpClient();
         String key = getResources().getString(R.string.api_key);
         String text = searchKeyword.getText().toString();
-        String body = "api_key="+key+"&text="+text+"&per_page=30&safe_search=1&content_type=4&extras=original_format&media=photos&privacy_filter=1";
+        String body = "api_key="+key+"&text="+text+"&per_page=50&safe_search=1&content_type=4&extras=original_format&media=photos&privacy_filter=1";
         String url = "https://api.flickr.com/services/rest/?method=flickr.photos.search&"+body;
         Request request = new Request.Builder()
                 .url(url)
@@ -109,6 +124,13 @@ public class FlickrActivity extends Activity {
         } catch (XmlPullParserException e2) {
             e2.printStackTrace();
         }
+    }
+
+    public boolean isOnline() {
+        ConnectivityManager connMgr = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        return (networkInfo != null && networkInfo.isConnected());
     }
 
     void parseItems(ArrayList<String> items, String result) throws XmlPullParserException, IOException {
@@ -125,7 +147,7 @@ public class FlickrActivity extends Activity {
                 id = parser.getAttributeValue(null, "id");
                 format = parser.getAttributeValue(null, "originalformat");
                 if(id!=null) {
-                    String f = format!=null?format:"jpg";
+                    String f = format!=null?format:"png";
                     URL = "https://farm" + farm + ".staticflickr.com/" + server + "/" + id + "_" + secret + "_z." + f;
                     items.add(URL);
                 }
@@ -166,7 +188,7 @@ public class FlickrActivity extends Activity {
             final ImageView imageView;
             if (convertView == null) {
                 imageView = new ImageView(this.context);
-                imageView.setLayoutParams(new GridView.LayoutParams(200, 200));
+                imageView.setLayoutParams(new GridView.LayoutParams(150, 150));
                 imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             } else {
                 imageView = (ImageView) convertView;
