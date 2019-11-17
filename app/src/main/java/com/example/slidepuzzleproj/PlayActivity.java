@@ -67,6 +67,7 @@ public class PlayActivity extends Activity {
     private final long ONE_MINUTE = 60000;
     private final long ONE_SECOND = 1000;
     private final long PLAY_TIME = 3 * ONE_MINUTE;
+    private final int GAP = 2;
     private ImageView[] pieces;
     private MediaPlayer menuBGM;
 
@@ -225,7 +226,6 @@ public class PlayActivity extends Activity {
         tips.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(PlayActivity.this, playSpace.getWidth() + "," + playSpace.getHeight(), Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -281,7 +281,7 @@ public class PlayActivity extends Activity {
                 e.printStackTrace();
             }
         } catch (NullPointerException npe) {
-            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.wooloo2);
+            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ilya);
             //imageUri
         }
 
@@ -291,7 +291,7 @@ public class PlayActivity extends Activity {
 
 
 
-        ViewTreeObserver tree = playSpace.getViewTreeObserver();
+        ViewTreeObserver tree = findViewById(R.id.mainLayout).getViewTreeObserver();
         tree.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {@Override
         public void onGlobalLayout() {
             setupBoard(playSpace, getIntent().getIntExtra("WIDTH", 3),
@@ -357,8 +357,8 @@ public class PlayActivity extends Activity {
     }
 
     protected void setupBoard(final GridLayout playSpace, int w, int h,Bitmap bm){
-        width = getIntent().getIntExtra("WIDTH", 3);
-        height = getIntent().getIntExtra("HEIGHT", 3);
+        width = w; //getIntent().getIntExtra("WIDTH", 3);
+        height = h; //getIntent().getIntExtra("HEIGHT", 3);
         setupBoard(playSpace,width,height);
     }
     protected void scrambleBoard(){
@@ -367,37 +367,19 @@ public class PlayActivity extends Activity {
         }
     }
 
-
-
     protected void setupBoard(final GridLayout playSpace, int w, int h){
         try {
 
             //////////////////////////
             ////// setting up the bitmap dimension and puzzle board
-            DisplayMetrics display = new DisplayMetrics();
-            getWindowManager().getDefaultDisplay().getMetrics(display);
+            /// rescaling bitmap to fit the playfield
 
-            //bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ilya);
-            
-            int newWid = bitmap.getWidth();
-            int newHei = bitmap.getHeight();
-            Log.i("[ORIGINAL DIMENSION]", newWid+ ", " + newHei);
-            Toast.makeText(PlayActivity.this, playSpace.getWidth() + "," + playSpace.getHeight(), Toast.LENGTH_SHORT).show();
+            bitmap = scaleBitmapCenteredFit(bitmap, w, h);
+            currentBoard = new PuzzleBoard(bitmap, w, h);
 
-            newWid = playSpace.getWidth();
-            double ratio = (double)newWid/(double)bitmap.getWidth();
-            newHei = (int)(newHei * ratio);
-            if(newHei>playSpace.getHeight()){
-                newHei = playSpace.getHeight();
-            }
-
-            Log.i("[NEW DIMENSION]", newWid+ ", " + newHei);
-            bitmap = Bitmap.createScaledBitmap(bitmap, newWid, newHei, true);
-            currentBoard  = new PuzzleBoard(bitmap, w, h);
+            ///////////////////////////////
 
 
-
-            //// test code below
             playSpace.setRowCount(h);
             playSpace.setColumnCount(w);
             playSpace.setBackgroundColor(Color.DKGRAY);
@@ -430,6 +412,89 @@ public class PlayActivity extends Activity {
             Log.i("[ERROR]", "Failed to splice bitmap");
         }
     }
+
+///////////////////////////////////////////////
+///////////////////////////////////////////
+    //// BITMAP SCALING FUNCTIONS
+    protected Bitmap scaleBitmapNaive(Bitmap src, int w, int h)
+    {
+        int newWid = src.getWidth();
+        int newHei = src.getHeight();
+        newWid = playSpace.getWidth();
+        double ratio = (double)newWid/(double)bitmap.getWidth();
+        newHei = (int)(newHei * ratio);
+        if(newHei>playSpace.getHeight()){
+            newHei = playSpace.getHeight();
+        }
+
+        src = Bitmap.createScaledBitmap(bitmap, newWid - 2*w*GAP, newHei - 2*h*GAP, true);
+        return src;
+    }
+
+    /// uses the global variables:
+    /// - Bitmap, width, and height
+    /// - playSpace, prev
+    /// args: bitmap, width of board, height of board
+    protected Bitmap scaleBitmapCenteredFit(Bitmap src, int w, int h)
+    {
+        int newWid = playSpace.getWidth(); //bitmap.getWidth();
+        int newHei = (int)prev.getY() - findViewById(R.id.top_bar).getHeight(); //bitmap.getHeight();
+        int bmwid = src.getWidth();
+        int bmhei = src.getHeight();
+        float ratio1 = (float)newWid / (float)newHei;
+        float ratio2 = (float)bmwid / (float)bmhei;
+        int x1 = 0;
+        int y1 = 0;
+        int x2 = bmwid;
+        int y2 = bmhei;
+
+        if(ratio2 > ratio1)
+        {
+            x2 = (int)(y2 * ratio1);
+            x1 = bmwid/2 - x2/2;
+        }
+        else if(ratio2 < ratio1)
+        {
+            y2 = (int)(bmwid/ratio1);
+            y1 = bmhei/2 - y2/2;
+        }
+
+        src = Bitmap.createBitmap(src, x1, y1, x2, y2);
+        src = Bitmap.createScaledBitmap(src, newWid - 2*w*GAP, newHei - 2*h*GAP, true);
+        return src;
+    }
+
+    protected Bitmap scaleBitmapCenteredSquare(Bitmap src, int w, int h)
+    {
+        int min = playSpace.getWidth();
+        if(playSpace.getHeight() < playSpace.getWidth())
+            min = playSpace.getHeight();
+        int bmwid = src.getWidth();
+        int bmhei = src.getHeight();
+        int x1 = 0;
+        int y1 = 0;
+        int x2 = bmwid;
+        int y2 = bmhei;
+
+        if(bmwid < bmhei)
+        {
+            y1 = bmhei/2 - bmwid/2;
+            y2 = bmwid;
+        }
+        else if(bmwid > bmhei)
+        {
+            x1 = bmwid/2 - bmhei/2;
+            x2 = bmhei;
+        }
+
+        src = Bitmap.createBitmap(src, x1, y1, x2, y2);
+        src = Bitmap.createScaledBitmap(src, min - 2*w*GAP, min - 2*h*GAP, true);
+        return src;
+    }
+    ////// END BITMAP SCALING FUNCTIONS
+/////////////////////////////////////////
+
+
 
     private void lose(GridLayout playSpace) {
         isLose = true;
