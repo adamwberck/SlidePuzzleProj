@@ -3,50 +3,163 @@ package com.example.slidepuzzleproj;
 
 ///// WIP  - Dan ////
 
+
+import android.net.Uri;
+import android.os.CountDownTimer;
+
 import java.io.Serializable;
-import java.util.List;
+import java.util.Stack;
 
 public class PlayerStats implements Serializable {
-    private List<BoardStats> completedBoards;
-    private List<BoardStats> inProgressBoards;
+    private int moveInt = 0;    // save
+    private long timeElapsed;   //save
+    private long timeRemain;    // save
+    private CountDownTimer timerTick;   // save
+    private SerializablePuzzleBoard currentBoard;   // save
 
-    private boolean scrambled = false;
+    private String imageUri;   // save
+
+    private boolean isWin;  // save
+    private boolean isLose; // save
+
+    private int width;  // save
+    private int height; // save
+
+    private boolean isScrambled = false; // save
+    private boolean play; // save
+
+    private Stack<PuzzleBoard.Direction> undoStack = new Stack<>(); //save;
 
 
-    public PlayerStats()
+    public PlayerStats(int mov, long te, long tr, CountDownTimer timer, SerializablePuzzleBoard board,
+                       String img, boolean win, boolean lose, int w, int h,
+                       boolean scram, Stack<PuzzleBoard.Direction> stack, boolean p)
     {
-        ///load existing stats data
+        moveInt = mov;
+        timeElapsed = te;
+        timeRemain = tr;
+        timerTick    = timer;
+        currentBoard = board;
+        imageUri = img;
+        isWin = win;
+        isLose = lose;
+        width = w;
+        height = h;
+        isScrambled = scram;
+        play = p;
+        undoStack = stack;
 
     }
 
-    public PlayerStats(PlayerStats existing){
-        this.completedBoards = existing.getCompletedBoard();
-        this.inProgressBoards = existing.getInProgressBoards();
+    public int getMoveInt()
+    {
+        return moveInt;
     }
 
-    public List<BoardStats> getCompletedBoard(){
-        return this.completedBoards;
+    public long getTimeElapsed()
+    {
+        return timeElapsed;
     }
-    public List<BoardStats> getInProgressBoards(){
-        return this.inProgressBoards;
+    public long getTimeRemaining()
+    {
+        return timeRemain;
+    }
+    public CountDownTimer getTimerTick()
+    {
+        return timerTick;
+    }
+    public SerializablePuzzleBoard getCurrentBoard()
+    {
+        return currentBoard;
     }
 
-    public class BoardStats implements Serializable{
-        private PuzzleBoard board;
-        private int moveInt;
-        private int undoUsed;
-        private int hintUsed;
+    public Uri getImageUri()
+    {
+        return Uri.parse(this.imageUri);
+    }
+    public boolean getIsWin()
+    {
+        return isWin;
+    }
+    public boolean getIsLose()
+    {
+        return isLose;
+    }
+    public int getWidth()
+    {
+        return width;
+    }
+    public int getHeight()
+    {
+        return height;
+    }
+    public boolean getIsScrambled()
+    {
+        return isScrambled;
+    }
+    public boolean getPlay()
+    {
+        return play;
+    }
+    public Stack<PuzzleBoard.Direction> getUndoStack()
+    {
+        return undoStack;
+    }
 
-        private boolean isTimed; // true if game mode is timed mode
-        private long timeElapsed; //the current elapsed time
-        private long timeRemain; // the millisecond time remaining for the puzzle
 
-        private long ONE_MINUTE = 60000;
-        private long ONE_SECOND = 1000;
-        private long PLAY_TIME = 3 * ONE_MINUTE;
+    public void setMoveInt(int x)
+    {
+        moveInt = x;
+    }
 
-        public BoardStats(){
+    public void setTimeElapsed(long x)
+    {
+        timeElapsed = x;
+    }
+    public void setTimeRemaining(long x)
+    {
+        timeRemain = x;
+    }
+    public void setTimerTick(CountDownTimer x)
+    {
+        timerTick = x;
+    }
+    public void setCurrentBoard(SerializablePuzzleBoard x)
+    {
+        currentBoard = x;
+    }
 
-        }
+
+    public void setImageUri(Uri x)
+    {
+        imageUri = x.toString();
+    }
+    public void setIsWin(boolean x)
+    {
+        isWin = x;
+    }
+    public void setIsLose(boolean x)
+    {
+        isLose = x;
+    }
+    public void setWidth(int x)
+    {
+        width = x;
+    }
+    public void setHeight(int x)
+    {
+        height = x;
+    }
+    public void setIsScrambled(boolean x)
+    {
+        isScrambled = x;
+    }
+    public void setPlay(boolean x)
+    {
+        play = x;
+    }
+    public void setUndoStack(Stack<PuzzleBoard.Direction> x)
+    {
+        undoStack = x;
     }
 }

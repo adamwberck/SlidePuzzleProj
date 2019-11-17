@@ -17,12 +17,12 @@ import static android.content.ContentValues.TAG;
 public class PuzzleLab implements Serializable {//this is a singleton
     private static PuzzleLab sPuzzleLab;
     private static final String FILE_NAME = "puzzle.lab";
-    private List<PuzzleBoard> mPuzzleBoards;
+    private List<PlayerStats> stats;
     private int mCurrentIndex;
 
 
     private PuzzleLab(){
-        mPuzzleBoards = new ArrayList<>(5);
+        stats = new ArrayList<>(5);
         mCurrentIndex = 0;
     }
 
@@ -43,7 +43,9 @@ public class PuzzleLab implements Serializable {//this is a singleton
         return sPuzzleLab;
     }
 
-    private static PuzzleLab loadLab(Context context) throws IOException,ClassNotFoundException{
+
+
+    public static PuzzleLab loadLab(Context context) throws IOException,ClassNotFoundException{
         FileInputStream fis = context.openFileInput(FILE_NAME);
         ObjectInputStream ois = new ObjectInputStream(fis);
         PuzzleLab lab = (PuzzleLab) ois.readObject();
@@ -65,7 +67,7 @@ public class PuzzleLab implements Serializable {//this is a singleton
         }
     }
 
-    public PuzzleBoard getCurrentBoard() {
-        return mPuzzleBoards.get(mCurrentIndex);
+    public PlayerStats getCurrentBoard() {
+        return stats.get(mCurrentIndex);
     }
 }

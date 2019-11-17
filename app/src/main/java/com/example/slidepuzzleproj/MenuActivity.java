@@ -57,7 +57,7 @@ public class MenuActivity extends Activity {
         puzzleImageView = findViewById(R.id.puzzle_image);
         //puzzleImageView.setImageBitmap(currentBoard.getPuzzleImage());
         /// set default image
-        puzzleImageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.wooloo2));
+        puzzleImageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.ilya));
 
         changeImageButton = findViewById(R.id.change_image);
         changeImageButton.setOnClickListener(new View.OnClickListener() {
@@ -77,7 +77,7 @@ public class MenuActivity extends Activity {
                 playIntent.putExtra("HEIGHT", height);
                 if(imageUri == null)
                 {
-                    imageUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.wooloo2);
+                    imageUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.ilya);
                 }
                 playIntent.putExtra("picture",imageUri);
                 startActivityForResult(playIntent, DIMENSION);
