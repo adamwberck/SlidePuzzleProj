@@ -226,7 +226,11 @@ public class PlayActivity extends Activity {
         tips.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                try {
+                    new Solver(currentBoard);
+                } catch (CloneNotSupportedException e) {
+                    e.printStackTrace();
+                }
             }
         });
 

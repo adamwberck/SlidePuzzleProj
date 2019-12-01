@@ -40,6 +40,10 @@ public class PuzzleBoard implements Serializable
         pieces = tempPieces;
     }
 
+    public PuzzlePiece[] getPieces() {
+        return pieces;
+    }
+
     enum Direction{
         Up,
         Down,
