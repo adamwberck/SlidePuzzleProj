@@ -2,7 +2,7 @@ package com.example.slidepuzzleproj;
 
 
 ///// WIP  - Dan ////
-
+/// finish up adding entries and test pull data from the menu activity context
 
 import android.net.Uri;
 import android.os.CountDownTimer;
@@ -10,12 +10,71 @@ import android.os.CountDownTimer;
 import java.io.Serializable;
 import java.util.Stack;
 
+
 public class PlayerStats implements Serializable {
+
+    BoardTypeStatEntry[][] entries;
+
+    public PlayerStats(int maxboardwidth, int maxboardheight)
+    {
+        entries = new BoardTypeStatEntry[maxboardheight][maxboardwidth];
+        for(int y = 0; y < maxboardheight; y++)
+        {
+            for(int x = 0; x < maxboardwidth; x++){
+                entries[y][x] = new BoardTypeStatEntry(0,0,-1,-1,0,0);
+            }
+        }
+    }
+
+    public void updateEntry(int boardwidth, int boardheight, int numMoves, int numUndos,
+                            int time, int win, int lose)
+    {
+        //if(entries[boardheight-1][boardwidth-1] == null){
+        //    entries
+        //}
+    }
+
+    @Override
+    public String toString(){
+        String output = "PlayerStats object";
+        return output;
+    }
+
+
+
+    protected class BoardTypeStatEntry implements Serializable {
+        private int numMoves;
+        private int numUndos;
+        private int shortestTime;
+        private int longestTime;
+        private int numWin;
+        private int numLose;
+
+        public BoardTypeStatEntry(int nm, int nu, int st, int lt, int nw, int nl){
+            this.numMoves = nm;
+            this.numUndos = nu;
+            this.shortestTime = st;
+            this.longestTime = lt;
+            this.numWin = nw;
+            this.numLose = nl;
+        }
+
+        protected void setAllProperties(int nm, int nu, int st, int lt, int nw, int nl){
+            this.numMoves = nm;
+            this.numUndos = nu;
+            this.shortestTime = st;
+            this.longestTime = lt;
+            this.numWin = nw;
+            this.numLose = nl;
+        }
+
+
+    }
+    /*
     private int moveInt = 0;    // save
     private long timeElapsed;   //save
     private long timeRemain;    // save
     private CountDownTimer timerTick;   // save
-    private SerializablePuzzleBoard currentBoard;   // save
 
     private String imageUri;   // save
 
@@ -162,4 +221,5 @@ public class PlayerStats implements Serializable {
     {
         undoStack = x;
     }
+    */
 }

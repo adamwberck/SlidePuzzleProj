@@ -10,6 +10,7 @@
     <string name="win">Win</string>
     <string name="moves">Moves:</string>
     <string name="saveFile">stats.bin</string>
+    <string name="menu_stats">Stats</string>
 
     <string-array name="numbers">
         <item>3</item>

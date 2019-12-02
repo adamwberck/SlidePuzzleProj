@@ -379,16 +379,6 @@ public class PuzzleBoard implements Serializable
     }
 
 
-    public SerializablePuzzleBoard getSerializableData(){
-        SerializablePiece[] sp = new SerializablePiece[this.length];
-        for(int i = 0; i < this.length; i++)
-            sp[i] = new SerializablePiece(pieces[i].getCorrectPos(), pieces[i].getCurrentPos(), pieces[i].getIsBlank());
-        return new SerializablePuzzleBoard( width, height, length, blankIndex,
-                                            bmwidth, bmheight, pixwidth, pixheight,
-                                            sp, loaded);
-    }
-
-
     ////////////////////////////////////////////
     ///// Class representing each puzzle piece
     protected class PuzzlePiece implements Serializable

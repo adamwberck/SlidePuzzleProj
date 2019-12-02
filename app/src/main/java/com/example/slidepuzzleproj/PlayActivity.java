@@ -27,6 +27,9 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
@@ -40,9 +43,17 @@ import org.w3c.dom.Text;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
+import java.nio.file.Paths;
 import java.util.Stack;
 
 import static java.lang.Math.min;
@@ -53,8 +64,8 @@ public class PlayActivity extends Activity {
     private TextView timer;
     private TextView moveNum;
 
-    private PlayerStats stats;
-    private PuzzleLab lab;
+    //private PlayerStats stats;
+    //private PuzzleLab lab;
 
     private Button undo;
     private Button tips;
@@ -179,27 +190,40 @@ public class PlayActivity extends Activity {
                                 return true;
                             case R.id.load_menu:
                                 Toast.makeText(PlayActivity.this, "Load Menu Clicked", Toast.LENGTH_SHORT).show();
+                                try{
+                                    String path = getFilesDir() + "/test.bin";
+                                    FileInputStream fis = openFileInput("test.bin");
+                                    ObjectInputStream is = new ObjectInputStream(fis);
+                                    PlayerStats stats = (PlayerStats)is.readObject();
+                                    is.close();
+                                    fis.close();
+
+                                    Toast.makeText(PlayActivity.this, "LOAD NEW STRING " + stats.toString(), Toast.LENGTH_LONG).show();
+                                }catch(Exception e){
+                                    Toast.makeText(PlayActivity.this, "ERROR ERROR LOAD", Toast.LENGTH_LONG).show();
+                                }
                                 return true;
                             case R.id.save_menu:
-                                //Toast.makeText(PlayActivity.this, "Save Menu Clicked", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(PlayActivity.this, "Save Menu Clicked", Toast.LENGTH_SHORT).show();
 
-                                try {
-                                    PlayerStats stats = new PlayerStats(moveInt, timeElapsed, timeRemain, timerTick, currentBoard.getSerializableData(), imageUri.toString(), isWin, isLose, width, height, isScrambled, undoStack, play);
-
-                                    FileOutputStream fos = PlayActivity.this.openFileOutput(getResources().getString(R.string.saveFile), Context.MODE_PRIVATE);
-
+                                try{
+                                    PlayerStats stats = new PlayerStats();
+                                    String path = getFilesDir().getPath() + "/test.bin";
+                                    Toast.makeText(PlayActivity.this, path, Toast.LENGTH_LONG).show();
+                                    FileOutputStream fos = PlayActivity.this.openFileOutput("test.bin", Context.MODE_PRIVATE);
+                                    //File f = new File(path);
+                                    //FileInputStream
                                     ObjectOutputStream os = new ObjectOutputStream(fos);
-
                                     os.writeObject(stats);
-                                    Toast.makeText(PlayActivity.this, "Successfully saved stats", Toast.LENGTH_SHORT).show();
                                     os.close();
                                     fos.close();
 
-                                } catch (IOException e) {
-                                    e.printStackTrace();
+                                    Toast.makeText(PlayActivity.this, "SAVED NEW OBJECT " + stats.toString(), Toast.LENGTH_LONG).show();
+                                }catch(Exception e){
+                                    Log.i("BAD STATS WRITER", e.getMessage() + " | " + e.getCause());
+                                    Toast.makeText(PlayActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
                                 }
-                                //lab = PuzzleLab.get(PlayActivity.this);
-                                //PuzzleLab.saveLab(PlayActivity.this);
+
                                 return true;
                             case R.id.statistics_menu:
                                 Toast.makeText(PlayActivity.this, "Statistics Clicked", Toast.LENGTH_SHORT).show();
