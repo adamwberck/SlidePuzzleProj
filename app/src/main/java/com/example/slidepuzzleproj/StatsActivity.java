@@ -17,6 +17,7 @@ import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,13 +27,25 @@ public class StatsActivity extends Activity {
 
     Button sbut;
     LinearLayout statList;
+    PlayerStats stats;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stats);
 
-        Intent in = getIntent();
-        PlayerStats stats = in.getParcelableExtra("save");
+
+        try {
+            Intent in = getIntent();
+            stats = (PlayerStats)in.getSerializableExtra("save");
+
+
+            Toast.makeText(StatsActivity.this, "Loaded stat " + stats.getGlobalBoardMaxMoves(), Toast.LENGTH_LONG).show();
+
+        }
+        catch(Exception e){ Toast.makeText(StatsActivity.this, "ERROR STATS", Toast.LENGTH_LONG).show(); }
+        /// add to the list //linear layout
+
+        statList = findViewById(R.id.stats_list);
 
         sbut = findViewById(R.id.stats_x);
         sbut.setOnClickListener(new View.OnClickListener() {
@@ -41,12 +54,7 @@ public class StatsActivity extends Activity {
                 finish();
             }
         });
-
-        statList = findViewById(R.id.stats_list);
-
-
-        /// add to the list //linear layout
-
+        Toast.makeText(StatsActivity.this, "Done stat", Toast.LENGTH_LONG).show();
 
         /*
         Uri uri = in.getParcelableExtra("img");

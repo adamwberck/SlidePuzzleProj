@@ -102,7 +102,13 @@ public class MenuActivity extends Activity {
                         Toast.makeText(MenuActivity.this, "ERROR SAVE " + e.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 }
-                //Toast.makeText(MenuActivity.this, "Found Save " + foundFile, Toast.LENGTH_LONG).show();
+
+                /// load the stats activity
+                Intent intStats = new Intent(MenuActivity.this, StatsActivity.class);
+
+                intStats.putExtra("save", playerStats);
+
+                startActivity(intStats);
             }
         });
 
