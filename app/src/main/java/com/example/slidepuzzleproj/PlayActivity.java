@@ -73,7 +73,7 @@ public class PlayActivity extends Activity {
     private Button prev;
     private GridLayout playSpace;
     private TextView restartText;
-
+    private Button statbut;
 
     private final long ONE_MINUTE = 60000;
     private final long ONE_SECOND = 1000;
@@ -97,6 +97,9 @@ public class PlayActivity extends Activity {
     private Stack<PuzzleBoard.Direction> undoStack = new Stack<>(); //save
     private boolean play; // save
 
+    private PlayerStats stats;
+    private int minb;
+    private int maxb;
 
     @Override
     protected void onPause()
@@ -118,15 +121,17 @@ public class PlayActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
 
-        cw = new ContextWrapper(getApplicationContext());
+        minb = Integer.parseInt(getResources().getString(R.string.min_board_size));
+        maxb = Integer.parseInt(getResources().getString(R.string.max_board_size));
+        stats = new PlayerStats(minb, minb, maxb, maxb);
 
+        cw = new ContextWrapper(getApplicationContext());
 
         undo = findViewById(R.id.undoButton);
         tips = findViewById(R.id.tipsButton);
         menu = findViewById(R.id.menuButton);
         prev = findViewById(R.id.previewButton);
         timer = findViewById(R.id.time);
-
 
 
         moveNum = findViewById(R.id.moveNumber);
@@ -207,10 +212,12 @@ public class PlayActivity extends Activity {
                                 Toast.makeText(PlayActivity.this, "Save Menu Clicked", Toast.LENGTH_SHORT).show();
 
                                 try{
-                                    PlayerStats stats = new PlayerStats();
+                                    Toast.makeText(PlayActivity.this, minb + "," + maxb + "," + width + "," + height, Toast.LENGTH_LONG).show();
+                                    //stats.updateStats(width, height, 0, 1, 100, 1, 0);
                                     String path = getFilesDir().getPath() + "/test.bin";
                                     Toast.makeText(PlayActivity.this, path, Toast.LENGTH_LONG).show();
                                     FileOutputStream fos = PlayActivity.this.openFileOutput("test.bin", Context.MODE_PRIVATE);
+                                    Toast.makeText(PlayActivity.this, fos.toString(), Toast.LENGTH_LONG).show();
                                     //File f = new File(path);
                                     //FileInputStream
                                     ObjectOutputStream os = new ObjectOutputStream(fos);
@@ -221,7 +228,7 @@ public class PlayActivity extends Activity {
                                     Toast.makeText(PlayActivity.this, "SAVED NEW OBJECT " + stats.toString(), Toast.LENGTH_LONG).show();
                                 }catch(Exception e){
                                     Log.i("BAD STATS WRITER", e.getMessage() + " | " + e.getCause());
-                                    Toast.makeText(PlayActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                                    Toast.makeText(PlayActivity.this, "ERROR SAVE " + e.getMessage(), Toast.LENGTH_LONG).show();
                                 }
 
                                 return true;
