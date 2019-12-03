@@ -197,7 +197,7 @@ public class PlayActivity extends Activity {
                                 Toast.makeText(PlayActivity.this, "Load Menu Clicked", Toast.LENGTH_SHORT).show();
                                 try{
                                     String path = getFilesDir() + "/test.bin";
-                                    FileInputStream fis = openFileInput("test.bin");
+                                    FileInputStream fis = openFileInput(getResources().getString(R.string.saveFile));
                                     ObjectInputStream is = new ObjectInputStream(fis);
                                     PlayerStats stats = (PlayerStats)is.readObject();
                                     is.close();

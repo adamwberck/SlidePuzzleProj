@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -28,24 +29,53 @@ public class StatsActivity extends Activity {
     Button sbut;
     LinearLayout statList;
     PlayerStats stats;
+    int arrWidth, arrHeight;
+    int arrWidthMin, arrWidthMax;
+    int arrHeightMin, arrHeightMax;
+    //Button[][] statButs;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stats);
 
+        Intent in = getIntent();
+        stats = (PlayerStats)in.getSerializableExtra("save");
 
-        try {
-            Intent in = getIntent();
-            stats = (PlayerStats)in.getSerializableExtra("save");
+        arrWidth = stats.getBoardWidth();
+        arrHeight = stats.getBoardHeight();
+        arrWidthMin = stats.getMinBoardWidth();
+        arrWidthMax = stats.getMaxBoardWidth();
+        arrHeightMin = stats.getMinBoardHeight();
+        arrHeightMax = stats.getMaxBoardHeight();
 
+        //Toast.makeText(StatsActivity.this, "Loaded stat " + stats.getBoardHeight(), Toast.LENGTH_LONG).show();
 
-            Toast.makeText(StatsActivity.this, "Loaded stat " + stats.getGlobalBoardMaxMoves(), Toast.LENGTH_LONG).show();
-
-        }
-        catch(Exception e){ Toast.makeText(StatsActivity.this, "ERROR STATS", Toast.LENGTH_LONG).show(); }
-        /// add to the list //linear layout
-
+        //statButs = new Button[arrHeight][arrWidth];
         statList = findViewById(R.id.stats_list);
+        for(int x = 0; x < arrWidth; x++){
+            for(int y = 0; y < arrHeight; y++){
+                /////// add an entry to the linear list for each board stats
+                if(stats.getBoardNumGames(x+arrWidthMin, y+arrHeightMin) > 0) {
+                    Button but = new Button(this);
+                    but.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT));
+                    but.setText((x + arrWidthMin) + "x" + (y + arrHeightMin));
+                    but.setBackground(getResources().getDrawable(R.drawable.back_border));
+                    but.setTypeface(but.getTypeface(), Typeface.BOLD);
+                    but.setTextSize(30);
+
+                    but.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            /// load new StatsEntryActivity activity
+
+                        }
+                    });
+                    statList.addView(but);
+                }
+            }
+        }
+        statList.invalidate();
 
         sbut = findViewById(R.id.stats_x);
         sbut.setOnClickListener(new View.OnClickListener() {
@@ -54,34 +84,22 @@ public class StatsActivity extends Activity {
                 finish();
             }
         });
-        Toast.makeText(StatsActivity.this, "Done stat", Toast.LENGTH_LONG).show();
 
-        /*
-        Uri uri = in.getParcelableExtra("img");
+        //Toast.makeText(StatsActivity.this, "Done stat", Toast.LENGTH_LONG).show();
 
-        pimg = findViewById(R.id.prev_img);
-        try {
-            map = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
-            if (map==null) {
-                File f = new File(uri.toString());
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-                map = BitmapFactory.decodeStream(new FileInputStream(f), null, options);
-            }
-        }catch(Exception e){
-            File f= new File(uri.toString());
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-            try {
-                map = BitmapFactory.decodeStream(new FileInputStream(f), null, options);
-            } catch (FileNotFoundException ex) {
-                ex.printStackTrace();
-            }
-        }
-        pimg.setImageBitmap(map);
-        pimg.invalidate();
-
-         */
     }
 
+
+    protected class StatsEntryActivity extends Activity{
+        @Override
+        protected void onCreate(Bundle saveInstanceState){
+            super.onCreate(saveInstanceState);
+
+            /// setup the layout for each individual stat
+            setContentView(R.layout.activity_stats);
+
+            Intent in = getIntent();
+            stats = (PlayerStats)in.getSerializableExtra("save");
+        }
+    }
 }

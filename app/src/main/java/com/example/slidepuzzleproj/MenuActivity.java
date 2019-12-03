@@ -80,7 +80,7 @@ public class MenuActivity extends Activity {
                     fis.close();
 
                     foundFile = true;
-                    //Toast.makeText(MenuActivity.this, "LOAD NEW STRING " + playerStats.toString(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(MenuActivity.this, "SUCCESSFULLY LOADED SAVE " + savePath, Toast.LENGTH_LONG).show();
                 }catch(Exception e){
                     Toast.makeText(MenuActivity.this, "ERROR ERROR LOAD", Toast.LENGTH_LONG).show();
                 }
@@ -96,7 +96,7 @@ public class MenuActivity extends Activity {
                         fos.close();
 
                         foundFile = true;
-                        //Toast.makeText(MenuActivity.this, "SAVED NEW OBJECT " + playerStats.toString(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(MenuActivity.this, "CREATED A NEW SAVE " + savePath, Toast.LENGTH_LONG).show();
                     }catch(Exception e){
                         //Log.i("BAD STATS WRITER", e.getMessage() + " | " + e.getCause());
                         Toast.makeText(MenuActivity.this, "ERROR SAVE " + e.getMessage(), Toast.LENGTH_LONG).show();
