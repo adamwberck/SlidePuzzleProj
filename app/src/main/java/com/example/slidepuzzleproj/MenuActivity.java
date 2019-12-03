@@ -20,6 +20,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -32,7 +33,11 @@ import android.widget.Toast;
 import androidx.core.content.FileProvider;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -42,20 +47,73 @@ public class MenuActivity extends Activity {
     private View changeImageButton;
     private ImageView puzzleImageView;
     private Button playButton;
+    private Button statButton;
     private int width = 3 , height=3;
     private static final int PICK_IMAGE = 100;
     private static final int DIMENSION = 200;
     Uri imageUri = null;
+    private int minb, maxb;
+    private PlayerStats playerStats = null;
+    private String savePath;
+    private boolean foundFile = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
 
-
         setContentView(R.layout.activity_menu); //attach the layout
-        //currentBoard = PuzzleLab.get(this).getCurrentBoard();
+
+        savePath = getResources().getString(R.string.saveFile);
+        minb = Integer.parseInt(getResources().getString(R.string.min_board_size));
+        maxb = Integer.parseInt(getResources().getString(R.string.max_board_size));
+        statButton = findViewById(R.id.stats_button);
+        statButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                /// try to load save file
+                try{
+                    //String path = getFilesDir() + "/test.bin";
+                    FileInputStream fis = openFileInput(savePath);
+                    ObjectInputStream is = new ObjectInputStream(fis);
+                    playerStats = (PlayerStats)is.readObject();
+                    is.close();
+                    fis.close();
+
+                    foundFile = true;
+                    Toast.makeText(MenuActivity.this, "SUCCESSFULLY LOADED SAVE " + savePath, Toast.LENGTH_LONG).show();
+                }catch(Exception e){
+                    Toast.makeText(MenuActivity.this, "ERROR ERROR LOAD", Toast.LENGTH_LONG).show();
+                }
+
+                /// if no save file, create a fresh one
+                if(!foundFile){
+                    try{
+                        playerStats = new PlayerStats(minb, minb, maxb, maxb);
+                        FileOutputStream fos = MenuActivity.this.openFileOutput(savePath, Context.MODE_PRIVATE);
+                        ObjectOutputStream os = new ObjectOutputStream(fos);
+                        os.writeObject(playerStats);
+                        os.close();
+                        fos.close();
+
+                        foundFile = true;
+                        Toast.makeText(MenuActivity.this, "CREATED A NEW SAVE " + savePath, Toast.LENGTH_LONG).show();
+                    }catch(Exception e){
+                        //Log.i("BAD STATS WRITER", e.getMessage() + " | " + e.getCause());
+                        Toast.makeText(MenuActivity.this, "ERROR SAVE " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                }
+
+                /// load the stats activity
+                Intent intStats = new Intent(MenuActivity.this, StatsActivity.class);
+
+                intStats.putExtra("save", playerStats);
+
+                startActivity(intStats);
+            }
+        });
+
         puzzleImageView = findViewById(R.id.puzzle_image);
-        //puzzleImageView.setImageBitmap(currentBoard.getPuzzleImage());
+
         /// set default image
         puzzleImageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.ilya));
 

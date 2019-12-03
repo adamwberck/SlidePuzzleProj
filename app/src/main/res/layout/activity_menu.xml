@@ -101,4 +101,15 @@
             android:textColor="@color/menu1"
             android:textSize="50sp" />
     </LinearLayout>
+    <Button
+        android:id="@+id/stats_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:layout_weight="0.1"
+        android:background="@drawable/back_border"
+        android:padding="10dp"
+        android:text="@string/menu_stats"
+        android:textSize="40sp" />
 </LinearLayout>
