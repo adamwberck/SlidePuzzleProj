@@ -3,17 +3,20 @@ package com.example.slidepuzzleproj;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
-public class Solver {
+public class Solver implements Runnable{
     private Graph<SolveBoard> mBoardTree;
     private Queue<SolveBoard> mQueue = new PriorityQueue<>();
     private int w;
     private int h;
 
-    public Solver (PuzzleBoard firstBoard)throws CloneNotSupportedException{
+    public Solver (PuzzleBoard firstBoard){
         SolveBoard solveBoard = new SolveBoard(firstBoard.getBoardWidth(),
                 firstBoard.getBoardHeight(),firstBoard.getBlankIndex(),firstBoard.getPieces());
 
@@ -22,45 +25,77 @@ public class Solver {
         h = solveBoard.h;
         mBoardTree.addVertex(solveBoard);
         solveBoard.number = 0;
-        solveBoard.depth = 0;
         mQueue.add(solveBoard);
-        List<Direction> solution = solve();
-        for(Direction d: solution){
-            Log.i("Sol",d.name());
-            System.out.println(d.name());
-        }
     }
 
+
     public List<Direction> solve() throws CloneNotSupportedException {
-        int mDist = 1;
-        List<Direction> solution =  new ArrayList<>(10);
-        while(!mQueue.isEmpty() && mDist>0) {
-            SolveBoard qBoard = mQueue.poll();
-            solution.add(qBoard.dir);
-            List<Direction> dirs = qBoard.slideBlankPossible();
-            Direction backDir =  calcBackDir(qBoard.dir);
+        mQueue.peek().gScore = 0;
+        mQueue.peek().number = manhattanDist(mQueue.peek());
+        Map<SolveBoard,SolveBoard> cameFrom = new HashMap<>();
+        while(!mQueue.isEmpty()) {
+            SolveBoard currentBoard = mQueue.poll();
+            if(manhattanDist(currentBoard)==0){
+                //done
+                return reconstructPath(cameFrom,currentBoard);
+            }
+            List<Direction> dirs = currentBoard.slideBlankPossible();
+            Direction backDir =  calcBackDir(currentBoard.dir);
             for (Direction d : dirs) {
                 if(d!=backDir) {
-                    SolveBoard b = qBoard.clone();//clone the current board
-                    b.slideBlank(d);//slide in direction
-
-                    b.depth = qBoard.depth + 1;//depth set
-                    mDist = manhattanDist(b);
-                    Log.i("Sol", "D|" + qBoard.depth + " " + d.name() + " = " + mDist);
-                    b.number = mDist + b.depth;//set the number for the priority Q
-                    b.dir = d;
-
-                    mBoardTree.addVertex(b);
-                    mBoardTree.addEdge(qBoard, b);
-                    mQueue.add(b);
-                    if (mDist == 0) {//done
-                        solution.remove(0);//remove the dir which is null
-                        return solution;
+                    /*
+                    SolveBoard neighborBoard = currentBoard.clone();//clone the current board
+                    neighborBoard.slideBlank(d);//slide in direction
+                    */
+                    SolveBoard neighborBoard = getBoard(currentBoard,d);
+                    int tentative_gScore = currentBoard.gScore + 1;
+                    if( tentative_gScore < neighborBoard.gScore || neighborBoard.gScore<0){
+                        //record the score
+                        cameFrom.put(neighborBoard,currentBoard);
+                        neighborBoard.gScore = tentative_gScore;
+                        neighborBoard.dir = d;
+                        int mDist =  manhattanDist(neighborBoard);
+                        neighborBoard.number = tentative_gScore+mDist;
+                        if(!mQueue.contains(neighborBoard)){
+                            mQueue.add(neighborBoard);
+                        }
                     }
                 }
             }
         }
         return null;
+    }
+
+    private SolveBoard getBoard(SolveBoard currentBoard,Direction d)throws CloneNotSupportedException{
+        SolveBoard board = currentBoard.clone();
+        board.number = 0;
+        board.gScore = -1;
+        board.dir = null;
+        board.slideBlank(d);
+        for (SolveBoard b : mQueue){
+            boolean matched =  true;
+            for(int i=0;i<b.pieces.length;i++){
+                if(b.pieces[i].goalPos != board.pieces[i].goalPos){
+                    matched = false;
+                    i=b.pieces.length;
+                }
+            }
+            if(matched){
+                return b;
+            }
+        }
+        return board;
+    }
+
+    private List<Direction> reconstructPath(Map<SolveBoard,SolveBoard> cameFrom,SolveBoard current){
+        List<Direction> path = new LinkedList<>();
+        path.add(current.dir);
+        while(cameFrom.containsKey(current)){
+            current = cameFrom.get(current);
+            path.add(0,current.dir);
+        }
+        path.remove(0);
+        return path;
     }
 
     private Direction calcBackDir(Direction dir) {
@@ -99,6 +134,22 @@ public class Solver {
         return total;
     }
 
+    @Override
+    public void run() {
+        List<Direction> solution = null;
+        try {
+            solution = solve();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        if(solution!=null) {
+            for (Direction d : solution) {
+                Log.i("Sol", d.name());
+                System.out.println(d.name());
+            }
+        }
+    }
+
     enum Direction{
         Up,
         Down,
@@ -107,7 +158,9 @@ public class Solver {
     };
 
     private class SolveBoard implements Cloneable,Comparable<SolveBoard>{
-        public boolean isWin;
+        private int gScore = -1;
+        private int number;
+
         private int w;
         private int h;
         private int blankIndex;
@@ -115,10 +168,7 @@ public class Solver {
         private PuzzlePiece[] pieces;
 
 
-        private int number;
         private Direction dir;
-        private int depth;
-
         public SolveBoard clone() throws CloneNotSupportedException{
             SolveBoard clone = (SolveBoard) super.clone();
             clone.pieces = new PuzzlePiece[pieces.length];
