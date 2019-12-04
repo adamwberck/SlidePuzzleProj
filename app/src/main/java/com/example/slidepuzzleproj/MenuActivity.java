@@ -3,6 +3,7 @@ package com.example.slidepuzzleproj;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.media.MediaPlayer;
 import android.os.Environment;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -91,19 +92,20 @@ public class MenuActivity extends Activity {
                 });
 
         setContentView(R.layout.activity_menu); //attach the layout
-        VideoView videoView = findViewById(R.id.background);
-        Uri uri = Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.background);
-        videoView.setVideoURI(uri);
+        //VideoView videoView = findViewById(R.id.background);
+        //Uri uri = Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.background);
+        //videoView.setVideoURI(uri);
         //videoView.set
-        videoView.start();
-
+        //videoView.start();
+        /*
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
                 mp.setLooping(true);
             }
         });
-
+        */
+        
         savePath = getResources().getString(R.string.saveFile);
         //attemptLoadFile();
 
@@ -139,7 +141,7 @@ public class MenuActivity extends Activity {
             }
         });
 
-        playButton = findViewById(R.id.playButton);
+        playButton = findViewById(R.id.play_button);
         playButton.setOnClickListener(new View.OnClickListener() {
                                           @Override
                                           public void onClick(View v) {
