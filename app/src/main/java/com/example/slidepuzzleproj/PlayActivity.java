@@ -53,11 +53,12 @@ public class PlayActivity extends Activity {
     private PuzzleBoard currentBoard;
     private TextView restartText;
     private TextView challengeText;
+    private long seed = -1;
 
 
     private final long ONE_MINUTE = 60000;
     private final long ONE_SECOND = 1000;
-    private final long PLAY_TIME = 3 * ONE_MINUTE;
+    private long PLAY_TIME = 3 * ONE_MINUTE;
     private ImageView[] pieces;
   
     private Bitmap bitmap = null;
@@ -127,30 +128,35 @@ public class PlayActivity extends Activity {
         challengeText.setOnClickListener(new View.OnClickListener() {
              @Override
              public void onClick(View v) {
-                 String path = new String();
-                 if (imageUri.toString().contains(".jpg")||imageUri.toString().contains(".png")){
-                     path = imageUri.toString();
+                 if(User.getID()==null) {
+                     Toast.makeText(PlayActivity.this, "You must first log in or sign up.", Toast.LENGTH_SHORT).show();
+                     Intent playIntent = new Intent(PlayActivity.this, LoginActivity.class);
+                     startActivity(playIntent);
                  } else {
-                     File photoFile = null;
-                     try {
-                         photoFile = SaveImage.createImage(PlayActivity.this);
-                     } catch (IOException e) {
-                         e.printStackTrace();
-                     }
-                     if (photoFile != null) {
-                         try (FileOutputStream out = new FileOutputStream(SaveImage.getPath())) {
-                             bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+                     String path = new String();
+                     if (imageUri.toString().contains(".jpg") || imageUri.toString().contains(".png")) {
+                         path = imageUri.toString();
+                     } else {
+                         File photoFile = null;
+                         try {
+                             photoFile = SaveImage.createImage(PlayActivity.this);
                          } catch (IOException e) {
                              e.printStackTrace();
                          }
-                         path = photoFile.getAbsolutePath();
+                         if (photoFile != null) {
+                             try (FileOutputStream out = new FileOutputStream(SaveImage.getPath())) {
+                                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+                             } catch (IOException e) {
+                                 e.printStackTrace();
+                             }
+                             path = photoFile.getAbsolutePath();
+                         }
                      }
+                     String[] result = {path, String.valueOf(isWin), String.valueOf(PLAY_TIME), String.valueOf(width), String.valueOf(height), shareTimer};
+                     Intent shareIntent = new Intent(PlayActivity.this, ShareActivity.class);
+                     shareIntent.putExtra("INFO", result);
+                     startActivity(shareIntent);
                  }
-                 String[] result = {path, String.valueOf(isWin), shareTimer, String.valueOf(width), String.valueOf(height)};
-                 Intent shareIntent = new Intent(PlayActivity.this, ShareActivity.class);
-                 shareIntent.putExtra("INFO", result);
-                 startActivity(shareIntent);
-                 finish();
              }
         });
 
@@ -241,6 +247,12 @@ public class PlayActivity extends Activity {
             }
         });
 
+        Intent intent = getIntent();
+        if(intent.hasExtra("time")){
+            PLAY_TIME = intent.getLongExtra("time", 3*ONE_MINUTE);
+            seed = intent.getLongExtra("seed", -1);
+        }
+
         //init the timer text
         String text = getString(R.string.time_string,
                 PLAY_TIME/ONE_MINUTE,
@@ -255,9 +267,7 @@ public class PlayActivity extends Activity {
                 String text = getString(R.string.time_string,
                         millisUntilFinished/ONE_MINUTE,
                         millisUntilFinished%ONE_MINUTE/ONE_SECOND);
-                shareTimer = getString(R.string.time_string,
-                        timeElapsed/ONE_MINUTE,
-                        timeElapsed%ONE_MINUTE/ONE_SECOND);
+                shareTimer = String.valueOf(timeElapsed);
                 timer.setText(text);
                 timeElapsed = PLAY_TIME - millisUntilFinished;
                 timeRemain = millisUntilFinished;
@@ -268,16 +278,12 @@ public class PlayActivity extends Activity {
             public void onFinish() {
                 timer.setText(getString(R.string.time_gameover));
                 timeElapsed = PLAY_TIME;
-                shareTimer = getString(R.string.time_string,
-                        timeElapsed/ONE_MINUTE,
-                        timeElapsed%ONE_MINUTE/ONE_SECOND);
+                shareTimer = String.valueOf(timeElapsed);
                 timeRemain = 0;
                 lose(playSpace);
             }
         };
 
-
-        Intent intent = getIntent();
         imageUri = intent.getParcelableExtra("picture");
         try {
             bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
@@ -381,8 +387,19 @@ public class PlayActivity extends Activity {
         setupBoard(playSpace,width,height);
     }
     protected void scrambleBoard(){
-        for(int i=0;i<1000;i++){
-            slideImages(currentBoard.slideBlankRandom());
+        Log.i("SEED", String.valueOf(seed));
+        if(seed == -1) {
+            seed = (int) System.currentTimeMillis();
+            User.setSeed(seed);
+            for (int i = 0; i < 1000; i++) {
+                slideImages(currentBoard.slideBlankRandom(seed));
+                seed++;
+            }
+        } else {
+            for (int i = 0; i < 1000; i++) {
+                slideImages(currentBoard.slideBlankRandom(seed));
+                seed++;
+            }
         }
     }
 

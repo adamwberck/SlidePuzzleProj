@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
@@ -29,8 +30,13 @@ import com.mongodb.stitch.android.core.StitchAppClient;
 import com.mongodb.stitch.android.core.auth.StitchUser;
 import com.mongodb.stitch.core.auth.providers.anonymous.AnonymousCredential;
 
+import org.bson.Document;
+
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -91,8 +97,8 @@ public class MenuActivity extends Activity {
                     Intent playIntent = new Intent(MenuActivity.this, LoginActivity.class);
                     startActivity(playIntent);
                 } else {
-                    Intent getChallengeIntent = new Intent(MenuActivity.this, LoginActivity.class);
-                    startActivityForResult(getChallengeIntent, 123);
+                    Intent getChallengeIntent = new Intent(MenuActivity.this, InboxActivity.class);
+                    startActivity(getChallengeIntent);
                 }
             }
         });
@@ -237,9 +243,8 @@ public class MenuActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == RESULT_OK)
-        {
-            if(requestCode == PICK_IMAGE){
+        if(resultCode == RESULT_OK) {
+            if (requestCode == PICK_IMAGE) {
                 imageUri = data.getData();
             } else {
                 Log.i("INFO", SaveImage.getPath());

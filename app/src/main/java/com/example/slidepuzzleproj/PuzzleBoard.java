@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 //// fix bug where uneven sized board isnt processed properly
 
@@ -258,6 +259,14 @@ public class PuzzleBoard implements Serializable
         Collections.shuffle(dirs);
         return dirs.get(0);
     }
+
+    public Direction slideBlankRandom(long seed){
+        List<Direction> dirs = slideBlankPossible();
+        User.setSeed(seed);
+        Collections.shuffle(dirs, new Random(seed));
+        return dirs.get(0);
+    }
+
 
     private List<Direction> slideBlankPossible()
     {
