@@ -2,7 +2,6 @@ package com.example.slidepuzzleproj;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -36,12 +35,10 @@ import java.io.FileNotFoundException;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
-import org.w3c.dom.Text;
-
-import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -55,8 +52,6 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.nio.file.Paths;
 import java.util.Stack;
-
-import static java.lang.Math.min;
 
 public class PlayActivity extends Activity {
     private ContextWrapper cw; //context / working directory of app
@@ -79,9 +74,11 @@ public class PlayActivity extends Activity {
     private final long ONE_SECOND = 1000;
     private long playTime = 3 * ONE_MINUTE;
     private final int GAP = 2;
+    private TextView challengeText;
+    private long seed = -1;
     private ImageView[] pieces;
     private MediaPlayer menuBGM;
-
+  
     private int moveInt = 0;    // save
     private int undoInt = 0;
     private long timeElapsed;   //save
@@ -104,6 +101,7 @@ public class PlayActivity extends Activity {
     //private boolean foundFile = false;
     private int minb;
     private int maxb;
+    private String shareTimer;
 
     @Override
     protected void onPause()
@@ -154,12 +152,52 @@ public class PlayActivity extends Activity {
 
         playSpace = findViewById(R.id.playSpace);
         restartText = findViewById(R.id.restartText);
+        challengeText = findViewById(R.id.challengeText);
+
         restartText.setVisibility(View.INVISIBLE);
+        challengeText.setVisibility(View.INVISIBLE);
+
+        challengeText.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+                 if(User.getID()==null) {
+                     Toast.makeText(PlayActivity.this, "You must first log in or sign up.", Toast.LENGTH_SHORT).show();
+                     Intent playIntent = new Intent(PlayActivity.this, LoginActivity.class);
+                     startActivity(playIntent);
+                 } else {
+                     String path = new String();
+                     if (imageUri.toString().contains(".jpg") || imageUri.toString().contains(".png")) {
+                         path = imageUri.toString();
+                     } else {
+                         File photoFile = null;
+                         try {
+                             photoFile = SaveImage.createImage(PlayActivity.this);
+                         } catch (IOException e) {
+                             e.printStackTrace();
+                         }
+                         if (photoFile != null) {
+                             try (FileOutputStream out = new FileOutputStream(SaveImage.getPath())) {
+                                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+                             } catch (IOException e) {
+                                 e.printStackTrace();
+                             }
+                             path = photoFile.getAbsolutePath();
+                         }
+                     }
+                     String[] result = {path, String.valueOf(isWin), String.valueOf(playTime), String.valueOf(width), String.valueOf(height), shareTimer};
+                     Intent shareIntent = new Intent(PlayActivity.this, ShareActivity.class);
+                     shareIntent.putExtra("INFO", result);
+                     startActivity(shareIntent);
+                 }
+             }
+        });
+
+
         restartText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(isLose || isWin){
-                   restart();
+                if (isLose || isWin) {
+                    restart();
                 }
 
             }
@@ -181,6 +219,7 @@ public class PlayActivity extends Activity {
                     //This works except the timer is broken
                     if(isWin) {
                         restartText.setVisibility(View.INVISIBLE);
+                        challengeText.setVisibility(View.INVISIBLE);
                         playSpace.setBackgroundColor(Color.DKGRAY);
                         isWin = false;
                     }
@@ -247,7 +286,11 @@ public class PlayActivity extends Activity {
 
         width = getIntent().getIntExtra("WIDTH", 3);
         height = getIntent().getIntExtra("HEIGHT", 3);
-        playTime = (long)(((float)(width+height)/2.0) * ONE_MINUTE);  //(long)(1.5 * ONE_MINUTE);
+        Intent intent = getIntent();
+        if(intent.hasExtra("time")){
+            playTime = intent.getLongExtra("time", 3*ONE_MINUTE);
+            seed = intent.getLongExtra("seed", -1);
+        }
 
         //init the timer text
         String text = getString(R.string.time_string,
@@ -273,6 +316,7 @@ public class PlayActivity extends Activity {
                 String text = getString(R.string.time_string,
                         millisUntilFinished/ONE_MINUTE,
                         millisUntilFinished%ONE_MINUTE/ONE_SECOND);
+                shareTimer = String.valueOf(timeElapsed);
                 timer.setText(text);
                 timeElapsed = playTime - millisUntilFinished;
                 timeRemain = millisUntilFinished;
@@ -283,6 +327,7 @@ public class PlayActivity extends Activity {
             public void onFinish() {
                 timer.setText(getString(R.string.time_gameover));
                 timeElapsed = playTime;
+                shareTimer = String.valueOf(timeElapsed);
                 timeRemain = 0;
                 lose(playSpace);
             }
@@ -364,8 +409,10 @@ public class PlayActivity extends Activity {
         }
 
         restartText.setVisibility(View.INVISIBLE);
+        challengeText.setVisibility((View.INVISIBLE));
         playSpace.setBackgroundColor(Color.DKGRAY);
 
+        challengeText.invalidate();
         restartText.invalidate();
         playSpace.invalidate();
         isLose = false;
@@ -391,8 +438,19 @@ public class PlayActivity extends Activity {
         setupBoard(playSpace,width,height);
     }
     protected void scrambleBoard(){
-        for(int i=0;i<1000;i++){
-            slideImages(currentBoard.slideBlankRandom());
+        Log.i("SEED", String.valueOf(seed));
+        if(seed == -1) {
+            seed = (int) System.currentTimeMillis();
+            User.setSeed(seed);
+            for (int i = 0; i < 1000; i++) {
+                slideImages(currentBoard.slideBlankRandom(seed));
+                seed++;
+            }
+        } else {
+            for (int i = 0; i < 1000; i++) {
+                slideImages(currentBoard.slideBlankRandom(seed));
+                seed++;
+            }
         }
     }
 
@@ -493,6 +551,7 @@ public class PlayActivity extends Activity {
         return src;
     }
 
+
     protected Bitmap scaleBitmapCenteredSquare(Bitmap src, int w, int h)
     {
         int min = playSpace.getWidth();
@@ -580,6 +639,7 @@ public class PlayActivity extends Activity {
         isWin = true;
         restartText.setText(R.string.win);
         restartText.setVisibility(View.VISIBLE);
+        challengeText.setVisibility(View.VISIBLE);
         playSpace.setBackgroundColor(getResources().getColor(R.color.winColor));
         timerTick.cancel();
 
@@ -603,6 +663,8 @@ public class PlayActivity extends Activity {
         playSpace.setBackgroundColor(getResources().getColor(R.color.failColor));
         playSpace.invalidate();
         restartText.setVisibility(View.VISIBLE);
+        challengeText.setVisibility(View.VISIBLE);
+        challengeText.invalidate();
         restartText.invalidate();
         timerTick.cancel();
 

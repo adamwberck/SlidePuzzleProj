@@ -12,6 +12,7 @@
     <string name="moves">Moves:</string>
     <string name="saveFile">stats.bin</string>
     <string name="menu_stats">Stats</string>
+    <string name="stitch_client_app_id">slidepuzzle-llyuv</string>
 
     <string name="min_board_size">3</string>
     <string name="max_board_size">10</string>

@@ -8,12 +8,9 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -25,7 +22,6 @@ import android.widget.ScrollView;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
-import androidx.core.content.FileProvider;
 
 import com.squareup.picasso.Picasso;
 
@@ -193,7 +189,13 @@ public class FlickrActivity extends Activity {
             } else {
                 imageView = (ImageView) convertView;
             }
-            Picasso.get().load(this.uriList.get(position)).into(imageView);
+            try {
+                Picasso.get().load(this.uriList.get(position)).into(imageView);
+            } catch (Exception e) {
+                Toast toast = Toast.makeText(FlickrActivity.this, "Cannot get images. Maybe missing permission?", Toast.LENGTH_SHORT);
+                toast.show();
+                finish();
+            }
             imageView.setOnClickListener(new View.OnClickListener() {
                 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                 @Override
