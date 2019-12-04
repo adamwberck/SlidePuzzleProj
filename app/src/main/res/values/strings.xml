@@ -7,6 +7,7 @@
     <string name="time_string">%d:%02d</string>
     <string name="api_key">e0ac8379fcf11a7cc79a0f854269349a</string>
     <string name="time_gameover">GAME OVER</string>
+    <string name="classic_mode">CLASSIC MODE</string>
     <string name="win">Win</string>
     <string name="moves">Moves:</string>
     <string name="saveFile">stats.bin</string>

@@ -56,6 +56,7 @@ public class MenuActivity extends Activity {
     private PlayerStats playerStats = null;
     private String savePath;
     private boolean foundFile = false;
+    private boolean mode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -131,16 +132,7 @@ public class MenuActivity extends Activity {
             @Override
             public void onClick(View v)
             {
-
-                Intent playIntent = new Intent(MenuActivity.this, PlayActivity.class);
-                playIntent.putExtra("WIDTH", width);
-                playIntent.putExtra("HEIGHT", height);
-                if(imageUri == null)
-                {
-                    imageUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.ilya);
-                }
-                playIntent.putExtra("picture",imageUri);
-                startActivityForResult(playIntent, DIMENSION);
+                openDialog2();
             }
         });
         ArrayAdapter<CharSequence> adapter
@@ -182,6 +174,76 @@ public class MenuActivity extends Activity {
         public void onNothingSelected(AdapterView<?> parent) {
 
         }
+    }
+
+    private void openDialog2(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Choose Game Mode")
+                    .setView(R.layout.gamemode)
+                    .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            sourceChoice2(dialog);
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.dismiss();
+                        }
+                    });
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
+    }
+
+
+    private void sourceChoice2(DialogInterface dialog){
+        RadioGroup rg = ((AlertDialog) dialog).findViewById(R.id.game_mode);
+        int checked = rg.getCheckedRadioButtonId();
+        dialog.dismiss();
+        //Log.e("Checked", "" + checked);
+        switch (checked){
+            case R.id.mode1:
+                classicMode();
+                break;
+            case R.id.mode2:
+                timeMode();
+                break;
+            default:
+        }
+    }
+
+    public void timeMode()
+    {
+        mode = true;
+        Intent playIntent = new Intent(MenuActivity.this, PlayActivity.class);
+        playIntent.putExtra("WIDTH", width);
+        playIntent.putExtra("HEIGHT", height);
+        playIntent.putExtra("MODE", mode);
+        if(imageUri == null)
+        {
+            imageUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.ilya);
+        }
+        playIntent.putExtra("picture",imageUri);
+        startActivityForResult(playIntent, DIMENSION);
+    }
+
+    public void classicMode()
+    {
+        mode = false;
+        Intent playIntent = new Intent(MenuActivity.this, PlayActivity.class);
+        playIntent.putExtra("WIDTH", width);
+        playIntent.putExtra("HEIGHT", height);
+        playIntent.putExtra("MODE", mode);
+        if(imageUri == null)
+        {
+            imageUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.ilya);
+        }
+        playIntent.putExtra("picture",imageUri);
+        startActivityForResult(playIntent, DIMENSION);
     }
 
     private void openDialog() {
