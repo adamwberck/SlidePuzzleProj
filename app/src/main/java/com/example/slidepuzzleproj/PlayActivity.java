@@ -91,6 +91,7 @@ public class PlayActivity extends Activity {
   
     private int moveInt = 0;    // save
     private int undoInt = 0;
+    private int hintInt = 0;
     private long timeElapsed;   //save
     private long timeRemain;    // save
     private CountDownTimer timerTick;   // save
@@ -311,6 +312,7 @@ public class PlayActivity extends Activity {
                     } else {
                         glowPiece(mHints.get(0));
                     }
+                    hintInt++;
                 }
             }
         });
@@ -456,6 +458,7 @@ public class PlayActivity extends Activity {
 
         moveInt = 0;
         undoInt = 0;
+        hintInt = 0;
         moveNum.setText(String.format("%d", moveInt));
         moveNum.invalidate();
 
@@ -705,7 +708,7 @@ public class PlayActivity extends Activity {
         /// attempt to update save file
         try{
             int classic = mode ? 0 : 1;
-            stats.updateStats(width, height, moveInt, undoInt, (int)(timeElapsed/ONE_SECOND), classic^1, 0, classic);
+            stats.updateStats(width, height, moveInt, undoInt, (int)(timeElapsed/ONE_SECOND), classic^1, 0, classic, hintInt);
 
             FileOutputStream fos = PlayActivity.this.openFileOutput(savePath, Context.MODE_PRIVATE);
             ObjectOutputStream os = new ObjectOutputStream(fos);
@@ -730,7 +733,7 @@ public class PlayActivity extends Activity {
         /// attempt to update save file
         try{
             int classic = mode ? 1 : 0;
-            stats.updateStats(width, height, moveInt, undoInt, 0, 0, classic, 0);
+            stats.updateStats(width, height, moveInt, undoInt, 0, 0, classic, 0, hintInt);
             FileOutputStream fos = PlayActivity.this.openFileOutput(savePath, Context.MODE_PRIVATE);
             ObjectOutputStream os = new ObjectOutputStream(fos);
             os.writeObject(stats);
