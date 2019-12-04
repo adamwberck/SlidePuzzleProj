@@ -1,5 +1,6 @@
 package com.example.slidepuzzleproj;
 
+import android.animation.ValueAnimator;
 import android.graphics.Bitmap;
 import android.os.Environment;
 import android.app.Activity;
@@ -22,6 +23,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -29,6 +31,7 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.RadioGroup;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import androidx.core.content.FileProvider;
 
@@ -45,7 +48,7 @@ import static androidx.core.content.FileProvider.getUriForFile;
 
 public class MenuActivity extends Activity {
     private View changeImageButton;
-    private ImageView puzzleImageView;
+    private ImageView puzzleImageView, background1, background2;
     private Button playButton;
     private Button statButton;
     private int width = 3 , height=3;
@@ -63,6 +66,17 @@ public class MenuActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_menu); //attach the layout
+        VideoView videoView = findViewById(R.id.background);
+        Uri uri = Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.background);
+        videoView.setVideoURI(uri);
+        videoView.start();
+
+        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                mp.setLooping(true);
+            }
+        });
 
         savePath = getResources().getString(R.string.saveFile);
         minb = Integer.parseInt(getResources().getString(R.string.min_board_size));
