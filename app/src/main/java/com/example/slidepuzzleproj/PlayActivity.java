@@ -321,6 +321,12 @@ public class PlayActivity extends Activity {
         height = getIntent().getIntExtra("HEIGHT", 3);
         if(intent.hasExtra("time")){
             playTime = intent.getLongExtra("time", 3*ONE_MINUTE);
+            if(playTime == -1){
+                mode = false;
+                playTime = 3*ONE_MINUTE;
+            } else {
+                mode = true;
+            }
             seed = intent.getLongExtra("seed", -1);
         }
 
