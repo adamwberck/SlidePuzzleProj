@@ -1,7 +1,9 @@
 package com.example.slidepuzzleproj;
 
 import android.animation.ValueAnimator;
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.media.MediaPlayer;
 import android.os.Environment;
 import android.app.Activity;
 import android.app.AlertDialog;
