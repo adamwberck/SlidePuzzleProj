@@ -2,7 +2,6 @@ package com.example.slidepuzzleproj;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -25,25 +24,14 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.squareup.picasso.Picasso;
+import androidx.fragment.app.FragmentManager;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-
-import org.w3c.dom.Text;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Stack;
-
-import static java.lang.Math.min;
 
 public class PlayActivity extends Activity {
     private ContextWrapper cw; //context / working directory of app
@@ -64,6 +52,7 @@ public class PlayActivity extends Activity {
     private CountDownTimer timerTick;
     private PuzzleBoard currentBoard;
     private TextView restartText;
+    private TextView challengeText;
 
 
     private final long ONE_MINUTE = 60000;
@@ -89,6 +78,7 @@ public class PlayActivity extends Activity {
 
     private MediaPlayer menuBGM;
     private boolean play;
+    private String shareTimer;
 
     @Override
     protected void onPause()
@@ -129,12 +119,47 @@ public class PlayActivity extends Activity {
 
         playSpace = findViewById(R.id.playSpace);
         restartText = findViewById(R.id.restartText);
+        challengeText = findViewById(R.id.challengeText);
+
         restartText.setVisibility(View.INVISIBLE);
+        challengeText.setVisibility(View.INVISIBLE);
+
+        challengeText.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+                 String path = new String();
+                 if (imageUri.toString().contains(".jpg")||imageUri.toString().contains(".png")){
+                     path = imageUri.toString();
+                 } else {
+                     File photoFile = null;
+                     try {
+                         photoFile = SaveImage.createImage(PlayActivity.this);
+                     } catch (IOException e) {
+                         e.printStackTrace();
+                     }
+                     if (photoFile != null) {
+                         try (FileOutputStream out = new FileOutputStream(SaveImage.getPath())) {
+                             bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+                         } catch (IOException e) {
+                             e.printStackTrace();
+                         }
+                         path = photoFile.getAbsolutePath();
+                     }
+                 }
+                 String[] result = {path, String.valueOf(isWin), shareTimer, String.valueOf(width), String.valueOf(height)};
+                 Intent shareIntent = new Intent(PlayActivity.this, ShareActivity.class);
+                 shareIntent.putExtra("INFO", result);
+                 startActivity(shareIntent);
+                 finish();
+             }
+        });
+
+
         restartText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(isLose || isWin){
-                   restart();
+                if (isLose || isWin) {
+                    restart();
                 }
 
             }
@@ -155,6 +180,7 @@ public class PlayActivity extends Activity {
                     //This works except the timer is broken
                     if(isWin) {
                         restartText.setVisibility(View.INVISIBLE);
+                        challengeText.setVisibility(View.INVISIBLE);
                         playSpace.setBackgroundColor(Color.DKGRAY);
                         isWin = false;
                     }
@@ -229,6 +255,9 @@ public class PlayActivity extends Activity {
                 String text = getString(R.string.time_string,
                         millisUntilFinished/ONE_MINUTE,
                         millisUntilFinished%ONE_MINUTE/ONE_SECOND);
+                shareTimer = getString(R.string.time_string,
+                        timeElapsed/ONE_MINUTE,
+                        timeElapsed%ONE_MINUTE/ONE_SECOND);
                 timer.setText(text);
                 timeElapsed = PLAY_TIME - millisUntilFinished;
                 timeRemain = millisUntilFinished;
@@ -239,6 +268,9 @@ public class PlayActivity extends Activity {
             public void onFinish() {
                 timer.setText(getString(R.string.time_gameover));
                 timeElapsed = PLAY_TIME;
+                shareTimer = getString(R.string.time_string,
+                        timeElapsed/ONE_MINUTE,
+                        timeElapsed%ONE_MINUTE/ONE_SECOND);
                 timeRemain = 0;
                 lose(playSpace);
             }
@@ -321,8 +353,10 @@ public class PlayActivity extends Activity {
         }
 
         restartText.setVisibility(View.INVISIBLE);
+        challengeText.setVisibility((View.INVISIBLE));
         playSpace.setBackgroundColor(Color.DKGRAY);
 
+        challengeText.invalidate();
         restartText.invalidate();
         playSpace.invalidate();
         isLose = false;
@@ -421,6 +455,8 @@ public class PlayActivity extends Activity {
         playSpace.setBackgroundColor(getResources().getColor(R.color.failColor));
         playSpace.invalidate();
         restartText.setVisibility(View.VISIBLE);
+        challengeText.setVisibility(View.VISIBLE);
+        challengeText.invalidate();
         restartText.invalidate();
     }
 
@@ -468,6 +504,7 @@ public class PlayActivity extends Activity {
         isWin = true;
         restartText.setText(R.string.win);
         restartText.setVisibility(View.VISIBLE);
+        challengeText.setVisibility(View.VISIBLE);
         playSpace.setBackgroundColor(getResources().getColor(R.color.winColor));
         timerTick.cancel();
     }

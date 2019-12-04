@@ -9,6 +9,7 @@
     <string name="time_gameover">GAME OVER</string>
     <string name="win">Win</string>
     <string name="moves">Moves:</string>
+    <string name="stitch_client_app_id">slidepuzzle-llyuv</string>
 
     <string-array name="numbers">
         <item>3</item>

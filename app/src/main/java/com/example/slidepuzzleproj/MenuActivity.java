@@ -1,20 +1,11 @@
 package com.example.slidepuzzleproj;
 
-import android.graphics.Bitmap;
-import android.os.Environment;
 import android.app.Activity;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.pm.PackageManager;
-import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,16 +16,23 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.Toast;
 
-import androidx.core.content.FileProvider;
+import com.cloudinary.android.MediaManager;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.mongodb.lang.NonNull;
+import com.mongodb.stitch.android.core.Stitch;
+import com.mongodb.stitch.android.core.StitchAppClient;
+import com.mongodb.stitch.android.core.auth.StitchUser;
+import com.mongodb.stitch.core.auth.providers.anonymous.AnonymousCredential;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import static androidx.core.content.FileProvider.getUriForFile;
 
@@ -42,6 +40,7 @@ public class MenuActivity extends Activity {
     private View changeImageButton;
     private ImageView puzzleImageView;
     private Button playButton;
+    private Button inboxButton;
     private int width = 3 , height=3;
     private static final int PICK_IMAGE = 100;
     private static final int DIMENSION = 200;
@@ -51,6 +50,21 @@ public class MenuActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
 
+        final StitchAppClient client = Stitch.getDefaultAppClient();
+        client.getAuth().loginWithCredential(new AnonymousCredential()).addOnCompleteListener(
+                new OnCompleteListener<StitchUser>() {
+                    @Override
+                    public void onComplete(@NonNull final Task<StitchUser> task) {
+                        if (task.isSuccessful()) {
+                            Log.d("myApp", String.format(
+                                    "logged in as user %s with provider %s",
+                                    task.getResult().getId(),
+                                    task.getResult().getLoggedInProviderType()));
+                        } else {
+                            Log.e("myApp", "failed to log in", task.getException());
+                        }
+                    }
+                });
 
         setContentView(R.layout.activity_menu); //attach the layout
         //currentBoard = PuzzleLab.get(this).getCurrentBoard();
@@ -65,6 +79,21 @@ public class MenuActivity extends Activity {
             public void onClick(View v)
             {
                 openDialog();
+            }
+        });
+
+        inboxButton = findViewById(R.id.inbox_button);
+        inboxButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(User.getID()==null) {
+                    Toast.makeText(MenuActivity.this, "You must first log in or sign up.", Toast.LENGTH_SHORT).show();
+                    Intent playIntent = new Intent(MenuActivity.this, LoginActivity.class);
+                    startActivity(playIntent);
+                } else {
+                    Intent getChallengeIntent = new Intent(MenuActivity.this, LoginActivity.class);
+                    startActivityForResult(getChallengeIntent, 123);
+                }
             }
         });
 
@@ -179,12 +208,10 @@ public class MenuActivity extends Activity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            Log.i("HERE", "HERE");
             if (photoFile != null) {
                 Uri photoURI = getUriForFile(this, "com.example.slidepuzzleproj.provider", photoFile);
                 cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT,
                         photoURI);
-                Log.i("HERE", "HERE");
                 startActivityForResult(cameraIntent,
                         1);
 
@@ -219,7 +246,6 @@ public class MenuActivity extends Activity {
                 imageUri = Uri.parse(SaveImage.getPath());
             }
             puzzleImageView.setImageURI(imageUri);
-
         }
     }
 }
