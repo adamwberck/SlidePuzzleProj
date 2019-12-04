@@ -319,10 +319,8 @@ public class PlayActivity extends Activity {
 
         width = getIntent().getIntExtra("WIDTH", 3);
         height = getIntent().getIntExtra("HEIGHT", 3);
-        if(intent.hasExtra("time")){
-            playTime = intent.getLongExtra("time", 3*ONE_MINUTE);
-            seed = intent.getLongExtra("seed", -1);
-        }
+        playTime = intent.getLongExtra("time", (long)((float)(width+height)/2) * ONE_MINUTE);
+        seed = intent.getLongExtra("seed", -1);
 
         //init the timer text
         String text = getString(R.string.time_string,
@@ -339,7 +337,6 @@ public class PlayActivity extends Activity {
             timer.setText(getString(R.string.classic_mode));
             timer.setTextSize(20);
         }
-
 
         this.timerTick = new CountDownTimer(playTime, ONE_SECOND) {
             @Override
