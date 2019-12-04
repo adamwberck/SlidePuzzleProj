@@ -77,12 +77,13 @@ public class PlayActivity extends Activity {
 
     private final long ONE_MINUTE = 60000;
     private final long ONE_SECOND = 1000;
-    private final long PLAY_TIME = 3 * ONE_MINUTE;
+    private long playTime = 3 * ONE_MINUTE;
     private final int GAP = 2;
     private ImageView[] pieces;
     private MediaPlayer menuBGM;
 
     private int moveInt = 0;    // save
+    private int undoInt = 0;
     private long timeElapsed;   //save
     private long timeRemain;    // save
     private CountDownTimer timerTick;   // save
@@ -98,7 +99,9 @@ public class PlayActivity extends Activity {
     private boolean play; // save
     private boolean mode;
 
-    private PlayerStats stats;
+    private PlayerStats stats = null;
+    private String savePath;
+    //private boolean foundFile = false;
     private int minb;
     private int maxb;
 
@@ -122,11 +125,16 @@ public class PlayActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
 
+        Intent intent = getIntent(); ///intent args
+        stats = (PlayerStats)intent.getSerializableExtra("save"); /// get save file
+
+        savePath = getResources().getString(R.string.saveFile);
+
         mode = getIntent().getExtras().getBoolean("MODE");
 
         minb = Integer.parseInt(getResources().getString(R.string.min_board_size));
         maxb = Integer.parseInt(getResources().getString(R.string.max_board_size));
-        stats = new PlayerStats(minb, minb, maxb, maxb);
+        //stats = new PlayerStats(minb, minb, maxb, maxb);
 
         cw = new ContextWrapper(getApplicationContext());
 
@@ -161,11 +169,12 @@ public class PlayActivity extends Activity {
             @SuppressLint("DefaultLocale")
             @Override
             public void onClick(View v) {
-                if(!isLose && !undoStack.isEmpty()) {
+                if(!isLose && !isWin && !undoStack.isEmpty()) {
                     PuzzleBoard.Direction d = undoStack.pop();
                     d = PuzzleBoard.getOpposite(d);
                     slideImages(d);
                     moveInt--;
+                    undoInt++;
                     moveNum.setText(String.format("%d", moveInt));
                     moveNum.invalidate();
                     //TODO fix the timer after winning
@@ -196,47 +205,15 @@ public class PlayActivity extends Activity {
                                 //startActivity(intent);
                                 finish();
                                 return true;
-                            case R.id.load_menu:
-                                Toast.makeText(PlayActivity.this, "Load Menu Clicked", Toast.LENGTH_SHORT).show();
-                                try{
-                                    String path = getFilesDir() + "/test.bin";
-                                    FileInputStream fis = openFileInput(getResources().getString(R.string.saveFile));
-                                    ObjectInputStream is = new ObjectInputStream(fis);
-                                    PlayerStats stats = (PlayerStats)is.readObject();
-                                    is.close();
-                                    fis.close();
 
-                                    Toast.makeText(PlayActivity.this, "LOAD NEW STRING " + stats.toString(), Toast.LENGTH_LONG).show();
-                                }catch(Exception e){
-                                    Toast.makeText(PlayActivity.this, "ERROR ERROR LOAD", Toast.LENGTH_LONG).show();
-                                }
-                                return true;
-                            case R.id.save_menu:
-                                Toast.makeText(PlayActivity.this, "Save Menu Clicked", Toast.LENGTH_SHORT).show();
-
-                                try{
-                                    Toast.makeText(PlayActivity.this, minb + "," + maxb + "," + width + "," + height, Toast.LENGTH_LONG).show();
-                                    //stats.updateStats(width, height, 0, 1, 100, 1, 0);
-                                    String path = getFilesDir().getPath() + "/test.bin";
-                                    Toast.makeText(PlayActivity.this, path, Toast.LENGTH_LONG).show();
-                                    FileOutputStream fos = PlayActivity.this.openFileOutput("test.bin", Context.MODE_PRIVATE);
-                                    Toast.makeText(PlayActivity.this, fos.toString(), Toast.LENGTH_LONG).show();
-                                    //File f = new File(path);
-                                    //FileInputStream
-                                    ObjectOutputStream os = new ObjectOutputStream(fos);
-                                    os.writeObject(stats);
-                                    os.close();
-                                    fos.close();
-
-                                    Toast.makeText(PlayActivity.this, "SAVED NEW OBJECT " + stats.toString(), Toast.LENGTH_LONG).show();
-                                }catch(Exception e){
-                                    Log.i("BAD STATS WRITER", e.getMessage() + " | " + e.getCause());
-                                    Toast.makeText(PlayActivity.this, "ERROR SAVE " + e.getMessage(), Toast.LENGTH_LONG).show();
-                                }
-
-                                return true;
                             case R.id.statistics_menu:
-                                Toast.makeText(PlayActivity.this, "Statistics Clicked", Toast.LENGTH_SHORT).show();
+                                /// load the stats activity
+                                Intent intStats = new Intent(PlayActivity.this, StatsActivity.class);
+
+                                intStats.putExtra("path", savePath);
+                                intStats.putExtra("save", stats);
+
+                                startActivity(intStats);
                                 return true;
                             case R.id.mute_menu:
                                 if (play == true) {
@@ -268,10 +245,14 @@ public class PlayActivity extends Activity {
             }
         });
 
+        width = getIntent().getIntExtra("WIDTH", 3);
+        height = getIntent().getIntExtra("HEIGHT", 3);
+        playTime = (long)(((float)(width+height)/2.0) * ONE_MINUTE);  //(long)(1.5 * ONE_MINUTE);
+
         //init the timer text
         String text = getString(R.string.time_string,
-                PLAY_TIME/ONE_MINUTE,
-                PLAY_TIME%ONE_MINUTE/ONE_SECOND);
+                playTime/ONE_MINUTE,
+                playTime%ONE_MINUTE/ONE_SECOND);
 
         if(mode == true)
         {
@@ -285,7 +266,7 @@ public class PlayActivity extends Activity {
         }
 
 
-        this.timerTick = new CountDownTimer(PLAY_TIME, ONE_SECOND) {
+        this.timerTick = new CountDownTimer(playTime, ONE_SECOND) {
             @Override
             public void onTick(long millisUntilFinished) {
                 //DecimalFormat df = new DecimalFormat("00");
@@ -293,7 +274,7 @@ public class PlayActivity extends Activity {
                         millisUntilFinished/ONE_MINUTE,
                         millisUntilFinished%ONE_MINUTE/ONE_SECOND);
                 timer.setText(text);
-                timeElapsed = PLAY_TIME - millisUntilFinished;
+                timeElapsed = playTime - millisUntilFinished;
                 timeRemain = millisUntilFinished;
                 timer.invalidate();
             }
@@ -301,14 +282,14 @@ public class PlayActivity extends Activity {
             @Override
             public void onFinish() {
                 timer.setText(getString(R.string.time_gameover));
-                timeElapsed = PLAY_TIME;
+                timeElapsed = playTime;
                 timeRemain = 0;
                 lose(playSpace);
             }
         };
 
 
-        Intent intent = getIntent();
+        /// get the puzzle board picture
         imageUri = intent.getParcelableExtra("picture");
         try {
             bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
@@ -329,7 +310,7 @@ public class PlayActivity extends Activity {
                 e.printStackTrace();
             }
         } catch (NullPointerException npe) {
-            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ilya);
+            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.logo);
             //imageUri
         }
 
@@ -342,8 +323,7 @@ public class PlayActivity extends Activity {
         ViewTreeObserver tree = findViewById(R.id.mainLayout).getViewTreeObserver();
         tree.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {@Override
         public void onGlobalLayout() {
-            setupBoard(playSpace, getIntent().getIntExtra("WIDTH", 3),
-                    getIntent().getIntExtra("HEIGHT", 3), bitmap);
+            setupBoard(playSpace, width, height, bitmap);
             playSpace.getViewTreeObserver().removeOnGlobalLayoutListener(this);
         }
         });
@@ -392,16 +372,17 @@ public class PlayActivity extends Activity {
         isWin = false;
 
         String text = getString(R.string.time_string,
-                PLAY_TIME/ONE_MINUTE,
-                PLAY_TIME%ONE_MINUTE/ONE_SECOND);
+                playTime/ONE_MINUTE,
+                playTime%ONE_MINUTE/ONE_SECOND);
         timer.setText(text);
 
         moveInt = 0;
+        undoInt = 0;
         moveNum.setText(String.format("%d", moveInt));
         moveNum.invalidate();
 
         timeElapsed = 0;
-        timeRemain = PLAY_TIME;
+        timeRemain = playTime;
     }
 
     protected void setupBoard(final GridLayout playSpace, int w, int h,Bitmap bm){
@@ -544,13 +525,7 @@ public class PlayActivity extends Activity {
 
 
 
-    private void lose(GridLayout playSpace) {
-        isLose = true;
-        playSpace.setBackgroundColor(getResources().getColor(R.color.failColor));
-        playSpace.invalidate();
-        restartText.setVisibility(View.VISIBLE);
-        restartText.invalidate();
-    }
+
 
 
     private class PieceListener implements View.OnClickListener {
@@ -607,6 +582,43 @@ public class PlayActivity extends Activity {
         restartText.setVisibility(View.VISIBLE);
         playSpace.setBackgroundColor(getResources().getColor(R.color.winColor));
         timerTick.cancel();
+
+        /// attempt to update save file
+        try{
+            int classic = mode ? 0 : 1;
+            stats.updateStats(width, height, moveInt, undoInt, (int)(timeElapsed/ONE_SECOND), classic^1, 0, classic);
+
+            FileOutputStream fos = PlayActivity.this.openFileOutput(savePath, Context.MODE_PRIVATE);
+            ObjectOutputStream os = new ObjectOutputStream(fos);
+            os.writeObject(stats);
+            os.close();
+            fos.close();
+
+        }catch(Exception e){
+            Toast.makeText(PlayActivity.this, "WIN ERROR SAVE " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+    private void lose(GridLayout playSpace) {
+        isLose = true;
+        playSpace.setBackgroundColor(getResources().getColor(R.color.failColor));
+        playSpace.invalidate();
+        restartText.setVisibility(View.VISIBLE);
+        restartText.invalidate();
+        timerTick.cancel();
+
+        /// attempt to update save file
+        try{
+            int classic = mode ? 1 : 0;
+            stats.updateStats(width, height, moveInt, undoInt, 0, 0, classic, 0);
+            FileOutputStream fos = PlayActivity.this.openFileOutput(savePath, Context.MODE_PRIVATE);
+            ObjectOutputStream os = new ObjectOutputStream(fos);
+            os.writeObject(stats);
+            os.close();
+            fos.close();
+
+        }catch(Exception e){
+            Toast.makeText(PlayActivity.this, "LOSE ERROR SAVE " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
     }
 
     public void slideImages(PuzzleBoard.Direction d){

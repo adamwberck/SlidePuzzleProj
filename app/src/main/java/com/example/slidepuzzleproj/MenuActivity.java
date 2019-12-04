@@ -69,6 +69,7 @@ public class MenuActivity extends Activity {
         VideoView videoView = findViewById(R.id.background);
         Uri uri = Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.background);
         videoView.setVideoURI(uri);
+        //videoView.set
         videoView.start();
 
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -79,58 +80,15 @@ public class MenuActivity extends Activity {
         });
 
         savePath = getResources().getString(R.string.saveFile);
+        //attemptLoadFile();
+
         minb = Integer.parseInt(getResources().getString(R.string.min_board_size));
         maxb = Integer.parseInt(getResources().getString(R.string.max_board_size));
-        statButton = findViewById(R.id.stats_button);
-        statButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                /// try to load save file
-                try{
-                    //String path = getFilesDir() + "/test.bin";
-                    FileInputStream fis = openFileInput(savePath);
-                    ObjectInputStream is = new ObjectInputStream(fis);
-                    playerStats = (PlayerStats)is.readObject();
-                    is.close();
-                    fis.close();
-
-                    foundFile = true;
-                    Toast.makeText(MenuActivity.this, "SUCCESSFULLY LOADED SAVE " + savePath, Toast.LENGTH_LONG).show();
-                }catch(Exception e){
-                    Toast.makeText(MenuActivity.this, "ERROR ERROR LOAD", Toast.LENGTH_LONG).show();
-                }
-
-                /// if no save file, create a fresh one
-                if(!foundFile){
-                    try{
-                        playerStats = new PlayerStats(minb, minb, maxb, maxb);
-                        FileOutputStream fos = MenuActivity.this.openFileOutput(savePath, Context.MODE_PRIVATE);
-                        ObjectOutputStream os = new ObjectOutputStream(fos);
-                        os.writeObject(playerStats);
-                        os.close();
-                        fos.close();
-
-                        foundFile = true;
-                        Toast.makeText(MenuActivity.this, "CREATED A NEW SAVE " + savePath, Toast.LENGTH_LONG).show();
-                    }catch(Exception e){
-                        //Log.i("BAD STATS WRITER", e.getMessage() + " | " + e.getCause());
-                        Toast.makeText(MenuActivity.this, "ERROR SAVE " + e.getMessage(), Toast.LENGTH_LONG).show();
-                    }
-                }
-
-                /// load the stats activity
-                Intent intStats = new Intent(MenuActivity.this, StatsActivity.class);
-
-                intStats.putExtra("save", playerStats);
-
-                startActivity(intStats);
-            }
-        });
 
         puzzleImageView = findViewById(R.id.puzzle_image);
 
         /// set default image
-        puzzleImageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.ilya));
+        puzzleImageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.logo));
 
         changeImageButton = findViewById(R.id.change_image);
         changeImageButton.setOnClickListener(new View.OnClickListener() {
@@ -143,12 +101,31 @@ public class MenuActivity extends Activity {
 
         playButton = findViewById(R.id.play_button);
         playButton.setOnClickListener(new View.OnClickListener() {
+                                          @Override
+                                          public void onClick(View v) {
+
+                                              openDialog2();
+
+                                          }
+                                      });
+
+        statButton = findViewById(R.id.stats_button);
+        statButton.setOnClickListener(new View.OnClickListener(){
             @Override
-            public void onClick(View v)
-            {
-                openDialog2();
+            public void onClick(View v){
+                attemptLoadFile();
+
+                /// load the stats activity
+                Intent intStats = new Intent(MenuActivity.this, StatsActivity.class);
+
+                intStats.putExtra("path", savePath);
+                intStats.putExtra("save", playerStats);
+
+                startActivity(intStats);
             }
         });
+
+
         ArrayAdapter<CharSequence> adapter
                 = ArrayAdapter.createFromResource(
                 this,R.array.numbers,R.layout.beter_spinner);
@@ -164,6 +141,46 @@ public class MenuActivity extends Activity {
 
         spinnerH.setOnItemSelectedListener(new DimenListener(0));
         spinnerW.setOnItemSelectedListener(new DimenListener(1));
+
+    }
+
+    /////////////
+    // Load save file method for MenuActivity only
+    private void attemptLoadFile()
+    {
+        /// try to load save file
+        try{
+            //String path = getFilesDir() + "/test.bin";
+            FileInputStream fis = openFileInput(savePath);
+            ObjectInputStream is = new ObjectInputStream(fis);
+            playerStats = (PlayerStats)is.readObject();
+            is.close();
+            fis.close();
+
+            foundFile = true;
+            //Toast.makeText(MenuActivity.this, "SUCCESSFULLY LOADED SAVE " + savePath, Toast.LENGTH_LONG).show();
+        }catch(Exception e){
+            Toast.makeText(MenuActivity.this, "ERROR ERROR LOAD", Toast.LENGTH_LONG).show();
+        }
+
+        /// if no save file, create a fresh one
+        if(!foundFile){
+            try{
+                playerStats = new PlayerStats(minb, minb, maxb, maxb);
+                FileOutputStream fos = MenuActivity.this.openFileOutput(savePath, Context.MODE_PRIVATE);
+                ObjectOutputStream os = new ObjectOutputStream(fos);
+                os.writeObject(playerStats);
+                os.close();
+                fos.close();
+
+                foundFile = true;
+                Toast.makeText(MenuActivity.this, "CREATED A NEW SAVE " + savePath, Toast.LENGTH_LONG).show();
+            }catch(Exception e){
+                //Log.i("BAD STATS WRITER", e.getMessage() + " | " + e.getCause());
+                Toast.makeText(MenuActivity.this, "ERROR SAVE " + e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        }
+
 
     }
 
@@ -233,16 +250,22 @@ public class MenuActivity extends Activity {
     public void timeMode()
     {
         mode = true;
+
         Intent playIntent = new Intent(MenuActivity.this, PlayActivity.class);
         playIntent.putExtra("WIDTH", width);
         playIntent.putExtra("HEIGHT", height);
-        playIntent.putExtra("MODE", mode);
-        if(imageUri == null)
-        {
-            imageUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.ilya);
+        if (imageUri == null) {
+            imageUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.logo);
         }
+        attemptLoadFile();
+        playIntent.putExtra("save", playerStats);
+        playIntent.putExtra("MODE", mode);
+
         playIntent.putExtra("picture",imageUri);
         startActivityForResult(playIntent, DIMENSION);
+
+
+
     }
 
     public void classicMode()
@@ -254,8 +277,12 @@ public class MenuActivity extends Activity {
         playIntent.putExtra("MODE", mode);
         if(imageUri == null)
         {
-            imageUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.ilya);
+            imageUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.logo);
         }
+        attemptLoadFile();
+        playIntent.putExtra("save", playerStats);
+        playIntent.putExtra("MODE", mode);
+
         playIntent.putExtra("picture",imageUri);
         startActivityForResult(playIntent, DIMENSION);
     }

@@ -3,14 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginLeft="10dp"
-    android:layout_marginRight="10dp">
+    android:layout_height="match_parent">
 
 <VideoView
 android:id="@+id/background"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
 android:layout_gravity="center"
 android:layout_alignParentLeft="true"
 android:layout_alignParentRight="true"
@@ -100,7 +98,7 @@ android:scaleType="fitXY">
         android:textColor="@color/white">
 
         <Spinner
-            android:id="@+id/height"
+            android:id="@+id/width"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
@@ -116,12 +114,13 @@ android:scaleType="fitXY">
             android:textSize="50sp" />
 
         <Spinner
-            android:id="@+id/width"
+            android:id="@+id/height"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
             android:padding="10dp"
             android:textSize="50sp" />
+
     </LinearLayout>
     <Button
         android:id="@+id/stats_button"
