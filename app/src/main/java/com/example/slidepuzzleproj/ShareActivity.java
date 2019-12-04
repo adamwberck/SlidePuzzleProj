@@ -83,11 +83,16 @@ public class ShareActivity extends Activity {
         seed = String.valueOf(User.getSeed());
 
         Log.i("Timer", timer);
-        String minSecTimer = Long.parseLong(shareResult[5]) / ONE_MINUTE + ":" + Long.parseLong(shareResult[5]) % ONE_MINUTE / ONE_SECOND;
-        if(shareResult[1].equals("true")){
-            shareMess.setText("Your friend "+User.getID()+" completed a " + shareResult[3]+ " x " + shareResult[4] + " puzzle in "+minSecTimer+" . Can you do better?");
+        if(shareResult[5]!=null) {
+            String minSecTimer = Long.parseLong(shareResult[5]) / ONE_MINUTE + ":" + Long.parseLong(shareResult[5]) % ONE_MINUTE / ONE_SECOND;
+            if (shareResult[1].equals("true")) {
+                shareMess.setText("Your friend " + User.getID() + " completed a " + shareResult[3] + " x " + shareResult[4] + " puzzle in " + minSecTimer + " . Can you do better?");
+            } else {
+                shareMess.setText("Your friend " + User.getID() + " failed to complete a " + shareResult[3] + " x " + shareResult[4] + " puzzle " + URI + " within " + minSecTimer + " . Can you do better?");
+            }
         } else {
-            shareMess.setText("Your friend "+User.getID()+" failed to complete a " + shareResult[3]+ " x " + shareResult[4] + " puzzle "+URI+" within "+minSecTimer+" . Can you do better?");
+            shareMess.setText("Your friend " + User.getID() + " completed a " + shareResult[3] + " x " + shareResult[4] + " puzzle in classic mode. Do you want to try it?");
+            timer = String.valueOf(-1);
         }
         shareButton.setOnClickListener(new View.OnClickListener() {
             @Override
