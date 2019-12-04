@@ -1,61 +1,89 @@
 package com.example.slidepuzzleproj;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Stack;
 
-public class Solver {
-    private Graph<SolveBoard> mBoardTree;
-    private Queue<SolveBoard> mQueue = new PriorityQueue<>();
+import javax.xml.transform.Result;
+
+public class Solver extends AsyncTask<Void,Void,List<PuzzleBoard.Direction>>{
+    private PlayActivity mPlayActivity;
     private int w;
     private int h;
+    private Queue<SolveBoard> mQueue = new PriorityQueue<>();
 
-    public Solver (PuzzleBoard firstBoard)throws CloneNotSupportedException{
+    public Solver (PuzzleBoard firstBoard,PlayActivity playActivity){
         SolveBoard solveBoard = new SolveBoard(firstBoard.getBoardWidth(),
                 firstBoard.getBoardHeight(),firstBoard.getBlankIndex(),firstBoard.getPieces());
-
-        mBoardTree = new Graph<>(solveBoard);
+        mPlayActivity = playActivity;
         w = solveBoard.w;
         h = solveBoard.h;
-        mBoardTree.addVertex(solveBoard);
         solveBoard.number = 0;
-        solveBoard.depth = 0;
         mQueue.add(solveBoard);
-        List<Direction> solution = solve();
-        for(Direction d: solution){
-            Log.i("Sol",d.name());
-            System.out.println(d.name());
-        }
     }
 
-    public List<Direction> solve() throws CloneNotSupportedException {
-        int mDist = 1;
-        List<Direction> solution =  new ArrayList<>(10);
-        while(!mQueue.isEmpty() && mDist>0) {
-            SolveBoard qBoard = mQueue.poll();
-            solution.add(qBoard.dir);
-            List<Direction> dirs = qBoard.slideBlankPossible();
-            Direction backDir =  calcBackDir(qBoard.dir);
-            for (Direction d : dirs) {
+
+
+    protected List<PuzzleBoard.Direction> doInBackground(Void... v){
+        try {
+            return solve();
+        }
+        catch (CloneNotSupportedException e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    protected void onPostExecute(List<PuzzleBoard.Direction> solution){
+        mPlayActivity.solutionFound(solution);
+    }
+
+
+
+
+
+    public List<PuzzleBoard.Direction> solve() throws CloneNotSupportedException {
+        mQueue.peek().gScore = 0;
+        mQueue.peek().number = manhattanDist(mQueue.peek());
+        Map<SolveBoard,SolveBoard> cameFrom = new HashMap<>();
+        while(!mQueue.isEmpty()) {
+            SolveBoard currentBoard = mQueue.poll();
+            if(currentBoard.isWin){
+                //done
+                return reconstructPath(cameFrom,currentBoard);
+            }
+            List<PuzzleBoard.Direction> dirs = currentBoard.slideBlankPossible();
+            PuzzleBoard.Direction backDir =  calcBackDir(currentBoard.dir);
+            for (PuzzleBoard.Direction d : dirs) {
                 if(d!=backDir) {
-                    SolveBoard b = qBoard.clone();//clone the current board
-                    b.slideBlank(d);//slide in direction
-
-                    b.depth = qBoard.depth + 1;//depth set
-                    mDist = manhattanDist(b);
-                    Log.i("Sol", "D|" + qBoard.depth + " " + d.name() + " = " + mDist);
-                    b.number = mDist + b.depth;//set the number for the priority Q
-                    b.dir = d;
-
-                    mBoardTree.addVertex(b);
-                    mBoardTree.addEdge(qBoard, b);
-                    mQueue.add(b);
-                    if (mDist == 0) {//done
-                        solution.remove(0);//remove the dir which is null
-                        return solution;
+                    /*
+                    SolveBoard neighborBoard = currentBoard.clone();//clone the current board
+                    neighborBoard.slideBlank(d);//slide in direction
+                    */
+                    SolveBoard neighborBoard = getBoard(currentBoard,d);
+                    int tentative_gScore = currentBoard.gScore + 1;
+                    if( tentative_gScore < neighborBoard.gScore || neighborBoard.gScore<0){
+                        //record the score
+                        cameFrom.put(neighborBoard,currentBoard);
+                        neighborBoard.gScore = tentative_gScore;
+                        neighborBoard.dir = d;
+                        int mDist =  manhattanDist(neighborBoard);
+                        //int lin = linearConflicts(neighborBoard);
+                        neighborBoard.number = tentative_gScore+mDist;//+lin*2;
+                        if(!mQueue.contains(neighborBoard)){
+                            mQueue.add(neighborBoard);
+                        }
                     }
                 }
             }
@@ -63,18 +91,82 @@ public class Solver {
         return null;
     }
 
-    private Direction calcBackDir(Direction dir) {
-        if(dir == Direction.Down){
-            return Direction.Up;
+    private SolveBoard getBoard(SolveBoard currentBoard, PuzzleBoard.Direction d)throws CloneNotSupportedException{
+        SolveBoard board = currentBoard.clone();
+        board.number = 0;
+        board.gScore = -1;
+        board.dir = null;
+        board.isWin = false;
+        board.slideBlank(d);
+        for (SolveBoard b : mQueue){
+            boolean matched =  true;
+            for(int i=0;i<b.pieces.length;i++){
+                if(b.pieces[i].goalPos != board.pieces[i].goalPos){
+                    matched = false;
+                    i=b.pieces.length;
+                }
+            }
+            if(matched){
+                return b;
+            }
         }
-        if(dir == Direction.Up){
-            return Direction.Down;
+        return board;
+    }
+
+    private int linearConflicts(SolveBoard board){
+        int conflicts = 0;
+        //check rows
+        for(int r=0;r<h;r++) {
+            for (int i = 0; i < w; i++) {
+                for (int j = i + 1; j < w; j++) {
+                    if(board.pieces[i+r*w].goalPos/w == r) {
+                        if (board.pieces[i + r * w].goalPos / w == board.pieces[j + r * w].goalPos / w  //are supposed be on this line
+                                && board.pieces[i + r * w].goalPos > board.pieces[j + r * w].goalPos) {//are in the wrong order
+                            conflicts++;
+                        }
+                    }
+                }
+            }
         }
-        if(dir == Direction.Right){
-            return Direction.Left;
+        //check column
+        for(int r=0;r<w;r++) {
+            for (int i = 0; i < h; i++) {
+                for (int j = i + 1; j < h; j++) {
+                    if(board.pieces[i*w+r].goalPos%w == r) {
+                        if (board.pieces[i * w + r].goalPos / w == board.pieces[j * w + r].goalPos / w  //are supposed be on this line
+                                && board.pieces[i * w + r].goalPos > board.pieces[j * w + r].goalPos) {//are in the wrong order
+                            conflicts++;
+                        }
+                    }
+                }
+            }
         }
-        if(dir == Direction.Left){
-            return Direction.Right;
+        return conflicts;
+    }
+
+    private List<PuzzleBoard.Direction> reconstructPath(Map<SolveBoard,SolveBoard> cameFrom, SolveBoard current){
+        List<PuzzleBoard.Direction> path = new LinkedList<>();
+        path.add(current.dir);
+        while(cameFrom.containsKey(current)){
+            current = cameFrom.get(current);
+            path.add(0,current.dir);
+        }
+        path.remove(0);
+        return path;
+    }
+
+    private PuzzleBoard.Direction calcBackDir(PuzzleBoard.Direction dir) {
+        if(dir == PuzzleBoard.Direction.Down){
+            return PuzzleBoard.Direction.Up;
+        }
+        if(dir == PuzzleBoard.Direction.Up){
+            return PuzzleBoard.Direction.Down;
+        }
+        if(dir == PuzzleBoard.Direction.Right){
+            return PuzzleBoard.Direction.Left;
+        }
+        if(dir == PuzzleBoard.Direction.Left){
+            return PuzzleBoard.Direction.Right;
         }
         return null;
     }
@@ -82,7 +174,7 @@ public class Solver {
     public int manhattanDist(SolveBoard board){
         int total = 0;
         for(SolveBoard.PuzzlePiece piece : board.pieces) {
-            if(piece.goalPos!=8) {//don't count blank
+            if(piece.goalPos!=board.pieces.length-1) {//don't count blank
                 int pos = piece.pos;
                 int goalPos = piece.goalPos;
 
@@ -96,18 +188,18 @@ public class Solver {
                 total += distX + distY;
             }
         }
+        if(total==0){
+            board.isWin = true;
+        }
         return total;
     }
 
-    enum Direction{
-        Up,
-        Down,
-        Left,
-        Right
-    };
 
     private class SolveBoard implements Cloneable,Comparable<SolveBoard>{
-        public boolean isWin;
+        public boolean isWin = false;
+        private int gScore = -1;
+        private int number;
+
         private int w;
         private int h;
         private int blankIndex;
@@ -115,10 +207,7 @@ public class Solver {
         private PuzzlePiece[] pieces;
 
 
-        private int number;
-        private Direction dir;
-        private int depth;
-
+        private PuzzleBoard.Direction dir;
         public SolveBoard clone() throws CloneNotSupportedException{
             SolveBoard clone = (SolveBoard) super.clone();
             clone.pieces = new PuzzlePiece[pieces.length];
@@ -139,8 +228,20 @@ public class Solver {
             for(PuzzleBoard.PuzzlePiece p : pbPieces){
                 this.pieces[i++] = new PuzzlePiece(p.getCurrentPos(),p.getCorrectPos());
             }
+
+
         }
 
+        @NotNull
+        @Override
+        public String toString(){
+            StringBuilder str = new StringBuilder();
+            for(PuzzlePiece p : pieces){
+                str.append(p.goalPos);
+                str.append(" ");
+            }
+            return str.toString();
+        }
 
 
         private class PuzzlePiece{
@@ -159,33 +260,33 @@ public class Solver {
             return number>other.number ? 1 : -1 ;
         }
 
-        private List<Direction> slideBlankPossible()
+        private List<PuzzleBoard.Direction> slideBlankPossible()
         {
-            List<Direction> dirs = new ArrayList<>(4);
+            List<PuzzleBoard.Direction> dirs = new ArrayList<>(4);
             //up
             if(this.blankIndex - this.w >= 0)  ///if not on top row
             {
-                dirs.add(Direction.Up);
+                dirs.add(PuzzleBoard.Direction.Up);
             }
             //down
             if(this.blankIndex + this.w < this.size)
             {
-                dirs.add(Direction.Down);
+                dirs.add(PuzzleBoard.Direction.Down);
             }
             //left
             if(this.blankIndex % this.size != 0)
             {
-                dirs.add(Direction.Left);
+                dirs.add(PuzzleBoard.Direction.Left);
             }
             //right
             if(this.blankIndex % this.w != this.w - 1)
             {
-                dirs.add(Direction.Right);
+                dirs.add(PuzzleBoard.Direction.Right);
             }
             return dirs;
         }
 
-        private boolean slideBlank(Direction dir)
+        private boolean slideBlank(PuzzleBoard.Direction dir)
         {
             switch(dir)
             {

@@ -47,6 +47,7 @@ public class StatsEntryActivity extends AppCompatActivity {
         int avgTime = intStats.getIntExtra("avgTime", -1);
         int numClassic = intStats.getIntExtra("numClassic", -1);
         int numTimed = intStats.getIntExtra("numTimed", -1);
+        int numHints = intStats.getIntExtra("numHints", -1);
 
         LinearLayout elist = findViewById(R.id.stats_entry_list);
         /////////
@@ -118,6 +119,14 @@ public class StatsEntryActivity extends AppCompatActivity {
         v17.setText("Number of Timed Losses: " + numLosses);
         elist.addView(v17);
 
+        TextView v20 = new TextView(this);
+        v20.setTextSize(20);
+        v20.setTextColor(Color.BLACK);
+        v20.setTypeface(v20.getTypeface(), Typeface.BOLD);
+        v20.setPadding(10, 2, 2, 2);
+        v20.setBackground(getResources().getDrawable(R.drawable.back_border));
+        v20.setText("Number of Hints Used: " + numHints);
+        elist.addView(v20);
 
         TextView v4 = new TextView(this);
         v4.setTextSize(20);

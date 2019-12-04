@@ -35,6 +35,7 @@ public class PlayerStats implements Serializable
     private int globNumWins;
     private int globNumLosses;
     private int globNumClassicMode;
+    private int globalNumHints;
 
     private BoardTypeStatEntry[][] entries;
 
@@ -65,6 +66,7 @@ public class PlayerStats implements Serializable
         this.globNumWins = -1;
         this.globNumLosses = -1;
         this.globNumClassicMode = -1;
+        this.globalNumHints = -1;
 
 
         this.entries = new BoardTypeStatEntry[boardHeight][boardWidth];
@@ -72,14 +74,15 @@ public class PlayerStats implements Serializable
         {
             for(int x = 0; x < boardWidth; x++){
                 this.entries[y][x] = new BoardTypeStatEntry(0, -1,-1,-1,-1,
-                                                    -1,-1,-1,-1,-1,-1,-1, -1);
+                                                    -1,-1,-1,-1,-1,-1,
+                                                    -1, -1, -1);
             }
         }
 
     }
 
     public void updateStats(int boardwidth, int boardheight, int numMoves, int numUndos,
-                            int time, int win, int lose, int classic)
+                            int time, int win, int lose, int classic, int hints)
     {
         /// add new data to the board entry of that size
         BoardTypeStatEntry ent = this.entries[boardheight-this.minBoardHeight][boardwidth-this.minBoardWidth];
@@ -100,6 +103,7 @@ public class PlayerStats implements Serializable
             this.globNumWins = win;
             this.globNumLosses = lose;
             this.globNumClassicMode = classic;
+            this.globalNumHints = hints;
         }
         else {
             this.globNumGames += 1;
@@ -109,6 +113,7 @@ public class PlayerStats implements Serializable
             this.globNumWins += win;
             this.globNumLosses += lose;
             this.globNumClassicMode += classic;
+            this.globalNumHints += hints;
 
             if (lose != 1)  /// dont update lowest/highest on lose
             {
@@ -126,7 +131,7 @@ public class PlayerStats implements Serializable
         {
             ent.setAllProperties(1, numMoves, numMoves, numMoves,
                     numUndos, numUndos, numUndos,
-                    time, time, time, win, lose, classic);
+                    time, time, time, win, lose, classic, hints);
         }
         else {
             ent.setNumGames(ent.getNumGames() + 1);
@@ -136,6 +141,7 @@ public class PlayerStats implements Serializable
             ent.setNumWins(ent.getNumWins() + win);
             ent.setNumLosses(ent.getNumLosses() + lose);
             ent.setNumClassic(ent.getNumClassic() + classic);
+            ent.setNumHints(ent.getNumHints() + hints);
 
             if (lose != 1) /// dont update lowest/highest on lose
             {
@@ -227,6 +233,10 @@ public class PlayerStats implements Serializable
         if(this.globNumGames == 0) return -1;
         return this.globNumGames - this.globNumClassicMode;
     }
+    public int getGlobalNumHints(){
+        if(this.globNumGames == 0) return -1;
+        return this.globalNumHints;
+    }
 
     ////////////////////////////////////////
     /// accessors for individual board data
@@ -315,6 +325,11 @@ public class PlayerStats implements Serializable
         if(temp.getNumGames() == 0) return -1;
         else return temp.getNumGames() - temp.getNumClassic();
     }
+    public int getBoardNumHints(int boardwidth, int boardheight){
+        BoardTypeStatEntry temp = entries[boardheight-this.minBoardHeight][boardwidth-this.minBoardWidth];
+        if(temp.getNumGames() == 0) return -1;
+        else return temp.getNumHints();
+    }
 
 
 
@@ -343,9 +358,10 @@ public class PlayerStats implements Serializable
         private int numWins;
         private int numLosses;
         private int numClassic;
+        private int numHints;
 
         public BoardTypeStatEntry(int ng, int nm, int minm, int maxm, int nu, int minu, int maxu,
-                                  int st, int lt, int tott, int nw, int nl, int nclass){
+                                  int st, int lt, int tott, int nw, int nl, int nclass, int hints){
             this.numGames = ng;
             this.numMoves = nm;
             this.minMoves = minm;
@@ -359,10 +375,11 @@ public class PlayerStats implements Serializable
             this.numWins = nw;
             this.numLosses = nl;
             this.numClassic = nclass;
+            this.numHints = hints;
         }
 
         public void setAllProperties(int ng, int nm, int minm, int maxm, int nu, int minu, int maxu,
-                                        int st, int lt, int tott, int nw, int nl, int nclass){
+                                        int st, int lt, int tott, int nw, int nl, int nclass, int hints){
             this.numGames = ng;
             this.numMoves = nm;
             this.minMoves = minm;
@@ -376,6 +393,7 @@ public class PlayerStats implements Serializable
             this.numWins = nw;
             this.numLosses = nl;
             this.numClassic = nclass;
+            this.numHints = hints;
         }
 
         public int getNumGames(){
@@ -425,6 +443,7 @@ public class PlayerStats implements Serializable
             return this.numLosses;
         }
         public int getNumClassic(){ return this.numClassic; }
+        public int getNumHints(){return this.numHints;}
 
         ///////////////////////////
         //// sets new value and RETURN THE delta value
@@ -491,6 +510,11 @@ public class PlayerStats implements Serializable
         public int setNumClassic(int val){
             int toret = val - this.numClassic;
             this.numClassic = val;
+            return toret;
+        }
+        public int setNumHints(int val){
+            int toret = val - this.numHints;
+            this.numHints = val;
             return toret;
         }
     }
