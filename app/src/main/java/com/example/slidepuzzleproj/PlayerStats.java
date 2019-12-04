@@ -183,14 +183,14 @@ public class PlayerStats implements Serializable
         return this.globNumUndos/this.globNumGames;
     }
     public int getGlobalBoardAverageTime(){
-        return this.globTotalTime/this.globNumGames;
+        return this.globTotalTime/this.globNumWins;
     }
 
     ////////////////////////////////////////
     /// accessors for individual board data
     public int getBoardNumGames(int boardwidth, int boardheight){
         BoardTypeStatEntry temp = entries[boardheight-this.minBoardHeight][boardwidth-this.minBoardWidth];
-        if(temp.getNumGames() == 0) return -1;
+        if(temp.getNumGames() == 0) return 0;
         else return temp.getNumGames();
     }
     public int getBoardNumMoves(int boardwidth, int boardheight){
@@ -360,7 +360,7 @@ public class PlayerStats implements Serializable
             return this.totalTime;
         }
         public int getAverageTime(){
-            return this.totalTime/this.numGames;
+            return this.totalTime/this.numWins;
         }
         public int getNumWins(){
             return this.numWins;
