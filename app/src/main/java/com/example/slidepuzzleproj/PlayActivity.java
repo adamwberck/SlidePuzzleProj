@@ -2,6 +2,7 @@ package com.example.slidepuzzleproj;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -286,7 +287,6 @@ public class PlayActivity extends Activity {
 
         width = getIntent().getIntExtra("WIDTH", 3);
         height = getIntent().getIntExtra("HEIGHT", 3);
-        Intent intent = getIntent();
         if(intent.hasExtra("time")){
             playTime = intent.getLongExtra("time", 3*ONE_MINUTE);
             seed = intent.getLongExtra("seed", -1);
