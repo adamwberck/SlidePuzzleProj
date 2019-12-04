@@ -4,4 +4,5 @@
     android:layout_height="wrap_content"
     android:textSize="50sp"
     android:textColor="@color/white"
+    android:background="@color/menu1"
     />
