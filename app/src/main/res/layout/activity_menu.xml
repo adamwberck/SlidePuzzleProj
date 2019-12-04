@@ -4,7 +4,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black">
+    android:background="@color/white">
 
 
 
@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:text="@string/menu_title"
             android:textAllCaps="true"
-            android:textColor="@color/white"
+            android:textColor="@color/menu1"
             android:textSize="40sp"
             android:textStyle="bold" />
 
@@ -34,7 +34,7 @@
             android:clickable="true"
             android:focusable="true"
             android:orientation="vertical"
-            android:textColor="@color/white">
+            android:textColor="@color/menu1">
 
             <ImageView
                 android:id="@+id/puzzle_image"
@@ -45,7 +45,7 @@
                 android:layout_marginRight="2dp"
                 android:layout_weight="0.8"
                 android:scaleType="centerCrop"
-                android:textColor="@color/white"/>
+                android:textColor="@color/menu1"/>
 
             <TextView
                 android:id="@+id/test"
@@ -60,7 +60,7 @@
                 android:text="@string/change_image"
                 android:textAlignment="center"
                 android:textAllCaps="true"
-                android:textColor="@color/white"
+                android:textColor="@color/menu1"
                 android:textSize="35sp"
                 android:visibility="visible" />
 
@@ -82,7 +82,7 @@
                 android:background="@drawable/back_border"
                 android:text="Inbox"
                 android:textSize="40sp"
-                android:textColor="@color/white"/>
+                android:textColor="@color/menu1"/>
 
             <Button
                 android:id="@+id/play_button"
@@ -93,7 +93,7 @@
                 android:background="@drawable/back_border"
                 android:text="@string/menu_play"
                 android:textSize="40sp"
-                android:textColor="@color/white"/>
+                android:textColor="@color/menu1"/>
 
 
         </LinearLayout>
@@ -105,7 +105,7 @@
             android:layout_marginTop="20dp"
             android:background="@drawable/back_border"
             android:orientation="horizontal"
-            android:textColor="@color/white">
+            android:textColor="@color/menu1">
 
             <Spinner
                 android:id="@+id/width"
@@ -120,7 +120,7 @@
                 android:layout_height="wrap_content"
                 android:padding="10dp"
                 android:text="x"
-                android:textColor="@color/white"
+                android:textColor="@color/menu1"
                 android:textSize="50sp" />
 
             <Spinner
@@ -143,7 +143,7 @@
             android:padding="10dp"
             android:text="@string/menu_stats"
             android:textSize="40sp"
-            android:textColor="@color/white"
+            android:textColor="@color/menu1"
             android:layout_marginBottom="10dp"/>
     </LinearLayout>
 </RelativeLayout>

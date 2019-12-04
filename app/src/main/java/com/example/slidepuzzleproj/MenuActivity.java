@@ -115,7 +115,7 @@ public class MenuActivity extends Activity {
         puzzleImageView = findViewById(R.id.puzzle_image);
 
         /// set default image
-        puzzleImageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.logo));
+        puzzleImageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.ilya));
 
         changeImageButton = findViewById(R.id.change_image);
         changeImageButton.setOnClickListener(new View.OnClickListener() {
@@ -297,7 +297,7 @@ public class MenuActivity extends Activity {
         playIntent.putExtra("WIDTH", width);
         playIntent.putExtra("HEIGHT", height);
         if (imageUri == null) {
-            imageUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.logo);
+            imageUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.ilya);
         }
         attemptLoadFile();
         playIntent.putExtra("save", playerStats);
@@ -319,7 +319,7 @@ public class MenuActivity extends Activity {
         playIntent.putExtra("MODE", mode);
         if(imageUri == null)
         {
-            imageUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.logo);
+            imageUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.ilya);
         }
         attemptLoadFile();
         playIntent.putExtra("save", playerStats);
