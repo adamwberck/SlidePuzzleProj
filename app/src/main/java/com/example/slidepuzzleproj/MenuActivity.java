@@ -118,7 +118,7 @@ public class MenuActivity extends Activity {
         puzzleImageView.setImageBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.logo));
 
         changeImageButton = findViewById(R.id.change_image);
-        changeImageButton.setOnClickListener(new View.OnClickListener() {
+        changeImageButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v)
             {
