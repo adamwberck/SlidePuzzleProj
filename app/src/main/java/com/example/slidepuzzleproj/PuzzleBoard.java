@@ -188,6 +188,25 @@ public class PuzzleBoard implements Serializable
         return false;
     }
 
+    public int indexNextToBlank(Direction d)throws IllegalArgumentException{
+        int returnVal = -1;
+        if(d==Direction.Up){
+            returnVal = blankIndex-width;
+        }else if(d==Direction.Left){
+            returnVal = blankIndex-1;
+        }else if(d==Direction.Right){
+            returnVal = blankIndex+1;
+        }else if(d==Direction.Down){
+            returnVal = blankIndex+width;
+        }
+        if(returnVal<0 || returnVal>length){
+            throw new IllegalArgumentException();
+        }else{
+            return returnVal;
+        }
+    }
+
+
     public Direction dirNextToBlank(int i)
     {
         return dirNextToBlank(i%this.width, i/this.width);

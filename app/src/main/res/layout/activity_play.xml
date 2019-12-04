@@ -125,7 +125,7 @@
             android:layout_height="match_parent"
             android:layout_weight=".333"
             android:background="@drawable/back_border"
-            android:text="Tips"
+            android:text="Hint"
             android:textSize="26sp"
             android:textStyle="bold" />
 
