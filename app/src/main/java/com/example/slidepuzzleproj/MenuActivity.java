@@ -129,7 +129,9 @@ public class MenuActivity extends Activity {
         playButton = findViewById(R.id.play_button);
         playButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
+
                 Intent playIntent = new Intent(MenuActivity.this, PlayActivity.class);
                 playIntent.putExtra("WIDTH", width);
                 playIntent.putExtra("HEIGHT", height);
