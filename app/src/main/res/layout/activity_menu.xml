@@ -1,104 +1,161 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginLeft="10dp"
-    android:layout_marginRight="10dp">
+    android:background="@color/white">
 
-    <TextView
+    <ImageView
+        android:id="@+id/background_one"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/menu_title"
-        android:textAllCaps="true"
-        android:textColor="@color/menu1"
-        android:textSize="40sp"
-        android:textStyle="bold" />
+        android:layout_height="match_parent"
+        android:src="@drawable/background"
+        android:scaleType="fitEnd"/>
+
+    <ImageView
+        android:id="@+id/background_two"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/background"
+        android:scaleType="fitEnd"/>
 
     <LinearLayout
-        android:id="@+id/change_image"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.4"
-        android:background="@drawable/back_border"
-        android:clickable="true"
-        android:focusable="true"
-        android:orientation="vertical">
-
-        <ImageView
-            android:id="@+id/puzzle_image"
-            android:layout_width="match_parent"
-            android:layout_height="300dp"
-            android:layout_marginLeft="2dp"
-            android:layout_marginTop="2dp"
-            android:layout_marginRight="2dp"
-            android:layout_weight="0.8"
-            android:scaleType="centerCrop" />
+        android:layout_height="match_parent"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        >
 
         <TextView
-            android:id="@+id/test"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="2dp"
-            android:layout_marginTop="-2dp"
-            android:layout_marginRight="2dp"
-            android:layout_marginBottom="2dp"
-            android:layout_weight="0.2"
-            android:paddingTop="-2dp"
-            android:text="@string/change_image"
-            android:textAlignment="center"
+            android:text="@string/menu_title"
             android:textAllCaps="true"
             android:textColor="@color/menu1"
-            android:textSize="35sp"
-            android:visibility="visible" />
+            android:textSize="40sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:id="@+id/change_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.4"
+            android:background="@drawable/back_border"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="vertical"
+            android:textColor="@color/menu1">
+
+            <ImageView
+                android:id="@+id/puzzle_image"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_marginLeft="2dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginRight="2dp"
+                android:layout_weight="0.8"
+                android:scaleType="centerCrop"
+                android:textColor="@color/menu1"/>
+
+            <TextView
+                android:id="@+id/test"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="2dp"
+                android:layout_marginTop="-2dp"
+                android:layout_marginRight="2dp"
+                android:layout_marginBottom="2dp"
+                android:layout_weight="0.2"
+                android:paddingTop="-2dp"
+                android:text="@string/change_image"
+                android:textAlignment="center"
+                android:textAllCaps="true"
+                android:textColor="@color/menu1"
+                android:textSize="35sp"
+                android:visibility="visible" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="0.1"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/inbox_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.5"
+                android:background="@drawable/back_border"
+                android:text="Inbox"
+                android:textSize="40sp"
+                android:textColor="@color/menu1"/>
+
+            <Button
+                android:id="@+id/play_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="0.5"
+                android:background="@drawable/back_border"
+                android:text="@string/menu_play"
+                android:textSize="40sp"
+                android:textColor="@color/menu1"/>
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/back_border"
+            android:orientation="horizontal"
+            android:textColor="@color/menu1">
+
+            <Spinner
+                android:id="@+id/width"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:padding="10dp"
+                android:textSize="50sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:text="x"
+                android:textColor="@color/menu1"
+                android:textSize="50sp" />
+
+            <Spinner
+                android:id="@+id/height"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:padding="10dp"
+                android:textSize="50sp" />
+
+        </LinearLayout>
+        <Button
+            android:id="@+id/stats_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:layout_weight="0.1"
+            android:background="@drawable/back_border"
+            android:padding="10dp"
+            android:text="@string/menu_stats"
+            android:textSize="40sp"
+            android:textColor="@color/menu1"
+            android:layout_marginBottom="10dp"/>
     </LinearLayout>
-
-    <Button
-        android:id="@+id/play_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="20dp"
-        android:layout_weight="0.1"
-        android:background="@drawable/back_border"
-        android:padding="10dp"
-        android:text="@string/menu_play"
-        android:textSize="40sp" />
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="20dp"
-        android:layout_weight="0.3"
-        android:background="@drawable/back_border"
-        android:orientation="horizontal">
-
-        <Spinner
-            android:id="@+id/height"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@null"
-            android:padding="10dp"
-            android:textColor="@color/menu1"
-            android:textSize="50sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:text="x"
-            android:textColor="@color/menu1"
-            android:textSize="50sp" />
-
-        <Spinner
-            android:id="@+id/width"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@null"
-            android:padding="10dp"
-            android:textColor="@color/menu1"
-            android:textSize="50sp" />
-    </LinearLayout>
-</LinearLayout>
+</RelativeLayout>

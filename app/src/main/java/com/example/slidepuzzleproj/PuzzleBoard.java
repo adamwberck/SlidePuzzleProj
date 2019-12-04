@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 //// fix bug where uneven sized board isnt processed properly
 
@@ -280,6 +281,14 @@ public class PuzzleBoard implements Serializable
         return dirs.get(0);
     }
 
+    public Direction slideBlankRandom(long seed){
+        List<Direction> dirs = slideBlankPossible();
+        User.setSeed(seed);
+        Collections.shuffle(dirs, new Random(seed));
+        return dirs.get(0);
+    }
+
+
     private List<Direction> slideBlankPossible()
     {
         List<Direction> dirs = new ArrayList<>(4);
@@ -395,16 +404,6 @@ public class PuzzleBoard implements Serializable
     public boolean isBetween(int a, int x, int y)
     {
         return a >= x && a < y;
-    }
-
-
-    public SerializablePuzzleBoard getSerializableData(){
-        SerializablePiece[] sp = new SerializablePiece[this.length];
-        for(int i = 0; i < this.length; i++)
-            sp[i] = new SerializablePiece(pieces[i].getCorrectPos(), pieces[i].getCurrentPos(), pieces[i].getIsBlank());
-        return new SerializablePuzzleBoard( width, height, length, blankIndex,
-                                            bmwidth, bmheight, pixwidth, pixheight,
-                                            sp, loaded);
     }
 
 

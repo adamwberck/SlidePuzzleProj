@@ -28,14 +28,35 @@ import android.widget.Toast;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
+import com.squareup.picasso.Picasso;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.util.List;
+import java.io.OutputStream;
+import java.io.Serializable;
+import java.nio.file.Paths;
 import java.util.Stack;
-
-import static java.lang.Math.min;
 
 public class PlayActivity extends Activity {
     private ContextWrapper cw; //context / working directory of app
@@ -45,8 +66,8 @@ public class PlayActivity extends Activity {
     private TextView timer;
     private TextView moveNum;
 
-    private PlayerStats stats;
-    private PuzzleLab lab;
+    //private PlayerStats stats;
+    //private PuzzleLab lab;
 
     private Button undo;
     private Button hint;
@@ -54,20 +75,22 @@ public class PlayActivity extends Activity {
     private Button prev;
     private GridLayout playSpace;
     private TextView restartText;
-
+    private Button statbut;
 
     private int mGlowIndex = 0;
 
     private final long ONE_MINUTE = 60000;
     private final long ONE_SECOND = 1000;
-    private final long PLAY_TIME = 35 * ONE_MINUTE;
+    private long playTime = 3 * ONE_MINUTE;
     private final int GAP = 2;
+    private TextView challengeText;
+    private long seed = -1;
     private ImageView[] pieces;
     private MediaPlayer menuBGM;
-
     private boolean mIsThinking = false;
-
+  
     private int moveInt = 0;    // save
+    private int undoInt = 0;
     private long timeElapsed;   //save
     private long timeRemain;    // save
     private CountDownTimer timerTick;   // save
@@ -80,8 +103,15 @@ public class PlayActivity extends Activity {
     private int height; // save
     private boolean isScrambled = false; // save
     private Stack<PuzzleBoard.Direction> undoStack = new Stack<>(); //save
-    private boolean play = false; // save
+    private boolean play; // save
+    private boolean mode;
 
+    private PlayerStats stats = null;
+    private String savePath;
+    //private boolean foundFile = false;
+    private int minb;
+    private int maxb;
+    private String shareTimer;
 
     @Override
     protected void onPause()
@@ -103,15 +133,24 @@ public class PlayActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play);
 
-        cw = new ContextWrapper(getApplicationContext());
+        Intent intent = getIntent(); ///intent args
+        stats = (PlayerStats)intent.getSerializableExtra("save"); /// get save file
 
+        savePath = getResources().getString(R.string.saveFile);
+
+        mode = getIntent().getExtras().getBoolean("MODE");
+
+        minb = Integer.parseInt(getResources().getString(R.string.min_board_size));
+        maxb = Integer.parseInt(getResources().getString(R.string.max_board_size));
+        //stats = new PlayerStats(minb, minb, maxb, maxb);
+
+        cw = new ContextWrapper(getApplicationContext());
 
         undo = findViewById(R.id.undoButton);
         hint = findViewById(R.id.tipsButton);
         menu = findViewById(R.id.menuButton);
         prev = findViewById(R.id.previewButton);
         timer = findViewById(R.id.time);
-
 
 
         moveNum = findViewById(R.id.moveNumber);
@@ -124,12 +163,52 @@ public class PlayActivity extends Activity {
 
         playSpace = findViewById(R.id.playSpace);
         restartText = findViewById(R.id.restartText);
+        challengeText = findViewById(R.id.challengeText);
+
         restartText.setVisibility(View.INVISIBLE);
+        challengeText.setVisibility(View.INVISIBLE);
+
+        challengeText.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
+                 if(User.getID()==null) {
+                     Toast.makeText(PlayActivity.this, "You must first log in or sign up.", Toast.LENGTH_SHORT).show();
+                     Intent playIntent = new Intent(PlayActivity.this, LoginActivity.class);
+                     startActivity(playIntent);
+                 } else {
+                     String path = new String();
+                     if (imageUri.toString().contains(".jpg") || imageUri.toString().contains(".png")) {
+                         path = imageUri.toString();
+                     } else {
+                         File photoFile = null;
+                         try {
+                             photoFile = SaveImage.createImage(PlayActivity.this);
+                         } catch (IOException e) {
+                             e.printStackTrace();
+                         }
+                         if (photoFile != null) {
+                             try (FileOutputStream out = new FileOutputStream(SaveImage.getPath())) {
+                                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+                             } catch (IOException e) {
+                                 e.printStackTrace();
+                             }
+                             path = photoFile.getAbsolutePath();
+                         }
+                     }
+                     String[] result = {path, String.valueOf(isWin), String.valueOf(playTime), String.valueOf(width), String.valueOf(height), shareTimer};
+                     Intent shareIntent = new Intent(PlayActivity.this, ShareActivity.class);
+                     shareIntent.putExtra("INFO", result);
+                     startActivity(shareIntent);
+                 }
+             }
+        });
+
+
         restartText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(isLose || isWin){
-                   restart();
+                if (isLose || isWin) {
+                    restart();
                 }
 
             }
@@ -139,17 +218,19 @@ public class PlayActivity extends Activity {
             @SuppressLint("DefaultLocale")
             @Override
             public void onClick(View v) {
-                if(!isLose && !undoStack.isEmpty()) {
+                if(!isLose && !isWin && !undoStack.isEmpty()) {
                     PuzzleBoard.Direction d = undoStack.pop();
                     d = PuzzleBoard.getOpposite(d);
                     slideImages(d);
                     moveInt--;
+                    undoInt++;
                     moveNum.setText(String.format("%d", moveInt));
                     moveNum.invalidate();
                     //TODO fix the timer after winning
                     //This works except the timer is broken
                     if(isWin) {
                         restartText.setVisibility(View.INVISIBLE);
+                        challengeText.setVisibility(View.INVISIBLE);
                         playSpace.setBackgroundColor(Color.DKGRAY);
                         isWin = false;
                     }
@@ -183,32 +264,15 @@ public class PlayActivity extends Activity {
                                 //startActivity(intent);
                                 finish();
                                 return true;
-                            case R.id.load_menu:
-                                Toast.makeText(PlayActivity.this, "Load Menu Clicked", Toast.LENGTH_SHORT).show();
-                                return true;
-                            case R.id.save_menu:
-                                //Toast.makeText(PlayActivity.this, "Save Menu Clicked", Toast.LENGTH_SHORT).show();
 
-                                try {
-                                    PlayerStats stats = new PlayerStats(moveInt, timeElapsed, timeRemain, timerTick, currentBoard.getSerializableData(), imageUri.toString(), isWin, isLose, width, height, isScrambled, undoStack, play);
-
-                                    FileOutputStream fos = PlayActivity.this.openFileOutput(getResources().getString(R.string.saveFile), Context.MODE_PRIVATE);
-
-                                    ObjectOutputStream os = new ObjectOutputStream(fos);
-
-                                    os.writeObject(stats);
-                                    Toast.makeText(PlayActivity.this, "Successfully saved stats", Toast.LENGTH_SHORT).show();
-                                    os.close();
-                                    fos.close();
-
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                                //lab = PuzzleLab.get(PlayActivity.this);
-                                //PuzzleLab.saveLab(PlayActivity.this);
-                                return true;
                             case R.id.statistics_menu:
-                                Toast.makeText(PlayActivity.this, "Statistics Clicked", Toast.LENGTH_SHORT).show();
+                                /// load the stats activity
+                                Intent intStats = new Intent(PlayActivity.this, StatsActivity.class);
+
+                                intStats.putExtra("path", savePath);
+                                intStats.putExtra("save", stats);
+
+                                startActivity(intStats);
                                 return true;
                             case R.id.mute_menu:
                                 if (play == true) {
@@ -251,22 +315,40 @@ public class PlayActivity extends Activity {
             }
         });
 
+        width = getIntent().getIntExtra("WIDTH", 3);
+        height = getIntent().getIntExtra("HEIGHT", 3);
+        if(intent.hasExtra("time")){
+            playTime = intent.getLongExtra("time", 3*ONE_MINUTE);
+            seed = intent.getLongExtra("seed", -1);
+        }
+
         //init the timer text
         String text = getString(R.string.time_string,
-                PLAY_TIME/ONE_MINUTE,
-                PLAY_TIME%ONE_MINUTE/ONE_SECOND);
+                playTime/ONE_MINUTE,
+                playTime%ONE_MINUTE/ONE_SECOND);
 
-        timer.setText(text);
+        if(mode == true)
+        {
+            timer.setText(text);
+            timer.setTextSize(30);
+        }
+        else
+        {
+            timer.setText(getString(R.string.classic_mode));
+            timer.setTextSize(20);
+        }
 
-        this.timerTick = new CountDownTimer(PLAY_TIME, ONE_SECOND) {
+
+        this.timerTick = new CountDownTimer(playTime, ONE_SECOND) {
             @Override
             public void onTick(long millisUntilFinished) {
                 //DecimalFormat df = new DecimalFormat("00");
                 String text = getString(R.string.time_string,
                         millisUntilFinished/ONE_MINUTE,
                         millisUntilFinished%ONE_MINUTE/ONE_SECOND);
+                shareTimer = String.valueOf(timeElapsed);
                 timer.setText(text);
-                timeElapsed = PLAY_TIME - millisUntilFinished;
+                timeElapsed = playTime - millisUntilFinished;
                 timeRemain = millisUntilFinished;
                 timer.invalidate();
             }
@@ -274,14 +356,15 @@ public class PlayActivity extends Activity {
             @Override
             public void onFinish() {
                 timer.setText(getString(R.string.time_gameover));
-                timeElapsed = PLAY_TIME;
+                timeElapsed = playTime;
+                shareTimer = String.valueOf(timeElapsed);
                 timeRemain = 0;
                 lose(playSpace);
             }
         };
 
 
-        Intent intent = getIntent();
+        /// get the puzzle board picture
         imageUri = intent.getParcelableExtra("picture");
         try {
             bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
@@ -302,7 +385,7 @@ public class PlayActivity extends Activity {
                 e.printStackTrace();
             }
         } catch (NullPointerException npe) {
-            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ilya);
+            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.logo);
             //imageUri
         }
 
@@ -315,8 +398,7 @@ public class PlayActivity extends Activity {
         ViewTreeObserver tree = findViewById(R.id.mainLayout).getViewTreeObserver();
         tree.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {@Override
         public void onGlobalLayout() {
-            setupBoard(playSpace, getIntent().getIntExtra("WIDTH", 3),
-                    getIntent().getIntExtra("HEIGHT", 3), bitmap);
+            setupBoard(playSpace, width, height, bitmap);
             playSpace.getViewTreeObserver().removeOnGlobalLayoutListener(this);
         }
         });
@@ -358,24 +440,27 @@ public class PlayActivity extends Activity {
         }
 
         restartText.setVisibility(View.INVISIBLE);
+        challengeText.setVisibility((View.INVISIBLE));
         playSpace.setBackgroundColor(Color.DKGRAY);
 
+        challengeText.invalidate();
         restartText.invalidate();
         playSpace.invalidate();
         isLose = false;
         isWin = false;
 
         String text = getString(R.string.time_string,
-                PLAY_TIME/ONE_MINUTE,
-                PLAY_TIME%ONE_MINUTE/ONE_SECOND);
+                playTime/ONE_MINUTE,
+                playTime%ONE_MINUTE/ONE_SECOND);
         timer.setText(text);
 
         moveInt = 0;
+        undoInt = 0;
         moveNum.setText(String.format("%d", moveInt));
         moveNum.invalidate();
 
         timeElapsed = 0;
-        timeRemain = PLAY_TIME;
+        timeRemain = playTime;
     }
 
     protected void setupBoard(final GridLayout playSpace, int w, int h,Bitmap bm){
@@ -384,8 +469,19 @@ public class PlayActivity extends Activity {
         setupBoard(playSpace,width,height);
     }
     protected void scrambleBoard(){
-        for(int i=0;i<1000;i++){
-            slideImages(currentBoard.slideBlankRandom());
+        Log.i("SEED", String.valueOf(seed));
+        if(seed == -1) {
+            seed = (int) System.currentTimeMillis();
+            User.setSeed(seed);
+            for (int i = 0; i < 1000; i++) {
+                slideImages(currentBoard.slideBlankRandom(seed));
+                seed++;
+            }
+        } else {
+            for (int i = 0; i < 1000; i++) {
+                slideImages(currentBoard.slideBlankRandom(seed));
+                seed++;
+            }
         }
     }
 
@@ -487,6 +583,7 @@ public class PlayActivity extends Activity {
         return src;
     }
 
+
     protected Bitmap scaleBitmapCenteredSquare(Bitmap src, int w, int h)
     {
         int min = playSpace.getWidth();
@@ -519,13 +616,7 @@ public class PlayActivity extends Activity {
 
 
 
-    private void lose(GridLayout playSpace) {
-        isLose = true;
-        playSpace.setBackgroundColor(getResources().getColor(R.color.failColor));
-        playSpace.invalidate();
-        restartText.setVisibility(View.VISIBLE);
-        restartText.invalidate();
-    }
+
 
     public void solutionFound(List<PuzzleBoard.Direction> solution) {
         mHints = solution;
@@ -555,14 +646,22 @@ public class PlayActivity extends Activity {
             Log.i("puz","clicked "+mNumOfView);
             PuzzleBoard.Direction d = currentBoard.dirNextToBlank(mNumOfView);
             stopGlow();
-            if(!isScrambled){
+            if(!isScrambled && mode == true)
+            {
                 isScrambled = true;
                 timerTick.start();
                 scrambleBoard();
                 timerTick.start();
                 return;
             }
-            if(isLose || isWin){//restart if game is over
+            if(!isScrambled && mode == false)
+            {
+                    isScrambled = true;
+                    timer.setText(getString(R.string.classic_mode));
+                    scrambleBoard();
+                    return;
+            }
+            if(isLose || isWin){
                 restart();
             }
             else if(d!=null ){//so the solver doesn't have to resolve everytime
@@ -599,8 +698,48 @@ public class PlayActivity extends Activity {
         isWin = true;
         restartText.setText(R.string.win);
         restartText.setVisibility(View.VISIBLE);
+        challengeText.setVisibility(View.VISIBLE);
         playSpace.setBackgroundColor(getResources().getColor(R.color.winColor));
         timerTick.cancel();
+
+        /// attempt to update save file
+        try{
+            int classic = mode ? 0 : 1;
+            stats.updateStats(width, height, moveInt, undoInt, (int)(timeElapsed/ONE_SECOND), classic^1, 0, classic);
+
+            FileOutputStream fos = PlayActivity.this.openFileOutput(savePath, Context.MODE_PRIVATE);
+            ObjectOutputStream os = new ObjectOutputStream(fos);
+            os.writeObject(stats);
+            os.close();
+            fos.close();
+
+        }catch(Exception e){
+            Toast.makeText(PlayActivity.this, "WIN ERROR SAVE " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+    private void lose(GridLayout playSpace) {
+        isLose = true;
+        playSpace.setBackgroundColor(getResources().getColor(R.color.failColor));
+        playSpace.invalidate();
+        restartText.setVisibility(View.VISIBLE);
+        challengeText.setVisibility(View.VISIBLE);
+        challengeText.invalidate();
+        restartText.invalidate();
+        timerTick.cancel();
+
+        /// attempt to update save file
+        try{
+            int classic = mode ? 1 : 0;
+            stats.updateStats(width, height, moveInt, undoInt, 0, 0, classic, 0);
+            FileOutputStream fos = PlayActivity.this.openFileOutput(savePath, Context.MODE_PRIVATE);
+            ObjectOutputStream os = new ObjectOutputStream(fos);
+            os.writeObject(stats);
+            os.close();
+            fos.close();
+
+        }catch(Exception e){
+            Toast.makeText(PlayActivity.this, "LOSE ERROR SAVE " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
     }
 
     public void slideImages(PuzzleBoard.Direction d){
