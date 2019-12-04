@@ -80,7 +80,17 @@ android:scaleType="fitXY">
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_weight="0.1"
-        android:orientation="horizontal"/>
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/inbox_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="0.5"
+            android:background="@drawable/back_border"
+            android:text="Inbox"
+            android:textSize="40sp" />
 
         <Button
             android:id="@+id/play_button"
@@ -92,15 +102,7 @@ android:scaleType="fitXY">
             android:text="@string/menu_play"
             android:textSize="40sp" />
 
-        <Button
-            android:id="@+id/inbox_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="0.5"
-            android:background="@drawable/back_border"
-            android:text="Inbox"
-            android:textSize="40sp" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -151,5 +153,4 @@ android:scaleType="fitXY">
         android:textColor="@color/white"
         android:layout_marginBottom="10dp"/>
 </LinearLayout>
-
-    ></RelativeLayout>
+    </RelativeLayout>

@@ -1,6 +1,7 @@
 package com.example.slidepuzzleproj;
 
 import android.animation.ValueAnimator;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Environment;
 import android.app.Activity;
@@ -138,7 +139,7 @@ public class MenuActivity extends Activity {
             }
         });
 
-        playButton = findViewById(R.id.play_button);
+        playButton = findViewById(R.id.playButton);
         playButton.setOnClickListener(new View.OnClickListener() {
                                           @Override
                                           public void onClick(View v) {
