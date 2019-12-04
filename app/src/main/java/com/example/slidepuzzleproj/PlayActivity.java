@@ -97,6 +97,7 @@ public class PlayActivity extends Activity {
     private boolean isScrambled = false; // save
     private Stack<PuzzleBoard.Direction> undoStack = new Stack<>(); //save
     private boolean play; // save
+    private boolean mode;
 
     private PlayerStats stats = null;
     private String savePath;
@@ -128,6 +129,9 @@ public class PlayActivity extends Activity {
         stats = (PlayerStats)intent.getSerializableExtra("save"); /// get save file
 
         savePath = getResources().getString(R.string.saveFile);
+
+        mode = getIntent().getExtras().getBoolean("MODE");
+
         minb = Integer.parseInt(getResources().getString(R.string.min_board_size));
         maxb = Integer.parseInt(getResources().getString(R.string.max_board_size));
         //stats = new PlayerStats(minb, minb, maxb, maxb);
@@ -144,7 +148,7 @@ public class PlayActivity extends Activity {
         moveNum = findViewById(R.id.moveNumber);
         moveNum.setText(String.format("%d", moveInt));
 
-        menuBGM = MediaPlayer.create(this, R.raw.wotw);
+        menuBGM = MediaPlayer.create(this, R.raw.hometown_domina);
         menuBGM.start();
         play = true;
 
@@ -250,7 +254,17 @@ public class PlayActivity extends Activity {
                 playTime/ONE_MINUTE,
                 playTime%ONE_MINUTE/ONE_SECOND);
 
-        timer.setText(text);
+        if(mode == true)
+        {
+            timer.setText(text);
+            timer.setTextSize(30);
+        }
+        else
+        {
+            timer.setText(getString(R.string.classic_mode));
+            timer.setTextSize(20);
+        }
+
 
         this.timerTick = new CountDownTimer(playTime, ONE_SECOND) {
             @Override
@@ -525,12 +539,21 @@ public class PlayActivity extends Activity {
         public void onClick(View v) {
             Log.i("puz","clicked "+mNumOfView);
             PuzzleBoard.Direction d = currentBoard.dirNextToBlank(mNumOfView);
-            if(!isScrambled){
+            if(!isScrambled && mode == true)
+            {
                 isScrambled = true;
                 timerTick.start();
                 scrambleBoard();
                 timerTick.start();
                 return;
+            }
+
+            if(!isScrambled && mode == false)
+            {
+                    isScrambled = true;
+                    timer.setText(getString(R.string.classic_mode));
+                    scrambleBoard();
+                    return;
             }
 
             if(isLose || isWin){

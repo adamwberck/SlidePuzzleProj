@@ -112,5 +112,6 @@
         android:background="@drawable/back_border"
         android:padding="10dp"
         android:text="@string/menu_stats"
-        android:textSize="40sp" />
+        android:textSize="40sp"
+        android:layout_marginBottom="10dp"/>
 </LinearLayout>
