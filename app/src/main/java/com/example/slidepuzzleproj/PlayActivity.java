@@ -247,7 +247,7 @@ public class PlayActivity extends Activity {
 
         width = getIntent().getIntExtra("WIDTH", 3);
         height = getIntent().getIntExtra("HEIGHT", 3);
-        playTime = (long)(1.5 * ONE_MINUTE);//(long)(((float)(width+height)/2.0) * ONE_MINUTE);
+        playTime = (long)(((float)(width+height)/2.0) * ONE_MINUTE);  //(long)(1.5 * ONE_MINUTE);
 
         //init the timer text
         String text = getString(R.string.time_string,
@@ -310,7 +310,7 @@ public class PlayActivity extends Activity {
                 e.printStackTrace();
             }
         } catch (NullPointerException npe) {
-            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ilya);
+            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.logo);
             //imageUri
         }
 
@@ -585,7 +585,8 @@ public class PlayActivity extends Activity {
 
         /// attempt to update save file
         try{
-            stats.updateStats(width, height, moveInt, undoInt, (int)(timeElapsed/ONE_SECOND), 1, 0);
+            int classic = mode ? 0 : 1;
+            stats.updateStats(width, height, moveInt, undoInt, (int)(timeElapsed/ONE_SECOND), classic^1, 0, classic);
 
             FileOutputStream fos = PlayActivity.this.openFileOutput(savePath, Context.MODE_PRIVATE);
             ObjectOutputStream os = new ObjectOutputStream(fos);
@@ -607,8 +608,8 @@ public class PlayActivity extends Activity {
 
         /// attempt to update save file
         try{
-
-            stats.updateStats(width, height, moveInt, undoInt, 0, 0, 1);
+            int classic = mode ? 1 : 0;
+            stats.updateStats(width, height, moveInt, undoInt, 0, 0, classic, 0);
             FileOutputStream fos = PlayActivity.this.openFileOutput(savePath, Context.MODE_PRIVATE);
             ObjectOutputStream os = new ObjectOutputStream(fos);
             os.writeObject(stats);

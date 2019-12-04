@@ -45,6 +45,8 @@ public class StatsEntryActivity extends AppCompatActivity {
         int avgMoves = intStats.getIntExtra("avgMoves", -1);
         int avgUndos = intStats.getIntExtra("avgUndos", -1);
         int avgTime = intStats.getIntExtra("avgTime", -1);
+        int numClassic = intStats.getIntExtra("numClassic", -1);
+        int numTimed = intStats.getIntExtra("numTimed", -1);
 
         LinearLayout elist = findViewById(R.id.stats_entry_list);
         /////////
@@ -80,13 +82,31 @@ public class StatsEntryActivity extends AppCompatActivity {
         v3.setText("Total # of Games: " + numGames);
         elist.addView(v3);
 
+        TextView v19 = new TextView(this);
+        v19.setTextSize(20);
+        v19.setTextColor(Color.BLACK);
+        v19.setTypeface(v19.getTypeface(), Typeface.BOLD);
+        v19.setPadding(10, 2, 2, 2);
+        v19.setBackground(getResources().getDrawable(R.drawable.back_border));
+        v19.setText("Total # of Classic Mode: " + numClassic);
+        elist.addView(v19);
+
+        TextView v18 = new TextView(this);
+        v18.setTextSize(20);
+        v18.setTextColor(Color.BLACK);
+        v18.setTypeface(v18.getTypeface(), Typeface.BOLD);
+        v18.setPadding(10, 2, 2, 2);
+        v18.setBackground(getResources().getDrawable(R.drawable.back_border));
+        v18.setText("Total # of Timed Mode: " + numTimed);
+        elist.addView(v18);
+
         TextView v16 = new TextView(this);
         v16.setTextSize(20);
         v16.setTextColor(Color.BLACK);
         v16.setTypeface(v16.getTypeface(), Typeface.BOLD);
         v16.setPadding(10, 2, 2, 2);
         v16.setBackground(getResources().getDrawable(R.drawable.back_border));
-        v16.setText("Number of Wins: " + numWins);
+        v16.setText("Number of Timed Wins: " + numWins);
         elist.addView(v16);
 
         TextView v17 = new TextView(this);
@@ -95,8 +115,9 @@ public class StatsEntryActivity extends AppCompatActivity {
         v17.setTypeface(v17.getTypeface(), Typeface.BOLD);
         v17.setPadding(10, 2, 2, 2);
         v17.setBackground(getResources().getDrawable(R.drawable.back_border));
-        v17.setText("Number of Losses: " + numLosses);
+        v17.setText("Number of Timed Losses: " + numLosses);
         elist.addView(v17);
+
 
         TextView v4 = new TextView(this);
         v4.setTextSize(20);

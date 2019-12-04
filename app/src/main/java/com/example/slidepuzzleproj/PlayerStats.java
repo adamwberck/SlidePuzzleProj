@@ -34,6 +34,7 @@ public class PlayerStats implements Serializable
     private int globMaxTime;
     private int globNumWins;
     private int globNumLosses;
+    private int globNumClassicMode;
 
     private BoardTypeStatEntry[][] entries;
 
@@ -63,6 +64,7 @@ public class PlayerStats implements Serializable
         this.globMaxTime = -1;
         this.globNumWins = -1;
         this.globNumLosses = -1;
+        this.globNumClassicMode = -1;
 
 
         this.entries = new BoardTypeStatEntry[boardHeight][boardWidth];
@@ -70,14 +72,14 @@ public class PlayerStats implements Serializable
         {
             for(int x = 0; x < boardWidth; x++){
                 this.entries[y][x] = new BoardTypeStatEntry(0, -1,-1,-1,-1,
-                                                    -1,-1,-1,-1,-1,-1,-1);
+                                                    -1,-1,-1,-1,-1,-1,-1, -1);
             }
         }
 
     }
 
     public void updateStats(int boardwidth, int boardheight, int numMoves, int numUndos,
-                            int time, int win, int lose)
+                            int time, int win, int lose, int classic)
     {
         /// add new data to the board entry of that size
         BoardTypeStatEntry ent = this.entries[boardheight-this.minBoardHeight][boardwidth-this.minBoardWidth];
@@ -97,21 +99,26 @@ public class PlayerStats implements Serializable
             this.globMaxTime = time;
             this.globNumWins = win;
             this.globNumLosses = lose;
+            this.globNumClassicMode = classic;
         }
-        else{
+        else {
             this.globNumGames += 1;
             this.globNumMoves += numMoves;
             this.globNumUndos += numUndos;
             this.globTotalTime += time;
             this.globNumWins += win;
             this.globNumLosses += lose;
+            this.globNumClassicMode += classic;
 
-            if(numMoves < this.globMinMoves) this.globMinMoves = numMoves;
-            else if(numMoves > this.globMaxMoves) this.globMaxMoves = numMoves;
-            if(numUndos < this.globMinUndos) this.globMinUndos = numUndos;
-            else if(numUndos > this.globNumUndos) this.globMaxUndos = numUndos;
-            if(time < this.globMinTime) this.globMinTime = time;
-            else if(time > this.globMaxTime) this.globMaxTime = time;
+            if (lose != 1)  /// dont update lowest/highest on lose
+            {
+                if (numMoves < this.globMinMoves) this.globMinMoves = numMoves;
+                else if (numMoves > this.globMaxMoves) this.globMaxMoves = numMoves;
+                if (numUndos < this.globMinUndos) this.globMinUndos = numUndos;
+                else if (numUndos > this.globNumUndos) this.globMaxUndos = numUndos;
+                if (time < this.globMinTime) this.globMinTime = time;
+                else if (time > this.globMaxTime) this.globMaxTime = time;
+            }
         }
 
 
@@ -119,7 +126,7 @@ public class PlayerStats implements Serializable
         {
             ent.setAllProperties(1, numMoves, numMoves, numMoves,
                     numUndos, numUndos, numUndos,
-                    time, time, time, win, lose);
+                    time, time, time, win, lose, classic);
         }
         else {
             ent.setNumGames(ent.getNumGames() + 1);
@@ -128,13 +135,17 @@ public class PlayerStats implements Serializable
             ent.setTotalTime(ent.getTotalTime() + time);
             ent.setNumWins(ent.getNumWins() + win);
             ent.setNumLosses(ent.getNumLosses() + lose);
+            ent.setNumClassic(ent.getNumClassic() + classic);
 
-            if(numMoves < ent.getMinMoves()) ent.setMinMoves(numMoves);
-            else if(numMoves > ent.getMaxMoves()) ent.setMaxMoves(numMoves);
-            if(numUndos < ent.getMinUndos()) ent.setMinUndos(numUndos);
-            else if(numUndos > ent.getMaxUndos()) ent.setMaxUndos(numUndos);
-            if(time < ent.getMinTime()) ent.setMinTime(time);
-            else if(time > ent.getMaxTime()) ent.setMaxTime(time);
+            if (lose != 1) /// dont update lowest/highest on lose
+            {
+                if (numMoves < ent.getMinMoves()) ent.setMinMoves(numMoves);
+                else if (numMoves > ent.getMaxMoves()) ent.setMaxMoves(numMoves);
+                if (numUndos < ent.getMinUndos()) ent.setMinUndos(numUndos);
+                else if (numUndos > ent.getMaxUndos()) ent.setMaxUndos(numUndos);
+                if (time < ent.getMinTime()) ent.setMinTime(time);
+                else if (time > ent.getMaxTime()) ent.setMaxTime(time);
+            }
         }
 
     }
@@ -207,6 +218,14 @@ public class PlayerStats implements Serializable
     public int getGlobalAverageTime(){
         if(this.globNumGames == 0 || this.globNumWins == 0) return -1;
         return this.globTotalTime/this.globNumWins;
+    }
+    public int getGlobalNumClassicMode(){
+        if(this.globNumGames == 0) return -1;
+        return this.globNumClassicMode;
+    }
+    public int getGlobalNumTimedMode(){
+        if(this.globNumGames == 0) return -1;
+        return this.globNumGames - this.globNumClassicMode;
     }
 
     ////////////////////////////////////////
@@ -286,6 +305,16 @@ public class PlayerStats implements Serializable
         if(temp.getNumGames() == 0) return -1;
         else return temp.getAverageTime();
     }
+    public int getBoardNumClassic(int boardwidth, int boardheight){
+        BoardTypeStatEntry temp = entries[boardheight-this.minBoardHeight][boardwidth-this.minBoardWidth];
+        if(temp.getNumGames() == 0) return -1;
+        else return temp.getNumClassic();
+    }
+    public int getBoardNumTimed(int boardwidth, int boardheight){
+        BoardTypeStatEntry temp = entries[boardheight-this.minBoardHeight][boardwidth-this.minBoardWidth];
+        if(temp.getNumGames() == 0) return -1;
+        else return temp.getNumGames() - temp.getNumClassic();
+    }
 
 
 
@@ -313,9 +342,10 @@ public class PlayerStats implements Serializable
         private int totalTime;
         private int numWins;
         private int numLosses;
+        private int numClassic;
 
         public BoardTypeStatEntry(int ng, int nm, int minm, int maxm, int nu, int minu, int maxu,
-                                  int st, int lt, int tott, int nw, int nl){
+                                  int st, int lt, int tott, int nw, int nl, int nclass){
             this.numGames = ng;
             this.numMoves = nm;
             this.minMoves = minm;
@@ -328,10 +358,11 @@ public class PlayerStats implements Serializable
             this.totalTime = tott;
             this.numWins = nw;
             this.numLosses = nl;
+            this.numClassic = nclass;
         }
 
         public void setAllProperties(int ng, int nm, int minm, int maxm, int nu, int minu, int maxu,
-                                        int st, int lt, int tott, int nw, int nl){
+                                        int st, int lt, int tott, int nw, int nl, int nclass){
             this.numGames = ng;
             this.numMoves = nm;
             this.minMoves = minm;
@@ -344,6 +375,7 @@ public class PlayerStats implements Serializable
             this.totalTime = tott;
             this.numWins = nw;
             this.numLosses = nl;
+            this.numClassic = nclass;
         }
 
         public int getNumGames(){
@@ -392,6 +424,7 @@ public class PlayerStats implements Serializable
         public int getNumLosses(){
             return this.numLosses;
         }
+        public int getNumClassic(){ return this.numClassic; }
 
         ///////////////////////////
         //// sets new value and RETURN THE delta value
@@ -455,157 +488,10 @@ public class PlayerStats implements Serializable
             this.numLosses = val;
             return toret;
         }
+        public int setNumClassic(int val){
+            int toret = val - this.numClassic;
+            this.numClassic = val;
+            return toret;
+        }
     }
-    /*
-    private int moveInt = 0;    // save
-    private long timeElapsed;   //save
-    private long timeRemain;    // save
-    private CountDownTimer timerTick;   // save
-
-    private String imageUri;   // save
-
-    private boolean isWin;  // save
-    private boolean isLose; // save
-
-    private int width;  // save
-    private int height; // save
-
-    private boolean isScrambled = false; // save
-    private boolean play; // save
-
-    private Stack<PuzzleBoard.Direction> undoStack = new Stack<>(); //save;
-
-
-    public PlayerStats(int mov, long te, long tr, CountDownTimer timer, SerializablePuzzleBoard board,
-                       String img, boolean win, boolean lose, int w, int h,
-                       boolean scram, Stack<PuzzleBoard.Direction> stack, boolean p)
-    {
-        moveInt = mov;
-        timeElapsed = te;
-        timeRemain = tr;
-        timerTick    = timer;
-        currentBoard = board;
-        imageUri = img;
-        isWin = win;
-        isLose = lose;
-        width = w;
-        height = h;
-        isScrambled = scram;
-        play = p;
-        undoStack = stack;
-
-    }
-
-    public int getMoveInt()
-    {
-        return moveInt;
-    }
-
-    public long getTimeElapsed()
-    {
-        return timeElapsed;
-    }
-    public long getTimeRemaining()
-    {
-        return timeRemain;
-    }
-    public CountDownTimer getTimerTick()
-    {
-        return timerTick;
-    }
-    public SerializablePuzzleBoard getCurrentBoard()
-    {
-        return currentBoard;
-    }
-
-    public Uri getImageUri()
-    {
-        return Uri.parse(this.imageUri);
-    }
-    public boolean getIsWin()
-    {
-        return isWin;
-    }
-    public boolean getIsLose()
-    {
-        return isLose;
-    }
-    public int getWidth()
-    {
-        return width;
-    }
-    public int getHeight()
-    {
-        return height;
-    }
-    public boolean getIsScrambled()
-    {
-        return isScrambled;
-    }
-    public boolean getPlay()
-    {
-        return play;
-    }
-    public Stack<PuzzleBoard.Direction> getUndoStack()
-    {
-        return undoStack;
-    }
-
-
-    public void setMoveInt(int x)
-    {
-        moveInt = x;
-    }
-
-    public void setTimeElapsed(long x)
-    {
-        timeElapsed = x;
-    }
-    public void setTimeRemaining(long x)
-    {
-        timeRemain = x;
-    }
-    public void setTimerTick(CountDownTimer x)
-    {
-        timerTick = x;
-    }
-    public void setCurrentBoard(SerializablePuzzleBoard x)
-    {
-        currentBoard = x;
-    }
-
-
-    public void setImageUri(Uri x)
-    {
-        imageUri = x.toString();
-    }
-    public void setIsWin(boolean x)
-    {
-        isWin = x;
-    }
-    public void setIsLose(boolean x)
-    {
-        isLose = x;
-    }
-    public void setWidth(int x)
-    {
-        width = x;
-    }
-    public void setHeight(int x)
-    {
-        height = x;
-    }
-    public void setIsScrambled(boolean x)
-    {
-        isScrambled = x;
-    }
-    public void setPlay(boolean x)
-    {
-        play = x;
-    }
-    public void setUndoStack(Stack<PuzzleBoard.Direction> x)
-    {
-        undoStack = x;
-    }
-    */
 }
