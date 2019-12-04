@@ -92,19 +92,20 @@ public class MenuActivity extends Activity {
                 });
 
         setContentView(R.layout.activity_menu); //attach the layout
-        VideoView videoView = findViewById(R.id.background);
-        Uri uri = Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.background);
-        videoView.setVideoURI(uri);
+        //VideoView videoView = findViewById(R.id.background);
+        //Uri uri = Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.background);
+        //videoView.setVideoURI(uri);
         //videoView.set
-        videoView.start();
-
+        //videoView.start();
+        /*
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
                 mp.setLooping(true);
             }
         });
-
+        */
+        
         savePath = getResources().getString(R.string.saveFile);
         //attemptLoadFile();
 
