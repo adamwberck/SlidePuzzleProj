@@ -8,12 +8,12 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.provider.MediaStore;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,6 +24,9 @@ import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 import com.squareup.picasso.Picasso;
 
@@ -49,6 +52,7 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.util.List;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.nio.file.Paths;
@@ -57,6 +61,8 @@ import java.util.Stack;
 public class PlayActivity extends Activity {
     private ContextWrapper cw; //context / working directory of app
 
+    private List<PuzzleBoard.Direction> mHints = null;
+
     private TextView timer;
     private TextView moveNum;
 
@@ -64,12 +70,14 @@ public class PlayActivity extends Activity {
     //private PuzzleLab lab;
 
     private Button undo;
-    private Button tips;
+    private Button hint;
     private Button menu;
     private Button prev;
     private GridLayout playSpace;
     private TextView restartText;
     private Button statbut;
+
+    private int mGlowIndex = 0;
 
     private final long ONE_MINUTE = 60000;
     private final long ONE_SECOND = 1000;
@@ -79,6 +87,7 @@ public class PlayActivity extends Activity {
     private long seed = -1;
     private ImageView[] pieces;
     private MediaPlayer menuBGM;
+    private boolean mIsThinking = false;
   
     private int moveInt = 0;    // save
     private int undoInt = 0;
@@ -109,14 +118,14 @@ public class PlayActivity extends Activity {
     {
         super.onPause();
         menuBGM.pause();
-        play = false;
     }
 
     @Override
     protected void onResume(){
         super.onResume();
-        menuBGM.start();
-        play = true;
+        if(play) {
+            menuBGM.start();
+        }
     }
 
     @Override
@@ -138,7 +147,7 @@ public class PlayActivity extends Activity {
         cw = new ContextWrapper(getApplicationContext());
 
         undo = findViewById(R.id.undoButton);
-        tips = findViewById(R.id.tipsButton);
+        hint = findViewById(R.id.tipsButton);
         menu = findViewById(R.id.menuButton);
         prev = findViewById(R.id.previewButton);
         timer = findViewById(R.id.time);
@@ -147,9 +156,10 @@ public class PlayActivity extends Activity {
         moveNum = findViewById(R.id.moveNumber);
         moveNum.setText(String.format("%d", moveInt));
 
-        menuBGM = MediaPlayer.create(this, R.raw.hometown_domina);
-        menuBGM.start();
-        play = true;
+        menuBGM = MediaPlayer.create(this, R.raw.wotw);
+        if(play) {
+            menuBGM.start();
+        }
 
         playSpace = findViewById(R.id.playSpace);
         restartText = findViewById(R.id.restartText);
@@ -229,12 +239,21 @@ public class PlayActivity extends Activity {
             }
         });
 
+
         menu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v)
             {
                 PopupMenu popupMenu = new PopupMenu(PlayActivity.this, menu);
                 popupMenu.getMenuInflater().inflate(R.menu.popup_menu, popupMenu.getMenu());
+
+                for(int i=0;i<popupMenu.getMenu().size();i++){
+                    MenuItem item =  popupMenu.getMenu().getItem(i);
+                    if(item.getItemId()==R.id.mute_menu) {
+                        item.setTitle(play?"Mute":"Un-mute");
+                    }
+                }
+
 
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
@@ -258,6 +277,7 @@ public class PlayActivity extends Activity {
                             case R.id.mute_menu:
                                 if (play == true) {
                                     menuBGM.pause();
+                                    item.setTitle(play?"Mute" : "Un-mute");
                                     play = false;
                                 }
                                 else if (play == false)
@@ -274,13 +294,23 @@ public class PlayActivity extends Activity {
             }
         });
 
-        tips.setOnClickListener(new View.OnClickListener() {
+        hint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    new Solver(currentBoard);
-                } catch (CloneNotSupportedException e) {
-                    e.printStackTrace();
+                if(width>3 || height>3){
+                    Toast.makeText(PlayActivity.this, "Hint only supported for 3x3"
+                            ,Toast.LENGTH_SHORT)
+                            .show();
+                }
+                else if(isScrambled && !mIsThinking) {
+                    if (mHints == null ) {
+                        Toast.makeText(PlayActivity.this, "Thinking?",Toast.LENGTH_SHORT)
+                                .show();
+                        mIsThinking = true;
+                        new Solver(currentBoard, PlayActivity.this).execute();
+                    } else {
+                        glowPiece(mHints.get(0));
+                    }
                 }
             }
         });
@@ -395,6 +425,7 @@ public class PlayActivity extends Activity {
     }
 
     private void restart() {
+        stopGlow();
         isScrambled = false;
         currentBoard.restart();
         undoStack.clear();
@@ -513,10 +544,11 @@ public class PlayActivity extends Activity {
         if(newHei>playSpace.getHeight()){
             newHei = playSpace.getHeight();
         }
-
         src = Bitmap.createScaledBitmap(bitmap, newWid - 2*w*GAP, newHei - 2*h*GAP, true);
         return src;
     }
+
+
 
     /// uses the global variables:
     /// - Bitmap, width, and height
@@ -586,6 +618,21 @@ public class PlayActivity extends Activity {
 
 
 
+    public void solutionFound(List<PuzzleBoard.Direction> solution) {
+        mHints = solution;
+        mIsThinking = false;
+        glowPiece(solution.get(0));
+    }
+
+    private void glowPiece(PuzzleBoard.Direction direction)  {
+        stopGlow();
+        int index = currentBoard.indexNextToBlank(direction);
+        mGlowIndex = index;
+        pieces[index].setColorFilter(pieces[index].getContext().getResources().getColor(R.color.hint1),
+                PorterDuff.Mode.SRC_ATOP);
+        pieces[index].invalidate();
+    }
+
 
     private class PieceListener implements View.OnClickListener {
         private int mNumOfView;
@@ -598,6 +645,7 @@ public class PlayActivity extends Activity {
         public void onClick(View v) {
             Log.i("puz","clicked "+mNumOfView);
             PuzzleBoard.Direction d = currentBoard.dirNextToBlank(mNumOfView);
+            stopGlow();
             if(!isScrambled && mode == true)
             {
                 isScrambled = true;
@@ -606,7 +654,6 @@ public class PlayActivity extends Activity {
                 timerTick.start();
                 return;
             }
-
             if(!isScrambled && mode == false)
             {
                     isScrambled = true;
@@ -614,11 +661,17 @@ public class PlayActivity extends Activity {
                     scrambleBoard();
                     return;
             }
-
             if(isLose || isWin){
                 restart();
             }
-            else if(d!=null){
+            else if(d!=null ){//so the solver doesn't have to resolve everytime
+                if(mHints!=null) {
+                    if (d == PlayActivity.this.mHints.get(0)) {
+                        PlayActivity.this.mHints.remove(0);
+                    } else {
+                        PlayActivity.this.mHints = null;
+                    }
+                }
                 slideImages(d);
 
                 //add to undo
@@ -633,6 +686,12 @@ public class PlayActivity extends Activity {
                 win();
             }
         }
+    }
+
+    private void stopGlow() {
+
+        pieces[mGlowIndex].clearColorFilter();
+        pieces[mGlowIndex].invalidate();
     }
 
     private void win() {
