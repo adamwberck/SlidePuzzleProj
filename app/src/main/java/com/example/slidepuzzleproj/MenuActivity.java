@@ -70,38 +70,7 @@ public class MenuActivity extends Activity {
         statButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                /// try to load save file
-                try{
-                    //String path = getFilesDir() + "/test.bin";
-                    FileInputStream fis = openFileInput(savePath);
-                    ObjectInputStream is = new ObjectInputStream(fis);
-                    playerStats = (PlayerStats)is.readObject();
-                    is.close();
-                    fis.close();
-
-                    foundFile = true;
-                    Toast.makeText(MenuActivity.this, "SUCCESSFULLY LOADED SAVE " + savePath, Toast.LENGTH_LONG).show();
-                }catch(Exception e){
-                    Toast.makeText(MenuActivity.this, "ERROR ERROR LOAD", Toast.LENGTH_LONG).show();
-                }
-
-                /// if no save file, create a fresh one
-                if(!foundFile){
-                    try{
-                        playerStats = new PlayerStats(minb, minb, maxb, maxb);
-                        FileOutputStream fos = MenuActivity.this.openFileOutput(savePath, Context.MODE_PRIVATE);
-                        ObjectOutputStream os = new ObjectOutputStream(fos);
-                        os.writeObject(playerStats);
-                        os.close();
-                        fos.close();
-
-                        foundFile = true;
-                        Toast.makeText(MenuActivity.this, "CREATED A NEW SAVE " + savePath, Toast.LENGTH_LONG).show();
-                    }catch(Exception e){
-                        //Log.i("BAD STATS WRITER", e.getMessage() + " | " + e.getCause());
-                        Toast.makeText(MenuActivity.this, "ERROR SAVE " + e.getMessage(), Toast.LENGTH_LONG).show();
-                    }
-                }
+                attemptLoadFile();
 
                 /// load the stats activity
                 Intent intStats = new Intent(MenuActivity.this, StatsActivity.class);
@@ -138,6 +107,10 @@ public class MenuActivity extends Activity {
                     imageUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.drawable.ilya);
                 }
                 playIntent.putExtra("picture",imageUri);
+
+                attemptLoadFile();
+                playIntent.putExtra("save", playerStats);
+
                 startActivityForResult(playIntent, DIMENSION);
             }
         });
@@ -156,6 +129,46 @@ public class MenuActivity extends Activity {
 
         spinnerH.setOnItemSelectedListener(new DimenListener(0));
         spinnerW.setOnItemSelectedListener(new DimenListener(1));
+
+    }
+
+    /////////////
+    // Load save file method for MenuActivity only
+    private void attemptLoadFile()
+    {
+        /// try to load save file
+        try{
+            //String path = getFilesDir() + "/test.bin";
+            FileInputStream fis = openFileInput(savePath);
+            ObjectInputStream is = new ObjectInputStream(fis);
+            playerStats = (PlayerStats)is.readObject();
+            is.close();
+            fis.close();
+
+            foundFile = true;
+            Toast.makeText(MenuActivity.this, "SUCCESSFULLY LOADED SAVE " + savePath, Toast.LENGTH_LONG).show();
+        }catch(Exception e){
+            Toast.makeText(MenuActivity.this, "ERROR ERROR LOAD", Toast.LENGTH_LONG).show();
+        }
+
+        /// if no save file, create a fresh one
+        if(!foundFile){
+            try{
+                playerStats = new PlayerStats(minb, minb, maxb, maxb);
+                FileOutputStream fos = MenuActivity.this.openFileOutput(savePath, Context.MODE_PRIVATE);
+                ObjectOutputStream os = new ObjectOutputStream(fos);
+                os.writeObject(playerStats);
+                os.close();
+                fos.close();
+
+                foundFile = true;
+                Toast.makeText(MenuActivity.this, "CREATED A NEW SAVE " + savePath, Toast.LENGTH_LONG).show();
+            }catch(Exception e){
+                //Log.i("BAD STATS WRITER", e.getMessage() + " | " + e.getCause());
+                Toast.makeText(MenuActivity.this, "ERROR SAVE " + e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        }
+
 
     }
 

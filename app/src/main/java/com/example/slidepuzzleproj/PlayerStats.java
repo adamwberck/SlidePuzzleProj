@@ -6,6 +6,8 @@ package com.example.slidepuzzleproj;
 
 import android.net.Uri;
 import android.os.CountDownTimer;
+import android.util.Log;
+import android.widget.Toast;
 
 import java.io.Serializable;
 import java.util.Stack;
@@ -74,6 +76,8 @@ public class PlayerStats implements Serializable
     public void updateStats(int boardwidth, int boardheight, int numMoves, int numUndos,
                             int time, int win, int lose)
     {
+        //Toast.makeText(null, boardwidth + "|" + boardheight, Toast.LENGTH_LONG).show();
+        Log.i("UPDATE STATS", boardwidth + "|" + boardheight);
         /// add new data to the board entry of that size
         BoardTypeStatEntry ent = this.entries[boardheight-this.minBoardHeight][boardwidth-this.minBoardWidth];
 
@@ -133,56 +137,73 @@ public class PlayerStats implements Serializable
         }
     }
 
-    //// accessors for global data
+
     public int getMinBoardWidth(){ return this.minBoardWidth; }
     public int getMinBoardHeight(){ return this.minBoardHeight; }
     public int getMaxBoardWidth(){ return this.maxBoardWidth; }
     public int getMaxBoardHeight(){ return this.maxBoardHeight; }
     public int getBoardWidth(){ return this.boardWidth; }
     public int getBoardHeight(){ return this.boardHeight; }
-    public int getGlobalBoardNumGames(){
-        return this.globNumGames;
+
+    //// accessors for global data
+    public int getGlobalNumGames(){
+        if(this.globNumGames == 0) return 0;
+        else return this.globNumGames;
     }
-    public int getGlobalBoardNumMoves(){
+    public int getGlobalNumMoves(){
+        if(this.globNumGames == 0) return -1;
         return this.globNumMoves;
     }
-    public int getGlobalBoardMinMoves(){
+    public int getGlobalMinMoves(){
+        if(this.globNumGames == 0) return -1;
         return this.globMinMoves;
     }
-    public int getGlobalBoardMaxMoves(){
+    public int getGlobalMaxMoves(){
+        if(this.globNumGames == 0) return -1;
         return this.globMaxMoves;
     }
-    public int getGlobalBoardNumUndos(){
+    public int getGlobalNumUndos(){
+        if(this.globNumGames == 0) return -1;
         return this.globNumUndos;
     }
-    public int getGlobalBoardMinUndos(){
+    public int getGlobalMinUndos(){
+        if(this.globNumGames == 0) return -1;
         return this.globMinUndos;
     }
-    public int getGlobalBoardMaxUndos(){
+    public int getGlobalMaxUndos(){
+        if(this.globNumGames == 0) return -1;
         return this.globMaxUndos;
     }
-    public int getGlobalBoardTotalTime(){
+    public int getGlobalTotalTime(){
+        if(this.globNumGames == 0) return -1;
         return this.globTotalTime;
     }
-    public int getGlobalBoardMinTime(){
+    public int getGlobalMinTime(){
+        if(this.globNumGames == 0) return -1;
         return this.globMaxUndos;
     }
-    public int getGlobalBoardMaxTime(){
+    public int getGlobalMaxTime(){
+        if(this.globNumGames == 0) return -1;
         return this.globMaxTime;
     }
-    public int getGlobalBoardNumWins(){
+    public int getGlobalNumWins(){
+        if(this.globNumGames == 0) return -1;
         return this.globNumWins;
     }
-    public int getGlobalBoardNumLosses(){
+    public int getGlobalNumLosses(){
+        if(this.globNumGames == 0) return -1;
         return this.globNumLosses;
     }
-    public int getGlobalBoardAverageMoves(){
+    public int getGlobalAverageMoves(){
+        if(this.globNumGames == 0) return -1;
         return this.globNumMoves/this.globNumGames;
     }
-    public int getGlobalBoardAverageUndos(){
+    public int getGlobalAverageUndos(){
+        if(this.globNumGames == 0) return -1;
         return this.globNumUndos/this.globNumGames;
     }
-    public int getGlobalBoardAverageTime(){
+    public int getGlobalAverageTime(){
+        if(this.globNumGames == 0) return -1;
         return this.globTotalTime/this.globNumWins;
     }
 

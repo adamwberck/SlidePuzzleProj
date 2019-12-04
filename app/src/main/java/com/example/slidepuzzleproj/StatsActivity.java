@@ -56,10 +56,48 @@ public class StatsActivity extends Activity {
 
         //Toast.makeText(StatsActivity.this, "Loaded stat " + stats.getBoardHeight(), Toast.LENGTH_LONG).show();
 
-        //statButs = new Button[arrHeight][arrWidth];
+
+        /// the view containing list of stats types
         statList = findViewById(R.id.stats_list);
-        //// have one button show the total stats
+
+        //// have one button show the total global stats
+
         Button totalBut = new Button(this);
+        totalBut.setText("Total Overall Stats");
+        totalBut.setBackground(getResources().getDrawable(R.drawable.back_border));
+        totalBut.setTypeface(totalBut.getTypeface(), Typeface.BOLD);
+        totalBut.setTextSize(30);
+        totalBut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try{
+                Intent intStats = new Intent(StatsActivity.this, StatsEntryActivity.class);
+
+                intStats.putExtra("isGlobal", true);
+                intStats.putExtra("numGames", stats.getGlobalNumGames());
+                intStats.putExtra("numMoves", stats.getGlobalNumMoves());
+                intStats.putExtra("minMoves", stats.getGlobalMinMoves());
+                intStats.putExtra("maxMoves", stats.getGlobalMaxMoves());
+                intStats.putExtra("numUndos", stats.getGlobalNumUndos());
+                intStats.putExtra("minUndos", stats.getGlobalMinUndos());
+                intStats.putExtra("maxUndos", stats.getGlobalMaxUndos());
+                intStats.putExtra("totTime", stats.getGlobalTotalTime());
+                intStats.putExtra("minTime", stats.getGlobalMinTime());
+                intStats.putExtra("maxTime", stats.getGlobalMaxTime());
+                intStats.putExtra("numWins", stats.getGlobalNumWins());
+                intStats.putExtra("numLosses", stats.getGlobalNumLosses());
+                intStats.putExtra("avgMoves", stats.getGlobalAverageMoves());
+                intStats.putExtra("avgUndos", stats.getGlobalAverageUndos());
+                intStats.putExtra("avgTime", stats.getGlobalAverageTime());
+
+                /// load final stat entry activity to show all stats for the chosen board type
+                startActivity(intStats);
+                }catch(Exception e){Toast.makeText(StatsActivity.this, e.getMessage() + "|" + e.getCause(), Toast.LENGTH_LONG).show();}
+
+
+            }
+        });
+        statList.addView(totalBut);
 
 
         for(int x = 0; x < arrWidth; x++){
@@ -67,10 +105,10 @@ public class StatsActivity extends Activity {
                 int adjX = x+arrWidthMin;
                 int adjY = y+arrHeightMin;
                 /////// add an entry to the linear list for each board stats
-                //if(stats.getBoardNumGames(adjX, adjY) > 0) {
+                if(stats.getBoardNumGames(adjX, adjY) > 0) {
                     Button but = new Button(this);
-                    but.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT));
+                    //but.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                    //        LinearLayout.LayoutParams.WRAP_CONTENT));
                     but.setText((adjX) + "x" + (adjY));
                     but.setBackground(getResources().getDrawable(R.drawable.back_border));
                     but.setTypeface(but.getTypeface(), Typeface.BOLD);
@@ -78,9 +116,10 @@ public class StatsActivity extends Activity {
 
                     but.setOnClickListener(new StatEntryOnClick(StatsActivity.this, stats, adjX, adjY));
                     statList.addView(but);
-                //}
+                }
             }
         }
+
         statList.invalidate();
 
         sbut = findViewById(R.id.stats_x);

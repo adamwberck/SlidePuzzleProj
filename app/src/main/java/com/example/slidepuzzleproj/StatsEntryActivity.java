@@ -27,6 +27,7 @@ public class StatsEntryActivity extends AppCompatActivity {
 
         //// a bunch of values will get passed
         Intent intStats = getIntent();
+        boolean isGlobal = intStats.getBooleanExtra("isGlobal", false);
         int adjX = intStats.getIntExtra("adjWidth", -1);
         int adjY = intStats.getIntExtra("adjHeight", -1);
         int numGames = intStats.getIntExtra("numGames", 0);
@@ -49,27 +50,32 @@ public class StatsEntryActivity extends AppCompatActivity {
         /////////
         // add all the stat values to the list
         //
-        TextView v1 = new TextView(this);
-        v1.setTextSize(20);
-        v1.setTextColor(Color.BLACK);
-        v1.setTypeface(v1.getTypeface(), Typeface.BOLD);
-        v1.setPadding(10,2,2,2);
-        v1.setBackground(getResources().getDrawable(R.drawable.back_border));
-        v1.setText("Board Width: " + adjX);
-        elist.addView(v1);
 
-        TextView v2 = new TextView(this);
-        v2.setTextSize(20);
-        v2.setTextColor(Color.BLACK);
-        v2.setPadding(10,2,2,2);
-        v2.setBackground(getResources().getDrawable(R.drawable.back_border));
-        v2.setText("Board Height: " + adjY);
-        elist.addView(v2);
+        if (!isGlobal) {
+            TextView v1 = new TextView(this);
+            v1.setTextSize(20);
+            v1.setTextColor(Color.BLACK);
+            v1.setTypeface(v1.getTypeface(), Typeface.BOLD);
+            v1.setPadding(10, 2, 2, 2);
+            v1.setBackground(getResources().getDrawable(R.drawable.back_border));
+            v1.setText("Board Width: " + adjX);
+            elist.addView(v1);
+
+            TextView v2 = new TextView(this);
+            v2.setTextSize(20);
+            v2.setTextColor(Color.BLACK);
+            v2.setTypeface(v2.getTypeface(), Typeface.BOLD);
+            v2.setPadding(10, 2, 2, 2);
+            v2.setBackground(getResources().getDrawable(R.drawable.back_border));
+            v2.setText("Board Height: " + adjY);
+            elist.addView(v2);
+        }
 
         TextView v3 = new TextView(this);
         v3.setTextSize(20);
         v3.setTextColor(Color.BLACK);
-        v3.setPadding(10,2,2,2);
+        v3.setTypeface(v3.getTypeface(), Typeface.BOLD);
+        v3.setPadding(10, 2, 2, 2);
         v3.setBackground(getResources().getDrawable(R.drawable.back_border));
         v3.setText("Total # of Games: " + numGames);
         elist.addView(v3);
@@ -77,7 +83,8 @@ public class StatsEntryActivity extends AppCompatActivity {
         TextView v16 = new TextView(this);
         v16.setTextSize(20);
         v16.setTextColor(Color.BLACK);
-        v16.setPadding(10,2,2,2);
+        v16.setTypeface(v16.getTypeface(), Typeface.BOLD);
+        v16.setPadding(10, 2, 2, 2);
         v16.setBackground(getResources().getDrawable(R.drawable.back_border));
         v16.setText("Number of Wins: " + numWins);
         elist.addView(v16);
@@ -85,7 +92,8 @@ public class StatsEntryActivity extends AppCompatActivity {
         TextView v17 = new TextView(this);
         v17.setTextSize(20);
         v17.setTextColor(Color.BLACK);
-        v17.setPadding(10,2,2,2);
+        v17.setTypeface(v17.getTypeface(), Typeface.BOLD);
+        v17.setPadding(10, 2, 2, 2);
         v17.setBackground(getResources().getDrawable(R.drawable.back_border));
         v17.setText("Number of Losses: " + numLosses);
         elist.addView(v17);
@@ -93,7 +101,8 @@ public class StatsEntryActivity extends AppCompatActivity {
         TextView v4 = new TextView(this);
         v4.setTextSize(20);
         v4.setTextColor(Color.BLACK);
-        v4.setPadding(10,2,2,2);
+        v4.setTypeface(v4.getTypeface(), Typeface.BOLD);
+        v4.setPadding(10, 2, 2, 2);
         v4.setBackground(getResources().getDrawable(R.drawable.back_border));
         v4.setText("Total # of Moves: " + numMoves);
         elist.addView(v4);
@@ -101,7 +110,8 @@ public class StatsEntryActivity extends AppCompatActivity {
         TextView v5 = new TextView(this);
         v5.setTextSize(20);
         v5.setTextColor(Color.BLACK);
-        v5.setPadding(10,2,2,2);
+        v5.setTypeface(v5.getTypeface(), Typeface.BOLD);
+        v5.setPadding(10, 2, 2, 2);
         v5.setBackground(getResources().getDrawable(R.drawable.back_border));
         v5.setText("Minimum # of Moves: " + minMoves);
         elist.addView(v5);
@@ -109,7 +119,8 @@ public class StatsEntryActivity extends AppCompatActivity {
         TextView v6 = new TextView(this);
         v6.setTextSize(20);
         v6.setTextColor(Color.BLACK);
-        v6.setPadding(10,2,2,2);
+        v6.setTypeface(v6.getTypeface(), Typeface.BOLD);
+        v6.setPadding(10, 2, 2, 2);
         v6.setBackground(getResources().getDrawable(R.drawable.back_border));
         v6.setText("Maximum # of Moves: " + maxMoves);
         elist.addView(v6);
@@ -117,7 +128,8 @@ public class StatsEntryActivity extends AppCompatActivity {
         TextView v7 = new TextView(this);
         v7.setTextSize(20);
         v7.setTextColor(Color.BLACK);
-        v7.setPadding(10,2,2,2);
+        v7.setTypeface(v7.getTypeface(), Typeface.BOLD);
+        v7.setPadding(10, 2, 2, 2);
         v7.setBackground(getResources().getDrawable(R.drawable.back_border));
         v7.setText("Average # of Moves: " + avgMoves);
         elist.addView(v7);
@@ -125,7 +137,8 @@ public class StatsEntryActivity extends AppCompatActivity {
         TextView v8 = new TextView(this);
         v8.setTextSize(20);
         v8.setTextColor(Color.BLACK);
-        v8.setPadding(10,2,2,2);
+        v8.setTypeface(v8.getTypeface(), Typeface.BOLD);
+        v8.setPadding(10, 2, 2, 2);
         v8.setBackground(getResources().getDrawable(R.drawable.back_border));
         v8.setText("Total # of Undo: " + numUndos);
         elist.addView(v8);
@@ -133,7 +146,8 @@ public class StatsEntryActivity extends AppCompatActivity {
         TextView v9 = new TextView(this);
         v9.setTextSize(20);
         v9.setTextColor(Color.BLACK);
-        v9.setPadding(10,2,2,2);
+        v9.setTypeface(v9.getTypeface(), Typeface.BOLD);
+        v9.setPadding(10, 2, 2, 2);
         v9.setBackground(getResources().getDrawable(R.drawable.back_border));
         v9.setText("Minimum # of Undo: " + minUndos);
         elist.addView(v9);
@@ -141,7 +155,8 @@ public class StatsEntryActivity extends AppCompatActivity {
         TextView v10 = new TextView(this);
         v10.setTextSize(20);
         v10.setTextColor(Color.BLACK);
-        v10.setPadding(10,2,2,2);
+        v10.setTypeface(v10.getTypeface(), Typeface.BOLD);
+        v10.setPadding(10, 2, 2, 2);
         v10.setBackground(getResources().getDrawable(R.drawable.back_border));
         v10.setText("Maximum # of Undo: " + maxUndos);
         elist.addView(v10);
@@ -149,7 +164,8 @@ public class StatsEntryActivity extends AppCompatActivity {
         TextView v11 = new TextView(this);
         v11.setTextSize(20);
         v11.setTextColor(Color.BLACK);
-        v11.setPadding(10,2,2,2);
+        v11.setTypeface(v11.getTypeface(), Typeface.BOLD);
+        v11.setPadding(10, 2, 2, 2);
         v11.setBackground(getResources().getDrawable(R.drawable.back_border));
         v11.setText("Average # of Undo: " + avgUndos);
         elist.addView(v11);
@@ -157,7 +173,8 @@ public class StatsEntryActivity extends AppCompatActivity {
         TextView v12 = new TextView(this);
         v12.setTextSize(20);
         v12.setTextColor(Color.BLACK);
-        v12.setPadding(10,2,2,2);
+        v12.setTypeface(v12.getTypeface(), Typeface.BOLD);
+        v12.setPadding(10, 2, 2, 2);
         v12.setBackground(getResources().getDrawable(R.drawable.back_border));
         v12.setText("Total Time Taken: " + totTime);
         elist.addView(v12);
@@ -165,7 +182,8 @@ public class StatsEntryActivity extends AppCompatActivity {
         TextView v13 = new TextView(this);
         v13.setTextSize(20);
         v13.setTextColor(Color.BLACK);
-        v13.setPadding(10,2,2,2);
+        v13.setTypeface(v13.getTypeface(), Typeface.BOLD);
+        v13.setPadding(10, 2, 2, 2);
         v13.setBackground(getResources().getDrawable(R.drawable.back_border));
         v13.setText("Minimum Time Taken: " + minTime);
         elist.addView(v13);
@@ -173,7 +191,8 @@ public class StatsEntryActivity extends AppCompatActivity {
         TextView v14 = new TextView(this);
         v14.setTextSize(20);
         v14.setTextColor(Color.BLACK);
-        v14.setPadding(10,2,2,2);
+        v14.setTypeface(v14.getTypeface(), Typeface.BOLD);
+        v14.setPadding(10, 2, 2, 2);
         v14.setBackground(getResources().getDrawable(R.drawable.back_border));
         v14.setText("Maximum Time Taken: " + maxTime);
         elist.addView(v14);
@@ -181,13 +200,13 @@ public class StatsEntryActivity extends AppCompatActivity {
         TextView v15 = new TextView(this);
         v15.setTextSize(20);
         v15.setTextColor(Color.BLACK);
-        v15.setPadding(10,2,2,2);
+        v15.setTypeface(v15.getTypeface(), Typeface.BOLD);
+        v15.setPadding(10, 2, 2, 2);
         v15.setBackground(getResources().getDrawable(R.drawable.back_border));
         v15.setText("Average Time Taken: " + avgTime);
         elist.addView(v15);
 
         elist.invalidate();
-
 
         Button sebut = findViewById(R.id.stats_entry_x);
         sebut.setOnClickListener(new View.OnClickListener() {
