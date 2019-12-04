@@ -96,6 +96,7 @@ public class StatsActivity extends Activity {
                 intStats.putExtra("avgTime", stats.getGlobalAverageTime());
                 intStats.putExtra("numClassic", stats.getGlobalNumClassicMode());
                 intStats.putExtra("numTimed", stats.getGlobalNumTimedMode());
+                intStats.putExtra("numHints", stats.getGlobalNumHints());
 
                 /// load final stat entry activity to show all stats for the chosen board type
                 startActivity(intStats);
@@ -199,6 +200,7 @@ public class StatsActivity extends Activity {
             int avgTime = stats.getBoardAverageTime(adjWidth, adjHeight);
             int numClassic = stats.getBoardNumClassic(adjWidth, adjHeight);
             int numTimed = stats.getBoardNumTimed(adjWidth, adjHeight);
+            int numHints = stats.getBoardNumHints(adjWidth, adjHeight);
 
             intStats.putExtra("adjWidth", this.adjWidth);
             intStats.putExtra("adjHeight", this.adjHeight);
@@ -219,6 +221,7 @@ public class StatsActivity extends Activity {
             intStats.putExtra("avgTime", avgTime);
             intStats.putExtra("numClassic", numClassic);
             intStats.putExtra("numTimed", numTimed);
+            intStats.putExtra("numHints", numHints);
 
             /// load final stat entry activity to show all stats for the chosen board type
             startActivity(intStats);
