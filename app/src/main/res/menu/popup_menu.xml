@@ -5,12 +5,6 @@
         android:id="@+id/main_menu"
         android:title="Main Menu"/>
     <item
-        android:id="@+id/save_menu"
-        android:title="Save"/>
-    <item
-        android:id="@+id/load_menu"
-        android:title="Load"/>
-    <item
         android:id="@+id/statistics_menu"
         android:title="Statistics"/>
     <item

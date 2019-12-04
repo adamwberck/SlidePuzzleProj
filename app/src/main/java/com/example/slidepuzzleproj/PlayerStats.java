@@ -47,6 +47,9 @@ public class PlayerStats implements Serializable
         this.maxBoardHeight = maxboardheight;
         this.boardWidth = maxboardwidth - minboardwidth + 1;
         this.boardHeight = maxboardheight - minboardheight + 1;
+        Log.i("[YO]", minboardwidth + "|" + maxboardwidth + "|" +
+                minboardheight + "|" + maxboardheight + "|" + boardWidth + "|" + boardHeight);
+
 
         this.globNumGames = 0;
         this.globNumMoves = -1;
@@ -76,8 +79,6 @@ public class PlayerStats implements Serializable
     public void updateStats(int boardwidth, int boardheight, int numMoves, int numUndos,
                             int time, int win, int lose)
     {
-        //Toast.makeText(null, boardwidth + "|" + boardheight, Toast.LENGTH_LONG).show();
-        Log.i("UPDATE STATS", boardwidth + "|" + boardheight);
         /// add new data to the board entry of that size
         BoardTypeStatEntry ent = this.entries[boardheight-this.minBoardHeight][boardwidth-this.minBoardWidth];
 
@@ -125,8 +126,8 @@ public class PlayerStats implements Serializable
             ent.setNumMoves(ent.getNumMoves() + numMoves);
             ent.setNumUndos(ent.getNumUndos() + numUndos);
             ent.setTotalTime(ent.getTotalTime() + time);
-            ent.setNumWins(ent.getNumWins() + 1);
-            ent.setNumLosses(ent.getNumLosses() + 1);
+            ent.setNumWins(ent.getNumWins() + win);
+            ent.setNumLosses(ent.getNumLosses() + lose);
 
             if(numMoves < ent.getMinMoves()) ent.setMinMoves(numMoves);
             else if(numMoves > ent.getMaxMoves()) ent.setMaxMoves(numMoves);
@@ -135,6 +136,7 @@ public class PlayerStats implements Serializable
             if(time < ent.getMinTime()) ent.setMinTime(time);
             else if(time > ent.getMaxTime()) ent.setMaxTime(time);
         }
+
     }
 
 
@@ -203,7 +205,7 @@ public class PlayerStats implements Serializable
         return this.globNumUndos/this.globNumGames;
     }
     public int getGlobalAverageTime(){
-        if(this.globNumGames == 0) return -1;
+        if(this.globNumGames == 0 || this.globNumWins == 0) return -1;
         return this.globTotalTime/this.globNumWins;
     }
 
@@ -381,6 +383,7 @@ public class PlayerStats implements Serializable
             return this.totalTime;
         }
         public int getAverageTime(){
+            if(this.numWins == 0) return -1;
             return this.totalTime/this.numWins;
         }
         public int getNumWins(){

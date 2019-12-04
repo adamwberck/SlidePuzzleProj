@@ -165,7 +165,7 @@ public class PlayActivity extends Activity {
             @SuppressLint("DefaultLocale")
             @Override
             public void onClick(View v) {
-                if(!isLose && !undoStack.isEmpty()) {
+                if(!isLose && !isWin && !undoStack.isEmpty()) {
                     PuzzleBoard.Direction d = undoStack.pop();
                     d = PuzzleBoard.getOpposite(d);
                     slideImages(d);
@@ -201,47 +201,15 @@ public class PlayActivity extends Activity {
                                 //startActivity(intent);
                                 finish();
                                 return true;
-                            case R.id.load_menu:
-                                Toast.makeText(PlayActivity.this, "Load Menu Clicked", Toast.LENGTH_SHORT).show();
-                                try{
-                                    String path = getFilesDir() + "/test.bin";
-                                    FileInputStream fis = openFileInput(getResources().getString(R.string.saveFile));
-                                    ObjectInputStream is = new ObjectInputStream(fis);
-                                    PlayerStats stats = (PlayerStats)is.readObject();
-                                    is.close();
-                                    fis.close();
 
-                                    Toast.makeText(PlayActivity.this, "LOAD NEW STRING " + stats.toString(), Toast.LENGTH_LONG).show();
-                                }catch(Exception e){
-                                    Toast.makeText(PlayActivity.this, "ERROR ERROR LOAD", Toast.LENGTH_LONG).show();
-                                }
-                                return true;
-                            case R.id.save_menu:
-                                Toast.makeText(PlayActivity.this, "Save Menu Clicked", Toast.LENGTH_SHORT).show();
-
-                                try{
-                                    Toast.makeText(PlayActivity.this, minb + "," + maxb + "," + width + "," + height, Toast.LENGTH_LONG).show();
-                                    //stats.updateStats(width, height, 0, 1, 100, 1, 0);
-                                    String path = getFilesDir().getPath() + "/test.bin";
-                                    Toast.makeText(PlayActivity.this, path, Toast.LENGTH_LONG).show();
-                                    FileOutputStream fos = PlayActivity.this.openFileOutput("test.bin", Context.MODE_PRIVATE);
-                                    Toast.makeText(PlayActivity.this, fos.toString(), Toast.LENGTH_LONG).show();
-                                    //File f = new File(path);
-                                    //FileInputStream
-                                    ObjectOutputStream os = new ObjectOutputStream(fos);
-                                    os.writeObject(stats);
-                                    os.close();
-                                    fos.close();
-
-                                    Toast.makeText(PlayActivity.this, "SAVED NEW OBJECT " + stats.toString(), Toast.LENGTH_LONG).show();
-                                }catch(Exception e){
-                                    Log.i("BAD STATS WRITER", e.getMessage() + " | " + e.getCause());
-                                    Toast.makeText(PlayActivity.this, "ERROR SAVE " + e.getMessage(), Toast.LENGTH_LONG).show();
-                                }
-
-                                return true;
                             case R.id.statistics_menu:
-                                Toast.makeText(PlayActivity.this, "Statistics Clicked", Toast.LENGTH_SHORT).show();
+                                /// load the stats activity
+                                Intent intStats = new Intent(PlayActivity.this, StatsActivity.class);
+
+                                intStats.putExtra("path", savePath);
+                                intStats.putExtra("save", stats);
+
+                                startActivity(intStats);
                                 return true;
                             case R.id.mute_menu:
                                 if (play == true) {
@@ -275,8 +243,8 @@ public class PlayActivity extends Activity {
 
         width = getIntent().getIntExtra("WIDTH", 3);
         height = getIntent().getIntExtra("HEIGHT", 3);
-        playTime = (int)(((float)(width+height)/2.0) * ONE_MINUTE);
-        Toast.makeText(PlayActivity.this, width + "|" + height + "|" + playTime , Toast.LENGTH_LONG).show();
+        playTime = (long)(1.5 * ONE_MINUTE);//(long)(((float)(width+height)/2.0) * ONE_MINUTE);
+
         //init the timer text
         String text = getString(R.string.time_string,
                 playTime/ONE_MINUTE,
@@ -595,16 +563,14 @@ public class PlayActivity extends Activity {
         /// attempt to update save file
         try{
             stats.updateStats(width, height, moveInt, undoInt, (int)(timeElapsed/ONE_SECOND), 1, 0);
+
             FileOutputStream fos = PlayActivity.this.openFileOutput(savePath, Context.MODE_PRIVATE);
             ObjectOutputStream os = new ObjectOutputStream(fos);
             os.writeObject(stats);
             os.close();
             fos.close();
 
-            //foundFile = true;
-            //Toast.makeText(MenuActivity.this, "CREATED A NEW SAVE " + savePath, Toast.LENGTH_LONG).show();
         }catch(Exception e){
-            //Log.i("BAD STATS WRITER", e.getMessage() + " | " + e.getCause());
             Toast.makeText(PlayActivity.this, "WIN ERROR SAVE " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
@@ -614,9 +580,11 @@ public class PlayActivity extends Activity {
         playSpace.invalidate();
         restartText.setVisibility(View.VISIBLE);
         restartText.invalidate();
+        timerTick.cancel();
 
         /// attempt to update save file
         try{
+
             stats.updateStats(width, height, moveInt, undoInt, 0, 0, 1);
             FileOutputStream fos = PlayActivity.this.openFileOutput(savePath, Context.MODE_PRIVATE);
             ObjectOutputStream os = new ObjectOutputStream(fos);
@@ -624,10 +592,7 @@ public class PlayActivity extends Activity {
             os.close();
             fos.close();
 
-            //foundFile = true;
-            //Toast.makeText(MenuActivity.this, "CREATED A NEW SAVE " + savePath, Toast.LENGTH_LONG).show();
         }catch(Exception e){
-            //Log.i("BAD STATS WRITER", e.getMessage() + " | " + e.getCause());
             Toast.makeText(PlayActivity.this, "LOSE ERROR SAVE " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }

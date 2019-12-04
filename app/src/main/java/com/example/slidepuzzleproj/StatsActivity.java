@@ -25,6 +25,8 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 
 /// finish implementing stats
 /// then add legit saving when win/lose
@@ -33,8 +35,10 @@ import java.io.FileNotFoundException;
 public class StatsActivity extends Activity {
 
     Button sbut;
+    Button cbut;
     LinearLayout statList;
     PlayerStats stats;
+    String path;
     int arrWidth, arrHeight;
     int arrWidthMin, arrWidthMax;
     int arrHeightMin, arrHeightMax;
@@ -46,6 +50,7 @@ public class StatsActivity extends Activity {
 
         Intent in = getIntent();
         stats = (PlayerStats)in.getSerializableExtra("save");
+        path = in.getStringExtra("path");
 
         arrWidth = stats.getBoardWidth();
         arrHeight = stats.getBoardHeight();
@@ -121,6 +126,26 @@ public class StatsActivity extends Activity {
         }
 
         statList.invalidate();
+
+        cbut = findViewById(R.id.stats_delete);
+        cbut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try{
+                    stats = new PlayerStats(arrWidthMin, arrHeightMin, arrWidthMax, arrHeightMax);
+                    FileOutputStream fos = StatsActivity.this.openFileOutput(path, Context.MODE_PRIVATE);
+                    ObjectOutputStream os = new ObjectOutputStream(fos);
+                    os.writeObject(stats);
+                    os.close();
+                    fos.close();
+                    finish();
+                    //Toast.makeText(MenuActivity.this, "CREATED A NEW SAVE " + savePath, Toast.LENGTH_LONG).show();
+                }catch(Exception e){
+                    //Log.i("BAD STATS WRITER", e.getMessage() + " | " + e.getCause());
+                    Toast.makeText(StatsActivity.this, "ERROR SAVE " + e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            }
+        });
 
         sbut = findViewById(R.id.stats_x);
         sbut.setOnClickListener(new View.OnClickListener() {

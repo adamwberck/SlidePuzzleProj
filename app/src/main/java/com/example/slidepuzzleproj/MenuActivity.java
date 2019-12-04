@@ -64,22 +64,10 @@ public class MenuActivity extends Activity {
         setContentView(R.layout.activity_menu); //attach the layout
 
         savePath = getResources().getString(R.string.saveFile);
+        //attemptLoadFile();
+
         minb = Integer.parseInt(getResources().getString(R.string.min_board_size));
         maxb = Integer.parseInt(getResources().getString(R.string.max_board_size));
-        statButton = findViewById(R.id.stats_button);
-        statButton.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                attemptLoadFile();
-
-                /// load the stats activity
-                Intent intStats = new Intent(MenuActivity.this, StatsActivity.class);
-
-                intStats.putExtra("save", playerStats);
-
-                startActivity(intStats);
-            }
-        });
 
         puzzleImageView = findViewById(R.id.puzzle_image);
 
@@ -114,6 +102,24 @@ public class MenuActivity extends Activity {
                 startActivityForResult(playIntent, DIMENSION);
             }
         });
+
+        statButton = findViewById(R.id.stats_button);
+        statButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                attemptLoadFile();
+
+                /// load the stats activity
+                Intent intStats = new Intent(MenuActivity.this, StatsActivity.class);
+
+                intStats.putExtra("path", savePath);
+                intStats.putExtra("save", playerStats);
+
+                startActivity(intStats);
+            }
+        });
+
+
         ArrayAdapter<CharSequence> adapter
                 = ArrayAdapter.createFromResource(
                 this,R.array.numbers,R.layout.beter_spinner);
