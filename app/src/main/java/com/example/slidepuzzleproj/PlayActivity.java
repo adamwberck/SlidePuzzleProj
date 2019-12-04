@@ -321,7 +321,7 @@ public class PlayActivity extends Activity {
         height = getIntent().getIntExtra("HEIGHT", 3);
         playTime = intent.getLongExtra("time", (long)((float)(width+height)/2) * ONE_MINUTE);
         seed = intent.getLongExtra("seed", -1);
-        
+
         //init the timer text
         String text = getString(R.string.time_string,
                 playTime/ONE_MINUTE,
