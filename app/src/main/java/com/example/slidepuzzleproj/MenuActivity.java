@@ -60,7 +60,6 @@ public class MenuActivity extends Activity {
     private String savePath;
     private boolean foundFile = false;
     private boolean mode;
-    VideoView videoView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
