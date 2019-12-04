@@ -137,7 +137,7 @@ public class PlayActivity extends Activity {
         moveNum = findViewById(R.id.moveNumber);
         moveNum.setText(String.format("%d", moveInt));
 
-        menuBGM = MediaPlayer.create(this, R.raw.wotw);
+        menuBGM = MediaPlayer.create(this, R.raw.hometown_domina);
         menuBGM.start();
         play = true;
 
