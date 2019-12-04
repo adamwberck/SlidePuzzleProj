@@ -7,10 +7,15 @@
     <string name="time_string">%d:%02d</string>
     <string name="api_key">e0ac8379fcf11a7cc79a0f854269349a</string>
     <string name="time_gameover">GAME OVER</string>
+    <string name="classic_mode">CLASSIC MODE</string>
     <string name="win">Win</string>
     <string name="moves">Moves:</string>
+    <string name="saveFile">stats.bin</string>
+    <string name="menu_stats">Stats</string>
     <string name="stitch_client_app_id">slidepuzzle-llyuv</string>
 
+    <string name="min_board_size">3</string>
+    <string name="max_board_size">10</string>
     <string-array name="numbers">
         <item>3</item>
         <item>4</item>
@@ -24,6 +29,8 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_stats">StatsActivity</string>
+    <string name="title_activity_stats_entry">StatsEntryActivity</string>
 
 
 </resources>

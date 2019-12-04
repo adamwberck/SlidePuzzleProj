@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.98">
+
+        <LinearLayout
+            android:id="@+id/stats_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+        </LinearLayout>
+    </ScrollView>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/stats_delete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/back_border"
+            android:text="CLEAR"
+            android:textStyle="bold"
+            android:textSize="30sp"
+            android:layout_weight="0.70">
+
+        </Button>
+        <Button
+            android:id="@+id/stats_x"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/back_border"
+            android:text="X"
+            android:textStyle="bold"
+            android:textSize="30sp"
+            android:layout_weight="0.30">
+
+        </Button>
+    </LinearLayout>
+
+
+</LinearLayout>

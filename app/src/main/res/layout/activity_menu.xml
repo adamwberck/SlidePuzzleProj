@@ -1,18 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+<VideoView
+android:id="@+id/background"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:layout_gravity="center"
+android:layout_alignParentLeft="true"
+android:layout_alignParentRight="true"
+android:layout_alignParentBottom="true"
+android:layout_alignParentTop="true"
+android:scaleType="fitXY">
+</VideoView>
+
+<LinearLayout
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginLeft="10dp"
-    android:layout_marginRight="10dp">
+    android:layout_marginRight="10dp"
+    >
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/menu_title"
         android:textAllCaps="true"
-        android:textColor="@color/menu1"
+        android:textColor="@color/white"
         android:textSize="40sp"
         android:textStyle="bold" />
 
@@ -24,7 +42,8 @@
         android:background="@drawable/back_border"
         android:clickable="true"
         android:focusable="true"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:textColor="@color/white">
 
         <ImageView
             android:id="@+id/puzzle_image"
@@ -34,7 +53,8 @@
             android:layout_marginTop="2dp"
             android:layout_marginRight="2dp"
             android:layout_weight="0.8"
-            android:scaleType="centerCrop" />
+            android:scaleType="centerCrop"
+            android:textColor="@color/white"/>
 
         <TextView
             android:id="@+id/test"
@@ -49,7 +69,7 @@
             android:text="@string/change_image"
             android:textAlignment="center"
             android:textAllCaps="true"
-            android:textColor="@color/menu1"
+            android:textColor="@color/white"
             android:textSize="35sp"
             android:visibility="visible" />
 
@@ -58,8 +78,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0.8"
-        android:orientation="horizontal">
+        android:layout_gravity="center"
+        android:layout_weight="0.1"
+        android:orientation="horizontal"/>
 
         <Button
             android:id="@+id/play_button"
@@ -88,24 +109,8 @@
         android:layout_gravity="center"
         android:layout_marginTop="20dp"
         android:background="@drawable/back_border"
-        android:orientation="horizontal">
-
-        <Spinner
-            android:id="@+id/height"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@null"
-            android:padding="10dp"
-            android:textColor="@color/menu1"
-            android:textSize="50sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:text="x"
-            android:textColor="@color/menu1"
-            android:textSize="50sp" />
+        android:orientation="horizontal"
+        android:textColor="@color/white">
 
         <Spinner
             android:id="@+id/width"
@@ -113,7 +118,38 @@
             android:layout_height="wrap_content"
             android:background="@null"
             android:padding="10dp"
-            android:textColor="@color/menu1"
             android:textSize="50sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="x"
+            android:textColor="@color/white"
+            android:textSize="50sp" />
+
+        <Spinner
+            android:id="@+id/height"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:padding="10dp"
+            android:textSize="50sp" />
+
     </LinearLayout>
+    <Button
+        android:id="@+id/stats_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:layout_weight="0.1"
+        android:background="@drawable/back_border"
+        android:padding="10dp"
+        android:text="@string/menu_stats"
+        android:textSize="40sp"
+        android:textColor="@color/white"
+        android:layout_marginBottom="10dp"/>
 </LinearLayout>
+
+    ></RelativeLayout>

@@ -41,13 +41,16 @@ public class PuzzleBoard implements Serializable
         pieces = tempPieces;
     }
 
+    public PuzzlePiece[] getPieces() {
+        return pieces;
+    }
+
     enum Direction{
         Up,
         Down,
         Left,
         Right
     };
-
 
 
     private int width, height, length, blankIndex;
@@ -104,7 +107,6 @@ public class PuzzleBoard implements Serializable
 
 
     }
-
 
     /////////////////////
     /// Accessor methods
@@ -411,6 +413,16 @@ public class PuzzleBoard implements Serializable
             if(this.image == null) return null;
             return this.image;
         }
+
+        public int getCorrectPos() {
+            return this.correctPos;
+        }
+        public int getCurrentPos(){
+            return this.currentPos;
+        }
+        public boolean getIsBlank(){
+            return this.isBlank;
+        }
     }
 
 
@@ -460,6 +472,7 @@ public class PuzzleBoard implements Serializable
             //}catch(Exception e){System.out.println("ERROR");}
             //return null;
         }
-
     }
+
+
 }
