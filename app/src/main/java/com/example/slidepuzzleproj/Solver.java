@@ -55,13 +55,12 @@ public class Solver extends AsyncTask<Void,Void,List<PuzzleBoard.Direction>>{
 
     public List<PuzzleBoard.Direction> solve() throws CloneNotSupportedException {
         mQueue.peek().gScore = 0;
-        mQueue.peek().number = manhattanDist(mQueue.peek());
-        Map<SolveBoard,SolveBoard> cameFrom = new HashMap<>();
-        while(!mQueue.isEmpty()) {
+        mQueue.peek().number = manhattanDist(mQueue.peek())+2*linearConflicts(mQueue.peek());
+        while(!mQueue.isEmpty() && !isCancelled()) {
             SolveBoard currentBoard = mQueue.poll();
             if(currentBoard.isWin){
                 //done
-                return reconstructPath(cameFrom,currentBoard);
+                return reconstructPath(currentBoard);
             }
             List<PuzzleBoard.Direction> dirs = currentBoard.slideBlankPossible();
             PuzzleBoard.Direction backDir =  calcBackDir(currentBoard.dir);
@@ -75,12 +74,12 @@ public class Solver extends AsyncTask<Void,Void,List<PuzzleBoard.Direction>>{
                     int tentative_gScore = currentBoard.gScore + 1;
                     if( tentative_gScore < neighborBoard.gScore || neighborBoard.gScore<0){
                         //record the score
-                        cameFrom.put(neighborBoard,currentBoard);
+                        neighborBoard.cameFrom = currentBoard;
                         neighborBoard.gScore = tentative_gScore;
                         neighborBoard.dir = d;
                         int mDist =  manhattanDist(neighborBoard);
-                        //int lin = linearConflicts(neighborBoard);
-                        neighborBoard.number = tentative_gScore+mDist;//+lin*2;
+                        int lin = linearConflicts(neighborBoard);
+                        neighborBoard.number = tentative_gScore+mDist+(lin*2);
                         if(!mQueue.contains(neighborBoard)){
                             mQueue.add(neighborBoard);
                         }
@@ -96,14 +95,19 @@ public class Solver extends AsyncTask<Void,Void,List<PuzzleBoard.Direction>>{
         board.number = 0;
         board.gScore = -1;
         board.dir = null;
+        board.cameFrom = null;
         board.isWin = false;
         board.slideBlank(d);
+        int hash = board.hashCode();
         for (SolveBoard b : mQueue){
-            boolean matched =  true;
-            for(int i=0;i<b.pieces.length;i++){
-                if(b.pieces[i].goalPos != board.pieces[i].goalPos){
-                    matched = false;
-                    i=b.pieces.length;
+            boolean matched =  false;
+            if(hash==b.hashCode()) {
+                matched = true;//probably a match
+                for (int i = 0; i < b.pieces.length; i++) {
+                    if (b.pieces[i].goalPos != board.pieces[i].goalPos) {
+                        matched = false;
+                        i = b.pieces.length;
+                    }
                 }
             }
             if(matched){
@@ -116,13 +120,17 @@ public class Solver extends AsyncTask<Void,Void,List<PuzzleBoard.Direction>>{
     private int linearConflicts(SolveBoard board){
         int conflicts = 0;
         //check rows
+        int blankGoal = board.size-1;
         for(int r=0;r<h;r++) {
             for (int i = 0; i < w; i++) {
                 for (int j = i + 1; j < w; j++) {
-                    if(board.pieces[i+r*w].goalPos/w == r) {
-                        if (board.pieces[i + r * w].goalPos / w == board.pieces[j + r * w].goalPos / w  //are supposed be on this line
-                                && board.pieces[i + r * w].goalPos > board.pieces[j + r * w].goalPos) {//are in the wrong order
-                            conflicts++;
+                    int pIg = board.pieces[i+r*w].goalPos;
+                    int pJg = board.pieces[j+r*w].goalPos;
+                    if(pIg!=blankGoal && pJg != blankGoal) {//j isn't blank
+                        if (pIg/ w == r) {// supposed be on this line
+                            if (pIg / w == pJg / w && pIg > pJg) {//are in the wrong order
+                                conflicts++;
+                            }
                         }
                     }
                 }
@@ -132,10 +140,13 @@ public class Solver extends AsyncTask<Void,Void,List<PuzzleBoard.Direction>>{
         for(int r=0;r<w;r++) {
             for (int i = 0; i < h; i++) {
                 for (int j = i + 1; j < h; j++) {
-                    if(board.pieces[i*w+r].goalPos%w == r) {
-                        if (board.pieces[i * w + r].goalPos / w == board.pieces[j * w + r].goalPos / w  //are supposed be on this line
-                                && board.pieces[i * w + r].goalPos > board.pieces[j * w + r].goalPos) {//are in the wrong order
-                            conflicts++;
+                    int pIg = board.pieces[i * w + r].goalPos;
+                    int pJg = board.pieces[j * w + r].goalPos;
+                    if(pIg!=blankGoal && pJg!=blankGoal) {
+                        if (pIg % w == r) {//are supposed be on this line
+                            if (pIg % w == pJg % w && pIg > pJg) {//are in the wrong order
+                                conflicts++;
+                            }
                         }
                     }
                 }
@@ -144,13 +155,14 @@ public class Solver extends AsyncTask<Void,Void,List<PuzzleBoard.Direction>>{
         return conflicts;
     }
 
-    private List<PuzzleBoard.Direction> reconstructPath(Map<SolveBoard,SolveBoard> cameFrom, SolveBoard current){
+    private List<PuzzleBoard.Direction> reconstructPath( SolveBoard current){
         List<PuzzleBoard.Direction> path = new LinkedList<>();
         path.add(current.dir);
-        while(cameFrom.containsKey(current)){
-            current = cameFrom.get(current);
+        while(current.cameFrom!=null){
+            current = current.cameFrom;
             path.add(0,current.dir);
         }
+
         path.remove(0);
         return path;
     }
@@ -197,6 +209,7 @@ public class Solver extends AsyncTask<Void,Void,List<PuzzleBoard.Direction>>{
 
     private class SolveBoard implements Cloneable,Comparable<SolveBoard>{
         public boolean isWin = false;
+        public SolveBoard cameFrom = null;
         private int gScore = -1;
         private int number;
 
@@ -208,6 +221,14 @@ public class Solver extends AsyncTask<Void,Void,List<PuzzleBoard.Direction>>{
 
 
         private PuzzleBoard.Direction dir;
+
+
+        @Override
+        public int hashCode(){
+            return toString().hashCode();
+        }
+
+
         public SolveBoard clone() throws CloneNotSupportedException{
             SolveBoard clone = (SolveBoard) super.clone();
             clone.pieces = new PuzzlePiece[pieces.length];
