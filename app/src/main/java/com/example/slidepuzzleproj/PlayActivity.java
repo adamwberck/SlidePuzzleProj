@@ -3,7 +3,6 @@ package com.example.slidepuzzleproj;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -27,47 +26,18 @@ import android.widget.Toast;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-
-import com.squareup.picasso.Picasso;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.util.List;
-import java.io.OutputStream;
-import java.io.Serializable;
-import java.nio.file.Paths;
 import java.util.Stack;
 
 public class PlayActivity extends Activity {
-    private ContextWrapper cw; //context / working directory of app
-
     private List<PuzzleBoard.Direction> mHints = null;
 
     private TextView timer;
     private TextView moveNum;
-
-    //private PlayerStats stats;
-    //private PuzzleLab lab;
 
     private Button undo;
     private Button hint;
@@ -75,7 +45,6 @@ public class PlayActivity extends Activity {
     private Button prev;
     private GridLayout playSpace;
     private TextView restartText;
-    private Button statbut;
 
     private int mGlowIndex = 0;
 
@@ -93,7 +62,6 @@ public class PlayActivity extends Activity {
     private int undoInt = 0;
     private int hintInt = 0;
     private long timeElapsed;   //save
-    private long timeRemain;    // save
     private CountDownTimer timerTick;   // save
     private PuzzleBoard currentBoard;   // save
     private Bitmap bitmap = null;   //save
@@ -109,7 +77,6 @@ public class PlayActivity extends Activity {
 
     private PlayerStats stats = null;
     private String savePath;
-    //private boolean foundFile = false;
     private int minb;
     private int maxb;
     private String shareTimer;
@@ -143,9 +110,6 @@ public class PlayActivity extends Activity {
 
         minb = Integer.parseInt(getResources().getString(R.string.min_board_size));
         maxb = Integer.parseInt(getResources().getString(R.string.max_board_size));
-        //stats = new PlayerStats(minb, minb, maxb, maxb);
-
-        cw = new ContextWrapper(getApplicationContext());
 
         undo = findViewById(R.id.undoButton);
         hint = findViewById(R.id.tipsButton);
@@ -357,7 +321,6 @@ public class PlayActivity extends Activity {
                 shareTimer = String.valueOf(timeElapsed);
                 timer.setText(text);
                 timeElapsed = playTime - millisUntilFinished;
-                timeRemain = millisUntilFinished;
                 timer.invalidate();
             }
 
@@ -366,7 +329,6 @@ public class PlayActivity extends Activity {
                 timer.setText(getString(R.string.time_gameover));
                 timeElapsed = playTime;
                 shareTimer = String.valueOf(timeElapsed);
-                timeRemain = 0;
                 lose(playSpace);
             }
         };
@@ -469,7 +431,6 @@ public class PlayActivity extends Activity {
         moveNum.invalidate();
 
         timeElapsed = 0;
-        timeRemain = playTime;
     }
 
     protected void setupBoard(final GridLayout playSpace, int w, int h,Bitmap bm){
@@ -540,25 +501,6 @@ public class PlayActivity extends Activity {
         }
     }
 
-///////////////////////////////////////////////
-///////////////////////////////////////////
-    //// BITMAP SCALING FUNCTIONS
-    protected Bitmap scaleBitmapNaive(Bitmap src, int w, int h)
-    {
-        int newWid = src.getWidth();
-        int newHei = src.getHeight();
-        newWid = playSpace.getWidth();
-        double ratio = (double)newWid/(double)bitmap.getWidth();
-        newHei = (int)(newHei * ratio);
-        if(newHei>playSpace.getHeight()){
-            newHei = playSpace.getHeight();
-        }
-        src = Bitmap.createScaledBitmap(bitmap, newWid - 2*w*GAP, newHei - 2*h*GAP, true);
-        return src;
-    }
-
-
-
     /// uses the global variables:
     /// - Bitmap, width, and height
     /// - playSpace, prev
@@ -591,41 +533,6 @@ public class PlayActivity extends Activity {
         src = Bitmap.createScaledBitmap(src, newWid - 2*w*GAP, newHei - 2*h*GAP, true);
         return src;
     }
-
-
-    protected Bitmap scaleBitmapCenteredSquare(Bitmap src, int w, int h)
-    {
-        int min = playSpace.getWidth();
-        if(playSpace.getHeight() < playSpace.getWidth())
-            min = playSpace.getHeight();
-        int bmwid = src.getWidth();
-        int bmhei = src.getHeight();
-        int x1 = 0;
-        int y1 = 0;
-        int x2 = bmwid;
-        int y2 = bmhei;
-
-        if(bmwid < bmhei)
-        {
-            y1 = bmhei/2 - bmwid/2;
-            y2 = bmwid;
-        }
-        else if(bmwid > bmhei)
-        {
-            x1 = bmwid/2 - bmhei/2;
-            x2 = bmhei;
-        }
-
-        src = Bitmap.createBitmap(src, x1, y1, x2, y2);
-        src = Bitmap.createScaledBitmap(src, min - 2*w*GAP, min - 2*h*GAP, true);
-        return src;
-    }
-    ////// END BITMAP SCALING FUNCTIONS
-/////////////////////////////////////////
-
-
-
-
 
     public void solutionFound(List<PuzzleBoard.Direction> solution) {
         mHints = solution;

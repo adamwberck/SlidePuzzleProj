@@ -12,6 +12,7 @@ import java.util.Locale;
 public class SaveImage {
     static String imageFilePath = null;
 
+    // Create a blank file and set the path to the file's URL
     public static File createImage(Context context) throws IOException {
         String timeStamp =
                 new SimpleDateFormat("yyyyMMdd_HHmmss",
@@ -28,6 +29,7 @@ public class SaveImage {
         return image;
     }
 
+    // Get the path of the newly created file
     public static String getPath(){
         return imageFilePath;
     }

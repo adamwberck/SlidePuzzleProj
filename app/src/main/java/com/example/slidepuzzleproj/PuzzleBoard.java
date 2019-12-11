@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Random;
 
 //// fix bug where uneven sized board isnt processed properly
-
-
 public class PuzzleBoard implements Serializable
 {
     public static Direction getOpposite(Direction d) {
@@ -57,7 +55,6 @@ public class PuzzleBoard implements Serializable
     private int bmwidth, bmheight, pixwidth, pixheight;
     private PuzzlePiece[] pieces;
     private Bitmap image;
-    //private byte[] imagebytes;
     private boolean loaded;
 
     public PuzzleBoard(Bitmap img, int w, int h)
@@ -79,7 +76,6 @@ public class PuzzleBoard implements Serializable
 
     private void sliceImageThreaded()
     {
-        //this.imagebytes = new byte[this.image.getWidth() * this.image.getHeight()];
         boolean done = false;
         ImageSlicer[] workers = new ImageSlicer[this.length-1];
 
@@ -118,19 +114,6 @@ public class PuzzleBoard implements Serializable
         return null;
     }
 
-    public PuzzlePiece getPiece(int x, int y)
-    {
-        if(isBetween(x, 0, this.width) && isBetween(y, 0, this.height))
-            return this.pieces[x*y];
-
-        return null;
-    }
-
-    public PuzzlePiece getBlank()
-    {
-        return this.pieces[this.blankIndex];
-    }
-
     public int getBlankIndex()
     {
         return this.blankIndex;
@@ -154,41 +137,6 @@ public class PuzzleBoard implements Serializable
         return this.height;
     }
 
-    public int getBitmapWidth(){
-        return this.bmwidth;
-    }
-
-    public int getBitmapHeight(){
-        return this.bmheight;
-    }
-
-    public int getPieceWidth(){
-        return this.pixwidth;
-    }
-
-    public int getPieceHeight(){
-        return this.pixheight;
-    }
-
-    public boolean isNextToBlank(int i)
-    {
-        return isNextToBlank(i%this.width, i/this.height);
-    }
-
-    public boolean isNextToBlank(int x, int y)
-    {
-        if(x == getBlankX() && y == getBlankY())
-            return false;
-
-        if( x-1 == getBlankX() && y == getBlankY() ||
-            x+1 == getBlankX() && y == getBlankY() ||
-            x == getBlankX() && y-1 == getBlankY() ||
-            x == getBlankX() && y+1 == getBlankY())
-            return true;
-
-        return false;
-    }
-
     public int indexNextToBlank(Direction d)throws IllegalArgumentException{
         int returnVal = -1;
         if(d==Direction.Up){
@@ -206,7 +154,6 @@ public class PuzzleBoard implements Serializable
             return returnVal;
         }
     }
-
 
     public Direction dirNextToBlank(int i)
     {
@@ -233,12 +180,6 @@ public class PuzzleBoard implements Serializable
         return null;
     }
 
-
-    ////// get the bitmap image of this puzzle
-    public Bitmap getPuzzleImage(){
-        return this.image;
-    }
-
     ////////////////////
     //// Check all pieces to see if theyre in the right positions
     public boolean checkWin()
@@ -251,34 +192,12 @@ public class PuzzleBoard implements Serializable
     }
 
 
-    /////////////////////////////////////
-    //// function to change the puzzle image
-    private boolean changeBitmap()
-    {
-        //// not yet implemented
-
-        return false;
-    }
-
-
     ///////////////////////////////////
     /// SLIDING THE BLANK PIECE
     /// DIFFERENT OVERLOADS
     public boolean slideBlank(Direction dir)
     {
         return slideBlankParsed(dir);
-    }
-    public boolean slideBlank(int dir)
-    {
-        if(!isBetween(dir, 0, Direction.values().length))
-            return false;
-        return slideBlankParsed(Direction.values()[dir]);
-    }
-
-    public Direction slideBlankRandom(){
-        List<Direction> dirs = slideBlankPossible();
-        Collections.shuffle(dirs);
-        return dirs.get(0);
     }
 
     public Direction slideBlankRandom(long seed){
@@ -287,7 +206,6 @@ public class PuzzleBoard implements Serializable
         Collections.shuffle(dirs, new Random(seed));
         return dirs.get(0);
     }
-
 
     private List<Direction> slideBlankPossible()
     {
@@ -314,8 +232,6 @@ public class PuzzleBoard implements Serializable
         }
         return dirs;
     }
-
-
 
     ///////////////////////////////
     //// The parsed direction version of slide blank
@@ -364,28 +280,6 @@ public class PuzzleBoard implements Serializable
         }
     }
 
-
-    /// maybe
-    //// Slide the whole row/column
-    //// return true if successful slide
-    private void slideAll(int direction)
-    {
-        /// not yet implemented
-        switch(direction)
-        {
-            case 0:
-                break;
-            case 1:
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-            default:
-                break;
-        }
-    }
-
     ////////////////
     /// Utility method to swap two pieces
     private void swapPieces(int i, int j) {
@@ -405,7 +299,6 @@ public class PuzzleBoard implements Serializable
     {
         return a >= x && a < y;
     }
-
 
     ////////////////////////////////////////////
     ///// Class representing each puzzle piece
@@ -438,9 +331,6 @@ public class PuzzleBoard implements Serializable
         }
         public int getCurrentPos(){
             return this.currentPos;
-        }
-        public boolean getIsBlank(){
-            return this.isBlank;
         }
     }
 
@@ -480,16 +370,11 @@ public class PuzzleBoard implements Serializable
 
         public Bitmap slice(Bitmap m, int x1, int pw, int y1, int ph, PuzzlePiece[] arr, int i)
         {
-            //try {
-
-
             Log.i("[CREATE BITMAP]", "" + m.getHeight()  + "/" + (y1*ph + ph));
                 Bitmap bm = Bitmap.createBitmap(m, x1 * pw, y1 * ph, pw, ph);
 
                 arr[i] = new PuzzlePiece(i, i, false, pw, ph, bm);
                 return bm;
-            //}catch(Exception e){System.out.println("ERROR");}
-            //return null;
         }
     }
 

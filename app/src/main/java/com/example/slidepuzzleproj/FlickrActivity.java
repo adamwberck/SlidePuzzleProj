@@ -122,6 +122,7 @@ public class FlickrActivity extends Activity {
         }
     }
 
+    // Check for online connection
     public boolean isOnline() {
         ConnectivityManager connMgr = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -129,6 +130,7 @@ public class FlickrActivity extends Activity {
         return (networkInfo != null && networkInfo.isConnected());
     }
 
+    // parse returned XML document to a list of URLs
     void parseItems(ArrayList<String> items, String result) throws XmlPullParserException, IOException {
         String farm, server, secret, id, format, URL;
         XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
@@ -154,6 +156,7 @@ public class FlickrActivity extends Activity {
 
     }
 
+    // Populate the View
     void populate(ArrayList<String> resultList){
         resultGrid.setAdapter(new ImageAdapter(this, resultList));
     }

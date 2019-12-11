@@ -3,7 +3,6 @@ package com.example.slidepuzzleproj;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,7 +15,6 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.android.MediaManager;
 import com.cloudinary.android.callback.ErrorInfo;
 import com.cloudinary.android.callback.UploadCallback;
-import com.cloudinary.utils.ObjectUtils;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.mongodb.lang.NonNull;
@@ -29,7 +27,6 @@ import com.mongodb.stitch.core.services.mongodb.remote.RemoteInsertOneResult;
 
 import org.bson.Document;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -109,6 +106,7 @@ public class ShareActivity extends Activity {
         });
     }
 
+    // AsyncTask implementation for uploading images
     public class UploadTask extends AsyncTask<String, String, String> {
 
     @Override
@@ -147,6 +145,7 @@ public class ShareActivity extends Activity {
 
     }
 
+    // Function to upload image
     private String upload(String uri){
         Cloudinary cloudinary = new Cloudinary();
         Log.i("HERE", uri);
@@ -175,6 +174,7 @@ public class ShareActivity extends Activity {
         return null;
     }
 
+    // AsyncTask implementation for inserting into database
     public class InsertTask extends AsyncTask<String, String, String> {
         ProgressDialog progressDialog;
         @Override

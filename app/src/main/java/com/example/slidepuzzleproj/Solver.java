@@ -1,7 +1,6 @@
 package com.example.slidepuzzleproj;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -12,9 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
-import java.util.Stack;
 
-import javax.xml.transform.Result;
 
 public class Solver extends AsyncTask<Void,Void,List<PuzzleBoard.Direction>>{
     private PlayActivity mPlayActivity;
