@@ -2,9 +2,6 @@ package com.example.slidepuzzleproj;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.media.MediaPlayer;
-import android.os.Environment;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -16,7 +13,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.Menu;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.AdapterView;
@@ -26,9 +22,6 @@ import android.widget.ImageView;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
-import android.widget.VideoView;
-
-import com.cloudinary.android.MediaManager;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.mongodb.lang.NonNull;
@@ -36,28 +29,18 @@ import com.mongodb.stitch.android.core.Stitch;
 import com.mongodb.stitch.android.core.StitchAppClient;
 import com.mongodb.stitch.android.core.auth.StitchUser;
 import com.mongodb.stitch.core.auth.providers.anonymous.AnonymousCredential;
-
-import org.bson.Document;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 import static androidx.core.content.FileProvider.getUriForFile;
 
 public class MenuActivity extends Activity {
     private View changeImageButton;
-    private ImageView puzzleImageView, background1, background2;
+    private ImageView puzzleImageView;
     private Button playButton;
     private Button statButton;
     private Button inboxButton;
@@ -181,11 +164,9 @@ public class MenuActivity extends Activity {
 
         Spinner spinnerW = findViewById(R.id.width);
         spinnerW.setAdapter(adapter);
-        //spinnerW.getBackground().setColorFilter(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
 
         Spinner spinnerH = findViewById(R.id.height);
         spinnerH.setAdapter(adapter);
-        //spinnerH.getBackground().setColorFilter(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
 
         spinnerH.setOnItemSelectedListener(new DimenListener(0));
         spinnerW.setOnItemSelectedListener(new DimenListener(1));
@@ -198,7 +179,6 @@ public class MenuActivity extends Activity {
     {
         /// try to load save file
         try{
-            //String path = getFilesDir() + "/test.bin";
             FileInputStream fis = openFileInput(savePath);
             ObjectInputStream is = new ObjectInputStream(fis);
             playerStats = (PlayerStats)is.readObject();
@@ -206,9 +186,8 @@ public class MenuActivity extends Activity {
             fis.close();
 
             foundFile = true;
-            //Toast.makeText(MenuActivity.this, "SUCCESSFULLY LOADED SAVE " + savePath, Toast.LENGTH_LONG).show();
         }catch(Exception e){
-            Toast.makeText(MenuActivity.this, "ERROR ERROR LOAD", Toast.LENGTH_LONG).show();
+            Toast.makeText(MenuActivity.this, "SAVE FILE NOT INITIALIZED, ATTEMPTING TO CREATE NEW SAVE", Toast.LENGTH_LONG).show();
         }
 
         /// if no save file, create a fresh one
@@ -224,7 +203,6 @@ public class MenuActivity extends Activity {
                 foundFile = true;
                 Toast.makeText(MenuActivity.this, "CREATED A NEW SAVE " + savePath, Toast.LENGTH_LONG).show();
             }catch(Exception e){
-                //Log.i("BAD STATS WRITER", e.getMessage() + " | " + e.getCause());
                 Toast.makeText(MenuActivity.this, "ERROR SAVE " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
         }
@@ -232,6 +210,7 @@ public class MenuActivity extends Activity {
 
     }
 
+    // Choosing Dimensions
     private class DimenListener implements AdapterView.OnItemSelectedListener {
         private int heightOrWidth;
 
@@ -255,6 +234,7 @@ public class MenuActivity extends Activity {
         }
     }
 
+    // Pop-up dialog for game mode selection
     private void openDialog2(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -278,12 +258,11 @@ public class MenuActivity extends Activity {
         }
     }
 
-
+    // Source choice for game mode
     private void sourceChoice2(DialogInterface dialog){
         RadioGroup rg = ((AlertDialog) dialog).findViewById(R.id.game_mode);
         int checked = rg.getCheckedRadioButtonId();
         dialog.dismiss();
-        //Log.e("Checked", "" + checked);
         switch (checked){
             case R.id.mode1:
                 classicMode();
@@ -295,6 +274,7 @@ public class MenuActivity extends Activity {
         }
     }
 
+    // Start Play Activity in Timed Mode
     public void timeMode()
     {
         mode = true;
@@ -316,6 +296,7 @@ public class MenuActivity extends Activity {
 
     }
 
+    // Start Play Activity in Classic Mode
     public void classicMode()
     {
         mode = false;
@@ -335,6 +316,7 @@ public class MenuActivity extends Activity {
         startActivityForResult(playIntent, DIMENSION);
     }
 
+    // Open image selection dialog
     private void openDialog() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -361,11 +343,11 @@ public class MenuActivity extends Activity {
 
     }
 
+    // Source choice for image selection
     private void sourceChoice(DialogInterface dialog){
         RadioGroup rg = ((AlertDialog) dialog).findViewById(R.id.source_radio);
         int checked = rg.getCheckedRadioButtonId();
         dialog.dismiss();
-        //Log.e("Checked", "" + checked);
         switch (checked){
             case R.id.source1:
                 openGallery();
@@ -380,6 +362,7 @@ public class MenuActivity extends Activity {
         }
     }
 
+    // Starting Camera Intent
     public void useCamera() {
         PackageManager pm = this.getPackageManager();
         if (pm.hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
@@ -404,17 +387,20 @@ public class MenuActivity extends Activity {
         toast.show();
     }
 
+    // Use Flickr API
     private void onlineImage(){
         Intent flickrAPI = new Intent(MenuActivity.this, FlickrActivity.class);
         startActivityForResult(flickrAPI, 1);
     }
 
+    // Use Android's Gallery for selecting an image
     private void openGallery()
     {
         Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(gallery, PICK_IMAGE);
     }
 
+    // Handling Activities' Results
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {

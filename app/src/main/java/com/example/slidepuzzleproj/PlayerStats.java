@@ -4,13 +4,8 @@ package com.example.slidepuzzleproj;
 ///// WIP  - Dan ////
 /// finish up adding entries and test pull data from the menu activity context
 
-import android.net.Uri;
-import android.os.CountDownTimer;
 import android.util.Log;
-import android.widget.Toast;
-
 import java.io.Serializable;
-import java.util.Stack;
 
 
 public class PlayerStats implements Serializable
@@ -38,8 +33,6 @@ public class PlayerStats implements Serializable
     private int globalNumHints;
 
     private BoardTypeStatEntry[][] entries;
-
-    // private savedBoard  // the current saved board. only 1 saved at a time.
 
     public PlayerStats(int minboardwidth, int minboardheight, int maxboardwidth, int maxboardheight)
     {

@@ -19,7 +19,7 @@ public class PreviewActivity extends Activity {
 
     Button pbut;
     ImageView pimg;
-    Bitmap map;// = BitmapFactory.decodeResource(getResources(), R.drawable.ilya);
+    Bitmap map;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

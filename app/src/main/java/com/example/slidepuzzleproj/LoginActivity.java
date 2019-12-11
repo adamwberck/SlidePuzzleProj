@@ -52,7 +52,6 @@ public class LoginActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         try {
-            //stitchClient = Stitch.initializeDefaultAppClient(getResources().getString(R.string.stitch_client_app_id));
             stitchClient = Stitch.getDefaultAppClient();
             mongoClient = stitchClient.getServiceClient(RemoteMongoClient.factory, "mongodb-atlas");
             itemsCollection = mongoClient.getDatabase("MultiplayerChallenge").getCollection("Users");
