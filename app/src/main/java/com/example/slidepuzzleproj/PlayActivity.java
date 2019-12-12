@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.provider.MediaStore;
@@ -80,12 +81,22 @@ public class PlayActivity extends Activity {
     private int minb;
     private int maxb;
     private String shareTimer;
+    private Solver mSolver;
 
     @Override
     protected void onPause()
     {
         super.onPause();
         menuBGM.pause();
+    }
+
+
+    @Override
+    public void onBackPressed(){
+        mSolver.cancel(true);
+        mIsThinking = false;
+        mSolver = null;
+        super.onBackPressed();
     }
 
     @Override
@@ -259,17 +270,20 @@ public class PlayActivity extends Activity {
         hint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 if(width>3 || height>3){
-                    Toast.makeText(PlayActivity.this, "Hint only supported for 3x3"
+                    Toast.makeText(PlayActivity.this, "Hint Only Supported for 3 by 3"
                             ,Toast.LENGTH_SHORT)
                             .show();
                 }
-                else if(isScrambled && !mIsThinking) {
+                else if(isScrambled ) {
                     if (mHints == null ) {
-                        Toast.makeText(PlayActivity.this, "Thinking?",Toast.LENGTH_SHORT)
+                        Toast.makeText(PlayActivity.this, "Thinking...",
+                                Toast.LENGTH_SHORT)
                                 .show();
                         mIsThinking = true;
-                        new Solver(currentBoard, PlayActivity.this).execute();
+                        mSolver = new Solver(currentBoard, PlayActivity.this);
+                        mSolver.execute();
                     } else {
                         glowPiece(mHints.get(0));
                     }
@@ -280,17 +294,9 @@ public class PlayActivity extends Activity {
 
         width = getIntent().getIntExtra("WIDTH", 3);
         height = getIntent().getIntExtra("HEIGHT", 3);
-        if(intent.hasExtra("time")){
-            playTime = intent.getLongExtra("time", 3*ONE_MINUTE);
-            if(playTime == -1){
-                mode = false;
-                playTime = 3*ONE_MINUTE;
-            } else {
-                mode = true;
-            }
-            seed = intent.getLongExtra("seed", -1);
-        }
-
+        playTime = intent.getLongExtra("time", (long)((float)(width+height)/2) * ONE_MINUTE);
+        seed = intent.getLongExtra("seed", -1);
+        
         //init the timer text
         String text = getString(R.string.time_string,
                 playTime/ONE_MINUTE,
@@ -306,7 +312,6 @@ public class PlayActivity extends Activity {
             timer.setText(getString(R.string.classic_mode));
             timer.setTextSize(20);
         }
-
 
         this.timerTick = new CountDownTimer(playTime, ONE_SECOND) {
             @Override
@@ -445,7 +450,7 @@ public class PlayActivity extends Activity {
                 seed++;
             }
         } else {
-            for (int i = 0; i < 1000; i++) {
+            for (int i = 0; i < 5; i++) {
                 slideImages(currentBoard.slideBlankRandom(seed));
                 seed++;
             }
@@ -532,7 +537,9 @@ public class PlayActivity extends Activity {
     public void solutionFound(List<PuzzleBoard.Direction> solution) {
         mHints = solution;
         mIsThinking = false;
-        glowPiece(solution.get(0));
+        if(solution!=null) {
+            glowPiece(solution.get(0));
+        }
     }
 
     private void glowPiece(PuzzleBoard.Direction direction)  {
@@ -557,6 +564,11 @@ public class PlayActivity extends Activity {
             Log.i("puz","clicked "+mNumOfView);
             PuzzleBoard.Direction d = currentBoard.dirNextToBlank(mNumOfView);
             stopGlow();
+            if(mIsThinking){
+                mIsThinking = false;
+                mSolver.cancel(true);
+            }
+
             if(!isScrambled && mode == true)
             {
                 isScrambled = true;
