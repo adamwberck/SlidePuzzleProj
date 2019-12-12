@@ -21,14 +21,6 @@ import com.mongodb.stitch.core.services.mongodb.remote.RemoteInsertOneResult;
 // Base Stitch Packages
 import com.mongodb.stitch.android.core.Stitch;
 import com.mongodb.stitch.android.core.StitchAppClient;
-// Stitch Authentication Packages
-import com.mongodb.stitch.android.core.auth.StitchUser;
-import com.mongodb.stitch.core.auth.providers.anonymous.AnonymousCredential;
-// MongoDB Service Packages
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoCollection;
-// Utility Packages
-import com.mongodb.stitch.core.internal.common.BsonUtils;
 
 import org.bson.Document;
 

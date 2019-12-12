@@ -203,7 +203,6 @@ public class PlayActivity extends Activity {
                     moveNum.setText(String.format("%d", moveInt));
                     moveNum.invalidate();
                     //TODO fix the timer after winning
-                    //This works except the timer is broken
                     if(isWin) {
                         restartText.setVisibility(View.INVISIBLE);
                         challengeText.setVisibility(View.INVISIBLE);
@@ -236,8 +235,6 @@ public class PlayActivity extends Activity {
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.main_menu:
-                                //Intent intent = new Intent(PlayActivity.this, MenuActivity.class);
-                                //startActivity(intent);
                                 finish();
                                 return true;
 
@@ -439,8 +436,8 @@ public class PlayActivity extends Activity {
     }
 
     protected void setupBoard(final GridLayout playSpace, int w, int h,Bitmap bm){
-        width = w; //getIntent().getIntExtra("WIDTH", 3);
-        height = h; //getIntent().getIntExtra("HEIGHT", 3);
+        width = w;
+        height = h;
         setupBoard(playSpace,width,height);
     }
     protected void scrambleBoard(){
@@ -487,7 +484,6 @@ public class PlayActivity extends Activity {
                     GridLayout.Spec col = GridLayout.spec(x, 1);
                     GridLayout.LayoutParams boardRules = new GridLayout.LayoutParams(row, col);
                     boardRules.setMargins(2,2,2,2);
-                    //boardRules.setGravity(Gravity.FILL);
                     pieces[i] = new ImageView(this);
                     pieces[i].setOnClickListener(new PieceListener(i));
                     if(i != currentBoard.getBlankIndex())
@@ -498,7 +494,6 @@ public class PlayActivity extends Activity {
             }
             ////// end test //////
 
-            //this.timerTick.start();
         }
         catch(Exception e)
         {

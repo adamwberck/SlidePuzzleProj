@@ -63,10 +63,6 @@ public class Solver extends AsyncTask<Void,Void,List<PuzzleBoard.Direction>>{
             PuzzleBoard.Direction backDir =  calcBackDir(currentBoard.dir);
             for (PuzzleBoard.Direction d : dirs) {
                 if(d!=backDir) {
-                    /*
-                    SolveBoard neighborBoard = currentBoard.clone();//clone the current board
-                    neighborBoard.slideBlank(d);//slide in direction
-                    */
                     SolveBoard neighborBoard = getBoard(currentBoard,d);
                     int tentative_gScore = currentBoard.gScore + 1;
                     if( tentative_gScore < neighborBoard.gScore || neighborBoard.gScore<0){
