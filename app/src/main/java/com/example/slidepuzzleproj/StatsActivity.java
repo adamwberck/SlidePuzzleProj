@@ -44,9 +44,6 @@ public class StatsActivity extends Activity {
         arrHeightMin = stats.getMinBoardHeight();
         arrHeightMax = stats.getMaxBoardHeight();
 
-        //Toast.makeText(StatsActivity.this, "Loaded stat " + stats.getBoardHeight(), Toast.LENGTH_LONG).show();
-
-
         /// the view containing list of stats types
         statList = findViewById(R.id.stats_list);
 
@@ -100,8 +97,6 @@ public class StatsActivity extends Activity {
                 /////// add an entry to the linear list for each board stats
                 if(stats.getBoardNumGames(adjX, adjY) > 0) {
                     Button but = new Button(this);
-                    //but.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                    //        LinearLayout.LayoutParams.WRAP_CONTENT));
                     but.setText((adjX) + "x" + (adjY));
                     but.setBackground(getResources().getDrawable(R.drawable.back_border));
                     but.setTypeface(but.getTypeface(), Typeface.BOLD);
@@ -127,9 +122,7 @@ public class StatsActivity extends Activity {
                     os.close();
                     fos.close();
                     finish();
-                    //Toast.makeText(MenuActivity.this, "CREATED A NEW SAVE " + savePath, Toast.LENGTH_LONG).show();
                 }catch(Exception e){
-                    //Log.i("BAD STATS WRITER", e.getMessage() + " | " + e.getCause());
                     Toast.makeText(StatsActivity.this, "ERROR SAVE " + e.getMessage(), Toast.LENGTH_LONG).show();
                 }
             }
@@ -142,8 +135,6 @@ public class StatsActivity extends Activity {
                 finish();
             }
         });
-
-        //Toast.makeText(StatsActivity.this, "Done stat", Toast.LENGTH_LONG).show();
 
     }
 
@@ -166,7 +157,6 @@ public class StatsActivity extends Activity {
 
 
             Intent intStats = new Intent(StatsActivity.this, StatsEntryActivity.class);
-            //Toast.makeText(StatsActivity.this, "I did it", Toast.LENGTH_LONG).show();
 
             int numGames = stats.getBoardNumGames(adjWidth, adjHeight);
             int numMoves = stats.getBoardNumMoves(adjWidth, adjHeight);

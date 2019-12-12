@@ -64,10 +64,6 @@ public class Solver extends AsyncTask<Void,Void,List<PuzzleBoard.Direction>>{
             PuzzleBoard.Direction backDir =  calcBackDir(currentBoard.dir);
             for (PuzzleBoard.Direction d : dirs) {
                 if(d!=backDir) {
-                    /*
-                    SolveBoard neighborBoard = currentBoard.clone();//clone the current board
-                    neighborBoard.slideBlank(d);//slide in direction
-                    */
                     SolveBoard neighborBoard = getBoard(currentBoard,d);
                     int tentative_gScore = currentBoard.gScore + 1;
                     if( tentative_gScore < neighborBoard.gScore || neighborBoard.gScore<0){
@@ -76,8 +72,7 @@ public class Solver extends AsyncTask<Void,Void,List<PuzzleBoard.Direction>>{
                         neighborBoard.gScore = tentative_gScore;
                         neighborBoard.dir = d;
                         int mDist =  manhattanDist(neighborBoard);
-                        //int lin = linearConflicts(neighborBoard);
-                        neighborBoard.number = tentative_gScore+mDist;//+lin*2;
+                        neighborBoard.number = tentative_gScore+mDist;
                         if(!mQueue.contains(neighborBoard)){
                             mQueue.add(neighborBoard);
                         }
@@ -108,37 +103,6 @@ public class Solver extends AsyncTask<Void,Void,List<PuzzleBoard.Direction>>{
             }
         }
         return board;
-    }
-
-    private int linearConflicts(SolveBoard board){
-        int conflicts = 0;
-        //check rows
-        for(int r=0;r<h;r++) {
-            for (int i = 0; i < w; i++) {
-                for (int j = i + 1; j < w; j++) {
-                    if(board.pieces[i+r*w].goalPos/w == r) {
-                        if (board.pieces[i + r * w].goalPos / w == board.pieces[j + r * w].goalPos / w  //are supposed be on this line
-                                && board.pieces[i + r * w].goalPos > board.pieces[j + r * w].goalPos) {//are in the wrong order
-                            conflicts++;
-                        }
-                    }
-                }
-            }
-        }
-        //check column
-        for(int r=0;r<w;r++) {
-            for (int i = 0; i < h; i++) {
-                for (int j = i + 1; j < h; j++) {
-                    if(board.pieces[i*w+r].goalPos%w == r) {
-                        if (board.pieces[i * w + r].goalPos / w == board.pieces[j * w + r].goalPos / w  //are supposed be on this line
-                                && board.pieces[i * w + r].goalPos > board.pieces[j * w + r].goalPos) {//are in the wrong order
-                            conflicts++;
-                        }
-                    }
-                }
-            }
-        }
-        return conflicts;
     }
 
     private List<PuzzleBoard.Direction> reconstructPath(Map<SolveBoard,SolveBoard> cameFrom, SolveBoard current){
